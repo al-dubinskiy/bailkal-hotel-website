@@ -164,11 +164,6 @@ interface IRoomTypeState {
     error: any;
     isLoading: boolean;
   };
-  getPaymentMethod: {
-    successMessage: string | null;
-    error: any;
-    isLoading: boolean;
-  };
   createPaymentMethod: {
     successMessage: string | null;
     error: any;
@@ -190,11 +185,6 @@ interface IRoomTypeState {
 const initialState: IRoomTypeState = {
   paymentMethods: null,
   getPaymentMethods: {
-    successMessage: null,
-    error: null,
-    isLoading: false,
-  },
-  getPaymentMethod: {
     successMessage: null,
     error: null,
     isLoading: false,

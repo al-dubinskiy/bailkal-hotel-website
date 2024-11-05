@@ -1,0 +1,4 @@
+{
+    "port": 5000,
+    "mongoUri": "mongodb+srv://al_dubinskiy:Alex_1260@baikal-hotel-website-cl.dtl3i.mongodb.net/?retryWrites=true&w=majority&appName=baikal-hotel-website-cluster"
+}

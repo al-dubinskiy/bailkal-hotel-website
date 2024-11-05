@@ -149,11 +149,6 @@ interface IRoomTypeState {
     error: any;
     isLoading: boolean;
   };
-  getRoomCategory: {
-    successMessage: string | null;
-    error: any;
-    isLoading: boolean;
-  };
   createRoomCategory: {
     successMessage: string | null;
     error: any;
@@ -175,11 +170,6 @@ interface IRoomTypeState {
 const initialState: IRoomTypeState = {
   roomsCategories: null,
   getRoomsCategories: {
-    successMessage: null,
-    error: null,
-    isLoading: false,
-  },
-  getRoomCategory: {
     successMessage: null,
     error: null,
     isLoading: false,

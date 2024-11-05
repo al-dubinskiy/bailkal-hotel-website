@@ -1,6 +1,6 @@
 // Local
 export type CreateRoomType = {
-  number: string;
+  number: number;
 };
 
 export type RoomType = CreateRoomType & {

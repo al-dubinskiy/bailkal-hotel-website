@@ -164,11 +164,6 @@ interface IRoomTypeState {
     error: any;
     isLoading: boolean;
   };
-  getBookingService: {
-    successMessage: string | null;
-    error: any;
-    isLoading: boolean;
-  };
   createBookingService: {
     successMessage: string | null;
     error: any;
@@ -190,11 +185,6 @@ interface IRoomTypeState {
 const initialState: IRoomTypeState = {
   bookingServices: null,
   getBookingServices: {
-    successMessage: null,
-    error: null,
-    isLoading: false,
-  },
-  getBookingService: {
     successMessage: null,
     error: null,
     isLoading: false,

@@ -5,18 +5,23 @@ import { roomsSlice } from "./slices/Rooms/roomsSlice";
 import { bookingTariffsSlice } from "./slices/BookingTariffs/bookingTariffsSlice";
 import { bookingServicesSlice } from "./slices/BookingServices/bookingServicesSlice";
 import { paymentMethodsSlice } from "./slices/PaymentMethods/paymentMethodsSlice";
-import { transfersSlice } from "./slices/Transfers/transfersSlice";
-import { bedTypesSlice } from "./slices/BedTypes/bedTypesSlice";
+import { transfersVariantsSlice } from "./slices/TransferVariants/transferVariantsSlice";
+import { roomBedTypesSlice } from "./slices/RoomBedTypes/roomBedTypesSlice";
+import { viewsFromRoomWindowSlice } from "./slices/ViewsFromRoomWindow/viewsFromRoomWindow";
+import { useDispatch } from "react-redux";
 
 export const store = configureStore({
   reducer: {
     bookings: bookingsSlice.reducer,
     roomsCategories: roomsCategoriesSlice.reducer,
     rooms: roomsSlice.reducer,
-    bedTypes: bedTypesSlice.reducer,
+    bedTypes: roomBedTypesSlice.reducer,
+    viewsFromRoomWindow: viewsFromRoomWindowSlice.reducer,
     bookingTariffs: bookingTariffsSlice.reducer,
     bookingServices: bookingServicesSlice.reducer,
     paymentMethods: paymentMethodsSlice.reducer,
-    transfersSlice: transfersSlice.reducer,
+    transfersVariants: transfersVariantsSlice.reducer,
   },
 });
+
+export const useAppDispatch = () => useDispatch<typeof store.dispatch>();

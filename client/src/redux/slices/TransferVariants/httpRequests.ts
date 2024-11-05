@@ -1,15 +1,15 @@
 import { RequestTypeHTTP } from "../../types";
 
-export const getViewsFromWindow: RequestTypeHTTP = {
-  url: "/api/viewsFromWindow",
+export const getTransferVariants: RequestTypeHTTP = {
+  url: "/api/transferVariants",
   method: "GET",
   headers: {
     Accept: "application/json",
   },
 };
 
-export const createViewFromWindow: RequestTypeHTTP = {
-  url: "/api/viewsFromWindow",
+export const createTransferVariant: RequestTypeHTTP = {
+  url: "/api/transferVariants",
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -17,8 +17,8 @@ export const createViewFromWindow: RequestTypeHTTP = {
   },
 };
 
-export const updateViewFromWindow: RequestTypeHTTP = {
-  url: "/api/viewsFromWindow",
+export const updateTransferVariant: RequestTypeHTTP = {
+  url: "/api/transferVariants",
   method: "PUT" /* .../{id} */,
   headers: {
     "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export const updateViewFromWindow: RequestTypeHTTP = {
   },
 };
 
-export const deleteViewFromWindow: RequestTypeHTTP = {
-  url: "/api/viewsFromWindow",
+export const deleteTransferVariant: RequestTypeHTTP = {
+  url: "/api/transferVariants",
   method: "DELETE" /* .../{id} */,
 };
