@@ -6,7 +6,7 @@ import { bookingTariffsSlice } from "./slices/BookingTariffs/bookingTariffsSlice
 import { bookingServicesSlice } from "./slices/BookingServices/bookingServicesSlice";
 import { paymentMethodsSlice } from "./slices/PaymentMethods/paymentMethodsSlice";
 import { transfersVariantsSlice } from "./slices/TransferVariants/transferVariantsSlice";
-import { roomBedTypesSlice } from "./slices/RoomBedTypes/roomBedTypesSlice";
+import { roomBedVariantsSlice } from "./slices/RoomBedVariants/roomBedVariantsSlice";
 import { viewsFromRoomWindowSlice } from "./slices/ViewsFromRoomWindow/viewsFromRoomWindow";
 import { useDispatch } from "react-redux";
 
@@ -15,7 +15,7 @@ export const store = configureStore({
     bookings: bookingsSlice.reducer,
     roomsCategories: roomsCategoriesSlice.reducer,
     rooms: roomsSlice.reducer,
-    bedTypes: roomBedTypesSlice.reducer,
+    roomBedVariants: roomBedVariantsSlice.reducer,
     viewsFromRoomWindow: viewsFromRoomWindowSlice.reducer,
     bookingTariffs: bookingTariffsSlice.reducer,
     bookingServices: bookingServicesSlice.reducer,

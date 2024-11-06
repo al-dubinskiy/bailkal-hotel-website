@@ -1,7 +1,9 @@
 // Local
 export type CreateTransferVariantType = {
-  title: string;
-  description: number;
+  from_hotel: boolean;
+  to_hotel: boolean;
+  price: number;
+  car_id: Boolean;
 };
 
 export type UpdateTransferVariantType = CreateTransferVariantType;

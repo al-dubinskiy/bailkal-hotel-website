@@ -7,7 +7,7 @@ router.get("/", async (reg, res) => {
   try {
   } catch (e) {
     res.status(500).json({
-      message: "Get rooms сategories: статус 500. Ошибка сервера.",
+      error: "Get rooms сategories: статус 500. Ошибка сервера.",
     });
   }
 });
@@ -25,7 +25,7 @@ router.post("/", async (reg, res) => {
     });
   } catch (e) {
     res.status(500).json({
-      message: "Create rooms сategory: статус 500. Ошибка сервера.",
+      error: "Create rooms сategory: статус 500. Ошибка сервера.",
     });
   }
 });
@@ -35,7 +35,7 @@ router.put("/:id", async (reg, res) => {
   try {
   } catch (e) {
     res.status(500).json({
-      message: "Update room сategory: статус 500. Ошибка сервера.",
+      error: "Update room сategory: статус 500. Ошибка сервера.",
     });
   }
 });
@@ -45,7 +45,7 @@ router.delete("/:id", async (reg, res) => {
   try {
   } catch (e) {
     res.status(500).json({
-      message: "Delete room сategory: статус 500. Ошибка сервера.",
+      error: "Delete room сategory: статус 500. Ошибка сервера.",
     });
   }
 });

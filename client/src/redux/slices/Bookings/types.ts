@@ -15,9 +15,10 @@ export type CreateBookingType = {
   tariff_id: number;
   service_id: number[];
   payment_method_id: number;
-  bed_type_id: number;
-  view_from_window_id: number;
-  transfer_id: number;
+  bed_type_id?: number;
+  view_from_window_id?: number;
+  transfer_id?: number;
+  transfer_comment?: string;
   price: number;
 };
 

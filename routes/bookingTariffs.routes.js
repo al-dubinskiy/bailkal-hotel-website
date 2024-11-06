@@ -1,23 +1,34 @@
 const { Router } = require("express");
 const BookingTariff = require("../models/BookingTariff");
+const moment = require("moment");
 const router = Router();
 
 // Get booking tariffs
-router.get("/", async (reg, res) => {
+router.get("/", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({
-      message: "Get booking tariffs: статус 500. Ошибка сервера.",
+      error: "Get booking tariffs: статус 500. Ошибка сервера.",
     });
   }
 });
 
 // Create booking tariff
-router.post("/", async (reg, res) => {
+router.post("/", async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
-    const bookingTariff = new BookingTariff(data);
+    const existingRecord = await BookingTariff.findOne({ title: data.title });
+    if (existingRecord) {
+      return res.status(409).json({
+        error:
+          "Create booking tariff: статус 409. Такая запись уже существует.",
+      });
+    }
+    const bookingTariff = new BookingTariff({
+      ...data,
+      created_at: moment().format("YYYY-MM-DD HH:mm"),
+      updated_at: moment().format("YYYY-MM-DD HH:mm"),
+    });
     await bookingTariff.save();
     res.status(201).json({
       message:
@@ -25,27 +36,27 @@ router.post("/", async (reg, res) => {
     });
   } catch (e) {
     res.status(500).json({
-      message: "Create booking tariff: статус 500. Ошибка сервера.",
+      error: "Create booking tariff: статус 500. Ошибка сервера.",
     });
   }
 });
 
 // Update booking tariff
-router.put("/:id", async (reg, res) => {
+router.put("/:id", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({
-      message: "Update booking tariff: статус 500. Ошибка сервера.",
+      error: "Update booking tariff: статус 500. Ошибка сервера.",
     });
   }
 });
 
 // Delete booking tariff
-router.delete("/:id", async (reg, res) => {
+router.delete("/:id", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({
-      message: "Delete booking tariff: статус 500. Ошибка сервера.",
+      error: "Delete booking tariff: статус 500. Ошибка сервера.",
     });
   }
 });

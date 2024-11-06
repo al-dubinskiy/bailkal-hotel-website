@@ -7,7 +7,7 @@ router.get("/", async (reg, res) => {
   try {
   } catch (e) {
     res.status(500).json({
-      message: "Get bookings: статус 500. Ошибка сервера.",
+      error: "Get bookings: статус 500. Ошибка сервера.",
     });
   }
 });
@@ -24,7 +24,7 @@ router.post("/", async (reg, res) => {
     });
   } catch (e) {
     res.status(500).json({
-      message: "Create booking: статус 500. Ошибка сервера.",
+      error: "Create booking: статус 500. Ошибка сервера.",
     });
   }
 });
@@ -34,7 +34,7 @@ router.put("/:id", async (reg, res) => {
   try {
   } catch (e) {
     res.status(500).json({
-      message: "Update booking: статус 500. Ошибка сервера.",
+      error: "Update booking: статус 500. Ошибка сервера.",
     });
   }
 });
@@ -44,7 +44,7 @@ router.delete("/:id", async (reg, res) => {
   try {
   } catch (e) {
     res.status(500).json({
-      message: "Delete booking: статус 500. Ошибка сервера.",
+      error: "Delete booking: статус 500. Ошибка сервера.",
     });
   }
 });

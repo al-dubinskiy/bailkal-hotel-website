@@ -14,6 +14,7 @@ const themeOptions: ThemeOptions = {
       lg: 1024,
       xl: 1200,
       xxl: 1536,
+      xxxl: 1920,
     },
   },
   components: {
@@ -92,9 +93,7 @@ const themeOptions: ThemeOptions = {
   },
 };
 
-let darkTheme = createTheme(themeOptions);
-darkTheme = responsiveFontSizes(darkTheme);
-let lightTheme = createTheme(themeOptions);
-lightTheme = responsiveFontSizes(lightTheme);
+let theme = createTheme(themeOptions);
+theme = responsiveFontSizes(theme);
 
-export { darkTheme, lightTheme };
+export { theme };

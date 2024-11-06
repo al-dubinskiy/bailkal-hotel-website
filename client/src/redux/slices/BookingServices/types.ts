@@ -1,7 +1,11 @@
 // Local
 export type CreateBookingServiceType = {
   title: string;
+  description?: string;
   price: number;
+  isPricePerNight: boolean;
+  forGuestsNumber: string;
+  isCanOrderSeveral: boolean;
 };
 
 export type UpdateBookingServiceType = CreateBookingServiceType;

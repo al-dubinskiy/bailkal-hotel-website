@@ -1,7 +1,6 @@
 const { Schema, model, models } = require("mongoose");
 
 const schema = new Schema({
-  id: { type: Schema.Types.UUID, required: true, unique: true },
   room_id: { type: Schema.Types.UUID, required: true, unique: true },
   user: {
     name: { type: String, required: true },
@@ -29,7 +28,6 @@ const schema = new Schema({
   },
   bed_type_id: {
     type: Schema.Types.ObjectId,
-    required: true,
     ref: "RoomBedType",
   },
   view_from_window_id: {
@@ -42,6 +40,11 @@ const schema = new Schema({
     required: true,
     ref: "Transfer",
   },
+  transfer_id: {
+    type: Schema.Types.ObjectId,
+    ref: "Transfer",
+  },
+  transfer_comment: { type: String },
   price: { type: Number, required: true },
   created_at: { type: Date, required: true, default: Date.now() },
   updated_at: { type: Date, required: true, default: Date.now() },

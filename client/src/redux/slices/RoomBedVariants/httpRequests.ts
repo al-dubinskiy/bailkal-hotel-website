@@ -1,15 +1,15 @@
 import { RequestTypeHTTP } from "../../types";
 
-export const getRoomRoomBedTypes: RequestTypeHTTP = {
-  url: "/api/roomBedTypes",
+export const getRoomRoomBedVariants: RequestTypeHTTP = {
+  url: "/api/roomBedVariants",
   method: "GET",
   headers: {
     Accept: "application/json",
   },
 };
 
-export const createRoomBedType: RequestTypeHTTP = {
-  url: "/api/roomBedTypes",
+export const createRoomBedVariant: RequestTypeHTTP = {
+  url: "/api/roomBedVariants",
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -17,8 +17,8 @@ export const createRoomBedType: RequestTypeHTTP = {
   },
 };
 
-export const updateRoomBedType: RequestTypeHTTP = {
-  url: "/api/roomBedTypes",
+export const updateRoomBedVariant: RequestTypeHTTP = {
+  url: "/api/roomBedVariants",
   method: "PUT" /* .../{id} */,
   headers: {
     "Content-Type": "application/json",
@@ -26,7 +26,7 @@ export const updateRoomBedType: RequestTypeHTTP = {
   },
 };
 
-export const deleteRoomBedType: RequestTypeHTTP = {
-  url: "/api/roomBedTypes",
+export const deleteRoomBedVariant: RequestTypeHTTP = {
+  url: "/api/roomBedVariants",
   method: "DELETE" /* .../{id} */,
 };

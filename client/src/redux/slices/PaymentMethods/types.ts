@@ -2,6 +2,8 @@
 export type CreatePaymentMethodType = {
   title: string;
   description: number;
+  paymentSystems?: string[];
+  payment_then_caption?: string;
 };
 
 export type UpdatePaymentMethodType = CreatePaymentMethodType;

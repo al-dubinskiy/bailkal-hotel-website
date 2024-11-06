@@ -149,11 +149,6 @@ interface IBookingState {
     error: any;
     isLoading: boolean;
   };
-  getBooking: {
-    successMessage: string | null;
-    error: any;
-    isLoading: boolean;
-  };
   createBooking: {
     successMessage: string | null;
     error: any;
@@ -175,11 +170,6 @@ interface IBookingState {
 const initialState: IBookingState = {
   bookings: null,
   getBookings: {
-    successMessage: null,
-    error: null,
-    isLoading: false,
-  },
-  getBooking: {
     successMessage: null,
     error: null,
     isLoading: false,
