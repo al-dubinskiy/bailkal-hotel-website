@@ -3,8 +3,11 @@ export type CreateRoomCategoryType = {
   title: string;
   description: string;
   feature_id: number[];
-  price_per_night: number;
-  room_id: number[];
+  guests_capacity: number;
+  square: number;
+  room_id: [number];
+  price_per_night_for_one_quest: number;
+  price_per_night_for_two_quest: number;
 };
 
 export type UpdateRoomCategoryType = CreateRoomCategoryType;

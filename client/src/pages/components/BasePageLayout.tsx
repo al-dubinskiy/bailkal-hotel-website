@@ -11,7 +11,7 @@ const BasePageLayout = (props: Props) => {
   const { children } = props;
 
   return (
-    <Container maxWidth="xxxl">
+    <Container maxWidth="xl">
       <Header></Header>
       {children}
       <Footer></Footer>

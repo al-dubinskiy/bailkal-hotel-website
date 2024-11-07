@@ -1,9 +1,10 @@
 const { Router } = require("express");
 const RoomCategory = require("../models/RoomCategory");
+const moment = require("moment");
 const router = Router();
 
 // Get rooms сategories
-router.get("/", async (reg, res) => {
+router.get("/", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({
@@ -13,11 +14,20 @@ router.get("/", async (reg, res) => {
 });
 
 // Create room сategory
-router.post("/", async (reg, res) => {
+router.post("/", async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
-    const roomCategory = new RoomCategory(data);
+    const existingRecord = await RoomCategory.findOne({ title: data.title });
+    if (existingRecord) {
+      return res.status(409).json({
+        error: "Create room category: статус 409. Такая запись уже существует.",
+      });
+    }
+    const roomCategory = new RoomCategory({
+      ...data,
+      created_at: moment().format("YYYY-MM-DD HH:mm"),
+      updated_at: moment().format("YYYY-MM-DD HH:mm"),
+    });
     await roomCategory.save();
     res.status(201).json({
       message:
@@ -31,7 +41,7 @@ router.post("/", async (reg, res) => {
 });
 
 // Update room сategory
-router.put("/:id", async (reg, res) => {
+router.put("/:id", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({
@@ -41,7 +51,7 @@ router.put("/:id", async (reg, res) => {
 });
 
 // Delete room сategory
-router.delete("/:id", async (reg, res) => {
+router.delete("/:id", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({

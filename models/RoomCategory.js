@@ -7,7 +7,7 @@ const schema = new Schema({
     {
       type: Schema.Types.ObjectId,
       required: true,
-      ref: "BookingTariff",
+      ref: "RoomFeature",
     },
   ],
   room_id: [
@@ -17,7 +17,8 @@ const schema = new Schema({
       ref: "Room",
     },
   ],
-  price_per_night: { type: Number, required: true },
+  price_per_night_for_one_quest: { type: Number, required: true },
+  price_per_night_for_two_quest: { type: Number, required: true },
   created_at: { type: Date, required: true, default: Date.now() },
   updated_at: { type: Date, required: true, default: Date.now() },
 });

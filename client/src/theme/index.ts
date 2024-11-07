@@ -12,9 +12,8 @@ const themeOptions: ThemeOptions = {
       sm: 360,
       md: 768,
       lg: 1024,
-      xl: 1200,
+      xl: 1328, // 1650 (on Figma layout) for 1920, but for 1536 (current width screen) is 1328
       xxl: 1536,
-      xxxl: 1920,
     },
   },
   components: {

@@ -1,9 +1,10 @@
 const { Router } = require("express");
 const TransferCar = require("../models/TransferCar");
+const moment = require("moment");
 const router = Router();
 
 // Get transfer cars
-router.get("/", async (reg, res) => {
+router.get("/", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({
@@ -13,11 +14,23 @@ router.get("/", async (reg, res) => {
 });
 
 // Create transfer car
-router.post("/", async (reg, res) => {
+router.post("/", async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
-    const transferCar = new TransferCar(data);
+    const existingRecord = await TransferCar.findOne({
+      brand: data.brand,
+      model: data.model,
+    });
+    if (existingRecord) {
+      return res.status(409).json({
+        error: "Create transfer car: статус 409. Такая запись уже существует.",
+      });
+    }
+    const transferCar = new TransferCar({
+      ...data,
+      created_at: moment().format("YYYY-MM-DD HH:mm"),
+      updated_at: moment().format("YYYY-MM-DD HH:mm"),
+    });
     await transferCar.save();
     res.status(201).json({
       message:
@@ -31,7 +44,7 @@ router.post("/", async (reg, res) => {
 });
 
 // Update transfer car
-router.put("/:id", async (reg, res) => {
+router.put("/:id", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({
@@ -41,7 +54,7 @@ router.put("/:id", async (reg, res) => {
 });
 
 // Delete transfer car
-router.delete("/:id", async (reg, res) => {
+router.delete("/:id", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({

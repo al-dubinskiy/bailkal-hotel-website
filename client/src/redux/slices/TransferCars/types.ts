@@ -3,7 +3,6 @@ export type CreateTransferCarType = {
   brand: string;
   model: string;
   seats_number: number;
-  price: number;
   body_type: string;
 };
 

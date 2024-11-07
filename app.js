@@ -17,10 +17,7 @@ app.use(
   "/api/viewsFromRoomWindow",
   require("./routes/viewsFromRoomWindow.routes.js")
 );
-/*?*/ app.use(
-  "/api/bookingTariffs",
-  require("./routes/bookingTariffs.routes.js")
-);
+app.use("/api/bookingTariffs", require("./routes/bookingTariffs.routes.js"));
 app.use("/api/bookingServices", require("./routes/bookingServices.routes.js"));
 app.use("/api/paymentMethods", require("./routes/paymentMethods.routes.js"));
 app.use(

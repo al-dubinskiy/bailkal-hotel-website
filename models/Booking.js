@@ -1,7 +1,12 @@
 const { Schema, model, models } = require("mongoose");
 
 const schema = new Schema({
-  room_id: { type: Schema.Types.UUID, required: true, unique: true },
+  room_id: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    unique: true,
+    ref: "Room",
+  },
   user: {
     name: { type: String, required: true },
     lastname: { type: String, required: true },
@@ -31,7 +36,7 @@ const schema = new Schema({
     ref: "RoomBedType",
   },
   view_from_window_id: {
-    type: Schema.Types.UUID,
+    type: Schema.Types.ObjectId,
     required: true,
     ref: "RoomViewFromWindow",
   },

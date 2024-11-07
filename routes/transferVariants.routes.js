@@ -1,9 +1,10 @@
 const { Router } = require("express");
 const TransferVariant = require("../models/TransferVariant");
+const moment = require("moment");
 const router = Router();
 
 // Get transfer variants
-router.get("/", async (reg, res) => {
+router.get("/", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({
@@ -13,11 +14,21 @@ router.get("/", async (reg, res) => {
 });
 
 // Create transfer variant
-router.post("/", async (reg, res) => {
+router.post("/", async (req, res) => {
   try {
     const data = req.body;
-    console.log(data);
-    const transferVariant = new TransferVariant(data);
+    const existingRecord = await TransferVariant.findOne({ ...data });
+    if (existingRecord) {
+      return res.status(409).json({
+        error:
+          "Create booking service: статус 409. Такая запись уже существует.",
+      });
+    }
+    const transferVariant = new TransferVariant({
+      ...data,
+      created_at: moment().format("YYYY-MM-DD HH:mm"),
+      updated_at: moment().format("YYYY-MM-DD HH:mm"),
+    });
     await transferVariant.save();
     res.status(201).json({
       message:
@@ -31,7 +42,7 @@ router.post("/", async (reg, res) => {
 });
 
 // Update transfer variant
-router.put("/:id", async (reg, res) => {
+router.put("/:id", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({
@@ -41,7 +52,7 @@ router.put("/:id", async (reg, res) => {
 });
 
 // Delete transfer variant
-router.delete("/:id", async (reg, res) => {
+router.delete("/:id", async (req, res) => {
   try {
   } catch (e) {
     res.status(500).json({
