@@ -52,19 +52,6 @@ export const BookingPage = () => {
 
   useEffect(() => {}, []);
 
-  const updateBookingBaseInfo = ({
-    allCategoryRoomsIDs,
-    bookedCategoryRoomsIDs,
-  }: {
-    allCategoryRoomsIDs: string[];
-    bookedCategoryRoomsIDs: string[];
-  }) => {
-    addBookingBaseInfo({
-      allCategoryRoomsIDs,
-      bookedCategoryRoomsIDs,
-    });
-  };
-
   const addBookingBaseInfo = ({
     allCategoryRoomsIDs,
     bookedCategoryRoomsIDs,
@@ -113,9 +100,7 @@ export const BookingPage = () => {
       };
 
       if (!isMultiRoomBooking) setBookings((prev) => [newBooking]);
-
-      // if (!isMultiRoomBooking)
-      //   setBookingSteps((prev) => ["Select a room", "Select a tariff"]);
+      else setBookings((prev) => [...prev, newBooking]);
     }
   };
 
@@ -204,21 +189,13 @@ export const BookingPage = () => {
                 ) ? (
                   <Button
                     onClick={() =>
-                      bookings.length
-                        ? updateBookingBaseInfo({
-                            allCategoryRoomsIDs: roomCategory.room_id,
-                            bookedCategoryRoomsIDs: Array.from(
-                              roomCategory.booked_rooms,
-                              (i) => i.room_id
-                            ),
-                          })
-                        : addBookingBaseInfo({
-                            allCategoryRoomsIDs: roomCategory.room_id,
-                            bookedCategoryRoomsIDs: Array.from(
-                              roomCategory.booked_rooms,
-                              (i) => i.room_id
-                            ),
-                          })
+                      addBookingBaseInfo({
+                        allCategoryRoomsIDs: roomCategory.room_id,
+                        bookedCategoryRoomsIDs: Array.from(
+                          roomCategory.booked_rooms,
+                          (i) => i.room_id
+                        ),
+                      })
                     }
                   >
                     Выбрать
