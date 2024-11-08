@@ -125,7 +125,7 @@ export const DeleteBookingTariff = createAsyncThunk(
   "bookingTariffs/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -283,7 +283,7 @@ export const bookingTariffsSlice = createSlice({
     });
     builder.addCase(
       DeleteBookingTariff.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.updateBookingTariff.isLoading = false;
         if (state.bookingTariffs)
           state.bookingTariffs = state.bookingTariffs.filter(

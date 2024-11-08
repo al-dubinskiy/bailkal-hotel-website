@@ -125,7 +125,7 @@ export const DeletePaymentMethod = createAsyncThunk(
   "paymentMethods/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -283,7 +283,7 @@ export const paymentMethodsSlice = createSlice({
     });
     builder.addCase(
       DeletePaymentMethod.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.updatePaymentMethod.isLoading = false;
         if (state.paymentMethods)
           state.paymentMethods = state.paymentMethods.filter(

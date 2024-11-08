@@ -115,7 +115,7 @@ export const DeleteRoomCategory = createAsyncThunk(
   "roomsCategories/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -268,7 +268,7 @@ export const roomsCategoriesSlice = createSlice({
     });
     builder.addCase(
       DeleteRoomCategory.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.updateRoomCategory.isLoading = false;
         if (state.roomsCategories)
           state.roomsCategories = state.roomsCategories.filter(

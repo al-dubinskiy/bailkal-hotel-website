@@ -130,7 +130,7 @@ export const DeleteViewFromRoomWindow = createAsyncThunk(
   "viewsFromRoomWindow/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -301,7 +301,7 @@ export const viewsFromRoomWindowSlice = createSlice({
     });
     builder.addCase(
       DeleteViewFromRoomWindow.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.updateViewFromRoomWindow.isLoading = false;
         if (state.viewsFromRoomWindow)
           state.viewsFromRoomWindow = state.viewsFromRoomWindow.filter(

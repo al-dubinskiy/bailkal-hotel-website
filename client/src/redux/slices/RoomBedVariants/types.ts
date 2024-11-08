@@ -7,7 +7,7 @@ export type CreateRoomBedVariantType = {
 export type UpdateRoomBedVariantType = CreateRoomBedVariantType;
 
 export type RoomBedVariantType = CreateRoomBedVariantType & {
-  id: number;
+  id: string;
   created_at: string;
   updated_at: string;
 };
@@ -30,5 +30,5 @@ export type UpdateRoomBedVariantApiResponseType = {
 
 export type DeleteRoomBedVariantApiResponseType = {
   success: boolean;
-  id: number;
+  id: string;
 };

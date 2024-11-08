@@ -110,7 +110,7 @@ export const DeleteRoom = createAsyncThunk(
   "rooms/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -258,7 +258,7 @@ export const roomsSlice = createSlice({
     });
     builder.addCase(
       DeleteRoom.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.deleteRoom.isLoading = false;
 
         if (state.rooms)

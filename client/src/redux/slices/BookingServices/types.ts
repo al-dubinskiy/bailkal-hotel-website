@@ -11,7 +11,7 @@ export type CreateBookingServiceType = {
 export type UpdateBookingServiceType = CreateBookingServiceType;
 
 export type BookingServiceType = CreateBookingServiceType & {
-  id: number;
+  id: string;
   created_at: string;
   updated_at: string;
 };
@@ -34,5 +34,5 @@ export type UpdateBookingServiceApiResponseType = {
 
 export type DeleteBookingServiceApiResponseType = {
   success: boolean;
-  id: number;
+  id: string;
 };

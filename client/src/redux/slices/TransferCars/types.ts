@@ -9,7 +9,7 @@ export type CreateTransferCarType = {
 export type UpdateTransferCarType = CreateTransferCarType;
 
 export type TransferCarType = CreateTransferCarType & {
-  id: number;
+  id: string;
   created_at: string;
   updated_at: string;
 };
@@ -32,5 +32,5 @@ export type UpdateTransferCarApiResponseType = {
 
 export type DeleteTransferCarApiResponseType = {
   success: boolean;
-  id: number;
+  id: string;
 };

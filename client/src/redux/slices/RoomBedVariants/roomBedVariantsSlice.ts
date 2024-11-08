@@ -130,7 +130,7 @@ export const DeleteRoomBedVariant = createAsyncThunk(
   "roomBedVariants/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -301,7 +301,7 @@ export const roomBedVariantsSlice = createSlice({
     });
     builder.addCase(
       DeleteRoomBedVariant.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.updateRoomBedVariant.isLoading = false;
         if (state.roomBedVariants)
           state.roomBedVariants = state.roomBedVariants.filter(

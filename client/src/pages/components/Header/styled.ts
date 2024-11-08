@@ -1,9 +1,7 @@
-import React from "react";
-import { Stack, Theme, useTheme } from "@mui/material";
 import Slider, { SliderProps } from "@mui/material/Slider";
-import { alpha, styled } from "@mui/material/styles";
+import { styled } from "@mui/material/styles";
 
-const SuccessSlider = styled(Slider)<SliderProps>(({ theme }) => ({
+export const Container = styled(Slider)<SliderProps>(({ theme }) => ({
   width: 300,
   color: theme.palette.success.main,
   // "& .MuiSlider-thumb": {
@@ -15,17 +13,3 @@ const SuccessSlider = styled(Slider)<SliderProps>(({ theme }) => ({
   //   },
   // },
 }));
-
-interface Props {}
-
-export const Header = (props: Props) => {
-  const {} = props;
-
-  const theme = useTheme();
-
-  return (
-    <Stack>
-      <SuccessSlider defaultValue={30} />
-    </Stack>
-  );
-};

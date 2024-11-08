@@ -130,7 +130,7 @@ export const DeleteTransferVariant = createAsyncThunk(
   "transferVariants/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -298,7 +298,7 @@ export const transfersVariantsSlice = createSlice({
     });
     builder.addCase(
       DeleteTransferVariant.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.updateTransferVariant.isLoading = false;
         if (state.transferVariants)
           state.transferVariants = state.transferVariants.filter(

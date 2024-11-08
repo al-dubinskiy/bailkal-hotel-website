@@ -9,7 +9,7 @@ export type CreatePaymentMethodType = {
 export type UpdatePaymentMethodType = CreatePaymentMethodType;
 
 export type PaymentMethodType = CreatePaymentMethodType & {
-  id: number;
+  id: string;
   created_at: string;
   updated_at: string;
 };
@@ -32,5 +32,5 @@ export type UpdatePaymentMethodApiResponseType = {
 
 export type DeletePaymentMethodApiResponseType = {
   success: boolean;
-  id: number;
+  id: string;
 };

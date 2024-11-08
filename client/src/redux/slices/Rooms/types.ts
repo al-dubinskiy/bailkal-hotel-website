@@ -4,7 +4,7 @@ export type CreateRoomType = {
 };
 
 export type RoomType = CreateRoomType & {
-  id: number;
+  id: string;
   created_at: string;
   updated_at: string;
 };
@@ -29,5 +29,5 @@ export type UpdateRoomApiResponseType = {
 
 export type DeleteRoomApiResponseType = {
   success: boolean;
-  id: number;
+  id: string;
 };

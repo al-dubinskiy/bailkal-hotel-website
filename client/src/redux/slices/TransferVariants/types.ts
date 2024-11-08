@@ -5,13 +5,13 @@ export type CreateTransferVariantType = {
   time_from: number;
   time_to: number;
   price: number;
-  car_id: Boolean;
+  car_id: string;
 };
 
 export type UpdateTransferVariantType = CreateTransferVariantType;
 
 export type TransferVariantType = CreateTransferVariantType & {
-  id: number;
+  id: string;
   created_at: string;
   updated_at: string;
 };
@@ -34,5 +34,5 @@ export type UpdateTransferVariantApiResponseType = {
 
 export type DeleteTransferVariantApiResponseType = {
   success: boolean;
-  id: number;
+  id: string;
 };

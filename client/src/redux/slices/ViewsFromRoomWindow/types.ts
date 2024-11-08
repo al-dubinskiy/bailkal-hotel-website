@@ -7,7 +7,7 @@ export type CreateViewFromRoomWindowType = {
 export type UpdateViewFromRoomWindowType = CreateViewFromRoomWindowType;
 
 export type ViewFromRoomWindowType = CreateViewFromRoomWindowType & {
-  id: number;
+  id: string;
   created_at: string;
   updated_at: string;
 };
@@ -30,5 +30,5 @@ export type UpdateViewFromRoomWindowApiResponseType = {
 
 export type DeleteViewFromRoomWindowApiResponseType = {
   success: boolean;
-  id: number;
+  id: string;
 };

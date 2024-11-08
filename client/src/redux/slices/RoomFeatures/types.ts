@@ -5,7 +5,7 @@ export type CreateRoomFeatureType = {
 };
 
 export type RoomFeatureType = CreateRoomFeatureType & {
-  id: number;
+  id: string;
   created_at: string;
   updated_at: string;
 };
@@ -30,5 +30,5 @@ export type UpdateRoomFeatureApiResponseType = {
 
 export type DeleteRoomFeatureApiResponseType = {
   success: boolean;
-  id: number;
+  id: string;
 };

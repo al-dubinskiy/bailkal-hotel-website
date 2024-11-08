@@ -115,7 +115,7 @@ export const DeleteTransferCar = createAsyncThunk(
   "transferCars/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -270,7 +270,7 @@ export const transfersVariantsSlice = createSlice({
     });
     builder.addCase(
       DeleteTransferCar.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.updateTransferCar.isLoading = false;
         if (state.transferCars)
           state.transferCars = state.transferCars.filter(
