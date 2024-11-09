@@ -39,6 +39,7 @@
     "@mui/styles": "^6.1.6",
     "config": "^3.3.12",
     "express": "^4.21.1",
+    "http-proxy-middleware": "^3.0.3",
     "moment": "^2.30.1",
     "mongoose": "^8.8.0"
   },

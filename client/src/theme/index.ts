@@ -1,8 +1,8 @@
 import { ThemeOptions, createTheme, responsiveFontSizes } from "@mui/material";
-import { palette } from "./palette";
 
 import { fontFaceOverrides } from "./fonts";
 import { typography } from "./typography";
+import { palette } from "./palette";
 
 const themeOptions: ThemeOptions = {
   typography,
@@ -12,8 +12,8 @@ const themeOptions: ThemeOptions = {
       sm: 360,
       md: 768,
       lg: 1024,
-      xl: 1328, // 1650 (on Figma layout) for 1920, but for 1536 (current width screen) is 1328
-      xxl: 1536,
+      xl: 1320, // 1650 (on Figma layout) for 1920, but for 1536 (current width screen) is 1328
+      xxl: 1536, // 1650 (on Figma layout) for 1920, but for 1536 (current width screen) is 1328
     },
   },
   components: {
@@ -35,23 +35,39 @@ const themeOptions: ThemeOptions = {
     MuiButton: {
       variants: [
         {
-          props: { variant: "contained", size: "medium" },
+          props: { variant: "contained", size: "medium", color: "buttonDark" },
           style: {
-            height: 65,
-            borderRadius: "10px",
-            padding: "18px 42px",
+            height: 50,
+            borderRadius: "8px",
+            padding: "16.5px 33.6px",
             background: "#2F70D9",
             color: "#ffffff",
+            fontFamily: "Raleway",
+            fontSize: "16px",
+            lineHeight: 1,
+            fontWeight: 500,
+            letterSpacing: "4%",
+            textTransform: "capitalize",
           },
         },
         {
-          props: { variant: "contained", size: "medium" },
+          props: {
+            variant: "contained",
+            size: "medium",
+            color: "buttonLight",
+          },
           style: {
-            height: 65,
-            borderRadius: "10px",
-            padding: "18px 42px",
+            height: 50,
+            borderRadius: "8px",
+            padding: "16.5px 33.6px",
             background: "#DAE8FF",
             color: "#1a1a1a",
+            fontFamily: "Raleway",
+            fontSize: "16px",
+            lineHeight: 1,
+            fontWeight: 500,
+            letterSpacing: "4%",
+            textTransform: "capitalize",
           },
         },
         {
@@ -59,21 +75,18 @@ const themeOptions: ThemeOptions = {
           style: {
             border: "1px solid #173236",
             style: {
-              height: 65,
+              height: 50,
               borderRadius: "10px",
-              padding: "18px 42px",
+              padding: "16.5px 33.6px",
               background: "#ffffff",
               color: "#1a1a1a",
+              fontFamily: "Raleway",
+              fontSize: "16px",
+              lineHeight: 1,
+              fontWeight: 500,
+              letterSpacing: "4%",
+              textTransform: "capitalize",
             },
-          },
-        },
-        {
-          props: { variant: "text" },
-          style: {
-            fontSize: "20px",
-            lineHeight: 1,
-            fontWeight: 400,
-            letterSpacing: "4%",
           },
         },
       ],

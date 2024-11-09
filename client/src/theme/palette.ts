@@ -31,4 +31,7 @@ export const palette: PaletteOptions = {
     light: "#ffffff",
     dark: "#1a1a1a",
   },
+  gray: {
+    dark: "#1a1a1a",
+  },
 };

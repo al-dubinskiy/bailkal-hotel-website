@@ -14,8 +14,8 @@ function App() {
   return (
     <Provider store={store}>
       <ThemeProvider theme={theme}>
+        <CssBaseline />
         <StyledEngineProvider injectFirst>
-          <CssBaseline />
           <Router>
             <Routes />
           </Router>

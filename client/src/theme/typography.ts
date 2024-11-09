@@ -1,43 +1,58 @@
 import { TypographyOptions } from "@mui/material/styles/createTypography";
+import { theme } from ".";
 
 export const typography: TypographyOptions = {
   h1: {
     fontFamily: "CormorantInfant",
-    fontSize: "100px",
+    fontSize: "80px",
     fontWeight: 400,
     lineHeight: 1.08,
     letterSpacing: "0%",
   },
   h2: {
     fontFamily: "CormorantInfant",
-    fontSize: "86px",
+    fontSize: "68.8px",
     fontWeight: 400,
     lineHeight: 1.08,
     letterSpacing: "0%",
   },
   h3: {
     fontFamily: "CormorantInfant",
-    fontSize: "50px",
+    fontSize: "48.8px",
+    fontWeight: 400,
+    lineHeight: 1.08,
+    letterSpacing: "0%",
+  },
+  h4: {
+    fontFamily: "CormorantInfant",
+    fontSize: "40px",
     fontWeight: 400,
     lineHeight: 1.08,
     letterSpacing: "0%",
   },
   intro: {
     fontFamily: "CormorantInfant",
-    fontSize: "50px",
+    fontSize: "40px",
     fontWeight: 400,
+    lineHeight: 1.5,
+    letterSpacing: "4%",
+  },
+  label: {
+    fontFamily: "Raleway",
+    fontSize: "16px",
+    fontWeight: 500,
     lineHeight: 1.5,
     letterSpacing: "4%",
   },
   body: {
     fontFamily: "Raleway",
-    fontSize: "20px",
+    fontSize: "16px",
     lineHeight: 1.5,
     letterSpacing: "4%",
   },
   small: {
     fontFamily: "Raleway",
-    fontSize: "16px",
+    fontSize: "12.8px",
     fontWeight: 400,
     lineHeight: 1.5,
     letterSpacing: "4%",

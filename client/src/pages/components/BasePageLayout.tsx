@@ -11,7 +11,15 @@ const BasePageLayout = (props: Props) => {
   const { children } = props;
 
   return (
-    <Container maxWidth="xl">
+    <Container
+      maxWidth="xl"
+      sx={{
+        "&.MuiContainer-root": {
+          paddingLeft: 0,
+          paddingRight: 0,
+        },
+      }}
+    >
       <Header></Header>
       {children}
       <Footer></Footer>
