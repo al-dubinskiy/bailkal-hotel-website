@@ -1,28 +1,31 @@
 // Local
+export type BookingUserInfoType = {
+  name: string;
+  lastname: string;
+  surname: string;
+  phone: string;
+  email: string;
+};
+
 export type CreateBookingType = {
-  room_id: number;
-  user: {
-    name: string;
-    lastname: string;
-    surname: string;
-    phone: string;
-    email: string;
-  };
+  room_id: string;
+  user: BookingUserInfoType;
   adults_count: number;
   children_count: number;
   arrival_datetime: string;
   departure_datetime: string;
-  tariff_id: number;
-  service_id: number[];
-  payment_method_id: number;
-  bed_type_id: number;
-  view_from_window_id: number;
-  transfer_id: number;
+  tariff_id: string;
+  service_id: string[];
+  bed_type_id?: string;
+  view_from_window_id?: string;
+  payment_method_id: string;
+  transfer_id?: string;
+  transfer_comment?: string;
   price: number;
 };
 
 export type BookingType = CreateBookingType & {
-  id: number;
+  id: string;
   created_at: string;
   updated_at: string;
 };
@@ -47,5 +50,5 @@ export type UpdateBookingApiResponseType = {
 
 export type DeleteBookingApiResponseType = {
   success: boolean;
-  id: number;
+  id: string;
 };

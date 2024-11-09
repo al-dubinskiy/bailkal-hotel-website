@@ -125,7 +125,7 @@ export const DeletePaymentMethod = createAsyncThunk(
   "paymentMethods/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -164,11 +164,6 @@ interface IRoomTypeState {
     error: any;
     isLoading: boolean;
   };
-  getPaymentMethod: {
-    successMessage: string | null;
-    error: any;
-    isLoading: boolean;
-  };
   createPaymentMethod: {
     successMessage: string | null;
     error: any;
@@ -190,11 +185,6 @@ interface IRoomTypeState {
 const initialState: IRoomTypeState = {
   paymentMethods: null,
   getPaymentMethods: {
-    successMessage: null,
-    error: null,
-    isLoading: false,
-  },
-  getPaymentMethod: {
     successMessage: null,
     error: null,
     isLoading: false,
@@ -293,7 +283,7 @@ export const paymentMethodsSlice = createSlice({
     });
     builder.addCase(
       DeletePaymentMethod.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.updatePaymentMethod.isLoading = false;
         if (state.paymentMethods)
           state.paymentMethods = state.paymentMethods.filter(

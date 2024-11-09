@@ -110,7 +110,7 @@ export const DeleteRoom = createAsyncThunk(
   "rooms/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -144,11 +144,6 @@ interface IRoomState {
     error: any;
     isLoading: boolean;
   };
-  getRoom: {
-    successMessage: string | null;
-    error: any;
-    isLoading: boolean;
-  };
   createRoom: {
     successMessage: string | null;
     error: any;
@@ -170,11 +165,6 @@ interface IRoomState {
 const initialState: IRoomState = {
   rooms: null,
   getRooms: {
-    successMessage: null,
-    error: null,
-    isLoading: false,
-  },
-  getRoom: {
     successMessage: null,
     error: null,
     isLoading: false,
@@ -206,7 +196,7 @@ export const roomsSlice = createSlice({
     builder.addCase(
       GetRooms.fulfilled,
       (state, { payload }: { payload: GetRoomsApiResponseType }) => {
-        state.getRoom.isLoading = false;
+        state.getRooms.isLoading = false;
         const rooms = payload.data;
         state.rooms = rooms;
 
@@ -268,7 +258,7 @@ export const roomsSlice = createSlice({
     });
     builder.addCase(
       DeleteRoom.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.deleteRoom.isLoading = false;
 
         if (state.rooms)

@@ -1,14 +1,26 @@
 import React from "react";
 import { Provider } from "react-redux";
-import ThemeConfig from "./theme/ThemeConfig";
+import { BrowserRouter as Router } from "react-router-dom";
 import { store } from "./redux/store";
+import { Routes } from "./Routes";
+import {
+  CssBaseline,
+  StyledEngineProvider,
+  ThemeProvider,
+} from "@mui/material";
+import { theme } from "./theme";
 
 function App() {
   return (
     <Provider store={store}>
-      <ThemeConfig>
-        <div>123</div>
-      </ThemeConfig>
+      <ThemeProvider theme={theme}>
+        <StyledEngineProvider injectFirst>
+          <CssBaseline />
+          <Router>
+            <Routes />
+          </Router>
+        </StyledEngineProvider>
+      </ThemeProvider>
     </Provider>
   );
 }

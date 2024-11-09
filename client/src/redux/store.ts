@@ -5,18 +5,26 @@ import { roomsSlice } from "./slices/Rooms/roomsSlice";
 import { bookingTariffsSlice } from "./slices/BookingTariffs/bookingTariffsSlice";
 import { bookingServicesSlice } from "./slices/BookingServices/bookingServicesSlice";
 import { paymentMethodsSlice } from "./slices/PaymentMethods/paymentMethodsSlice";
-import { transfersSlice } from "./slices/Transfers/transfersSlice";
-import { bedTypesSlice } from "./slices/BedTypes/bedTypesSlice";
+import { transfersVariantsSlice } from "./slices/TransferVariants/transferVariantsSlice";
+import { roomBedVariantsSlice } from "./slices/RoomBedVariants/roomBedVariantsSlice";
+import { viewsFromRoomWindowSlice } from "./slices/ViewsFromRoomWindow/viewsFromRoomWindow";
+import { useDispatch } from "react-redux";
 
 export const store = configureStore({
   reducer: {
     bookings: bookingsSlice.reducer,
     roomsCategories: roomsCategoriesSlice.reducer,
     rooms: roomsSlice.reducer,
-    bedTypes: bedTypesSlice.reducer,
+    roomBedVariants: roomBedVariantsSlice.reducer,
+    viewsFromRoomWindow: viewsFromRoomWindowSlice.reducer,
     bookingTariffs: bookingTariffsSlice.reducer,
     bookingServices: bookingServicesSlice.reducer,
     paymentMethods: paymentMethodsSlice.reducer,
-    transfersSlice: transfersSlice.reducer,
+    transfersVariants: transfersVariantsSlice.reducer,
   },
 });
+
+// Infer the `RootState` and `AppDispatch` types from the store itself
+export type RootState = ReturnType<typeof store.getState>;
+// Inferred type: {posts: PostsState, comments: CommentsState, users: UsersState}
+export type AppDispatch = typeof store.dispatch;

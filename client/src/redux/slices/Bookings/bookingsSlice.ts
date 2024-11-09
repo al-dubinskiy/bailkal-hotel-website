@@ -115,7 +115,7 @@ export const DeleteBooking = createAsyncThunk(
   "bookings/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -149,11 +149,6 @@ interface IBookingState {
     error: any;
     isLoading: boolean;
   };
-  getBooking: {
-    successMessage: string | null;
-    error: any;
-    isLoading: boolean;
-  };
   createBooking: {
     successMessage: string | null;
     error: any;
@@ -175,11 +170,6 @@ interface IBookingState {
 const initialState: IBookingState = {
   bookings: null,
   getBookings: {
-    successMessage: null,
-    error: null,
-    isLoading: false,
-  },
-  getBooking: {
     successMessage: null,
     error: null,
     isLoading: false,
@@ -273,7 +263,7 @@ export const bookingsSlice = createSlice({
     });
     builder.addCase(
       DeleteBooking.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.updateBooking.isLoading = false;
         if (state.bookings)
           state.bookings = state.bookings.filter(

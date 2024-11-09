@@ -115,7 +115,7 @@ export const DeleteRoomCategory = createAsyncThunk(
   "roomsCategories/delete",
   async (
     payload: {
-      id: number;
+      id: string;
     },
     thunkAPI
   ) => {
@@ -149,11 +149,6 @@ interface IRoomTypeState {
     error: any;
     isLoading: boolean;
   };
-  getRoomCategory: {
-    successMessage: string | null;
-    error: any;
-    isLoading: boolean;
-  };
   createRoomCategory: {
     successMessage: string | null;
     error: any;
@@ -175,11 +170,6 @@ interface IRoomTypeState {
 const initialState: IRoomTypeState = {
   roomsCategories: null,
   getRoomsCategories: {
-    successMessage: null,
-    error: null,
-    isLoading: false,
-  },
-  getRoomCategory: {
     successMessage: null,
     error: null,
     isLoading: false,
@@ -278,7 +268,7 @@ export const roomsCategoriesSlice = createSlice({
     });
     builder.addCase(
       DeleteRoomCategory.fulfilled,
-      (state, { payload }: { payload: { id: number } }) => {
+      (state, { payload }: { payload: { id: string } }) => {
         state.updateRoomCategory.isLoading = false;
         if (state.roomsCategories)
           state.roomsCategories = state.roomsCategories.filter(

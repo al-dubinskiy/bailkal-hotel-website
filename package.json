@@ -2,10 +2,10 @@
   "name": "hotel_baikal_website",
   "version": "1.0.0",
   "description": "Official website of the \"Baikal\" hotel (which is located in the village of Listvyanka in the Irkutsk region, Russia)",
-  "main": "app.ts",
+  "main": "app.js",
   "scripts": {
-    "start": "node app.ts",
-    "server": "nodemon app.ts",
+    "start": "node app.js",
+    "server": "nodemon app.js",
     "client": "npm run start --prefix client",
     "dev": "concurrently \"npm run server\" \"npm run client\""
   },
@@ -35,10 +35,15 @@
   },
   "homepage": "https://github.com/al-dubinskiy/bailkal-hotel-website#readme",
   "dependencies": {
+    "@material-ui/core": "^4.12.4",
+    "@mui/styles": "^6.1.6",
+    "config": "^3.3.12",
     "express": "^4.21.1",
+    "moment": "^2.30.1",
     "mongoose": "^8.8.0"
   },
   "devDependencies": {
+    "@types/react-dom": "^18.3.1",
     "concurrently": "^9.0.1",
     "nodemon": "^3.1.7"
   }

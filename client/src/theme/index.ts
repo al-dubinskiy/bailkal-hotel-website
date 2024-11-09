@@ -1,10 +1,4 @@
-import {
-  PaletteOptions,
-  ThemeOptions,
-  Container,
-  createTheme,
-  responsiveFontSizes,
-} from "@mui/material";
+import { ThemeOptions, createTheme, responsiveFontSizes } from "@mui/material";
 import { palette } from "./palette";
 
 import { fontFaceOverrides } from "./fonts";
@@ -18,7 +12,7 @@ const themeOptions: ThemeOptions = {
       sm: 360,
       md: 768,
       lg: 1024,
-      xl: 1200,
+      xl: 1328, // 1650 (on Figma layout) for 1920, but for 1536 (current width screen) is 1328
       xxl: 1536,
     },
   },
@@ -98,9 +92,7 @@ const themeOptions: ThemeOptions = {
   },
 };
 
-let darkTheme = createTheme(themeOptions);
-darkTheme = responsiveFontSizes(darkTheme);
-let lightTheme = createTheme(themeOptions);
-lightTheme = responsiveFontSizes(lightTheme);
+let theme = createTheme(themeOptions);
+theme = responsiveFontSizes(theme);
 
-export { darkTheme, lightTheme };
+export { theme };
