@@ -9,10 +9,10 @@ import {
   Typography,
   useTheme,
 } from "@mui/material";
-import { Container } from "./styled";
-import { Nav } from "./Nav/Nav";
-import HotelLogo from "../../../assets/images/hotel_logo.png";
+import { Nav } from "./components/Nav/Nav";
+import HotelLogo from "../../../assets/images/hotel_logo_ru.png";
 import { theme } from "../../../theme";
+import { LocaleButton } from "./components/LocaleButton";
 
 interface Props {}
 
@@ -23,7 +23,6 @@ export const Header = (props: Props) => {
     <AppBar
       position="static"
       sx={{
-        marginTop: "24px",
         bgcolor: theme.palette.layoutBackground.light,
         boxShadow: "none",
         maxHeight: "50px",
@@ -43,13 +42,31 @@ export const Header = (props: Props) => {
           justifyContent="space-between"
           alignItems="center"
           width="100%"
+          gap={{ xs: "30px", lg: "40px" }}
         >
           <img height={"50px"} src={HotelLogo} />
-          <Nav />
 
-          <Button variant="contained" size="medium" color="buttonDark">
-            Забронировать
-          </Button>
+          <Stack flexDirection="row" alignItems={"center"} gap={"16px"}>
+            <Nav />
+
+            <LocaleButton />
+
+            <Button
+              variant="contained"
+              size="medium"
+              color="buttonDark"
+              sx={{
+                display: {
+                  xs: "none",
+                  sm_md: "initial",
+                },
+              }}
+            >
+              <Typography variant="label" color="inherit">
+                Забронировать
+              </Typography>
+            </Button>
+          </Stack>
         </Stack>
       </Toolbar>
     </AppBar>

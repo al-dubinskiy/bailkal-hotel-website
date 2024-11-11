@@ -30,22 +30,24 @@ declare module "@mui/material/styles" {
     intro: React.CSSProperties;
     label: React.CSSProperties;
     body: React.CSSProperties;
+    someSmall: React.CSSProperties;
     small: React.CSSProperties;
   }
   interface TypographyVariantsOptions {
     intro?: React.CSSProperties;
     label?: React.CSSProperties;
     body?: React.CSSProperties;
+    someSmall?: React.CSSProperties;
     small?: React.CSSProperties;
   }
 
   interface BreakpointOverrides {
     xs: true;
     sm: true;
+    sm_md: true;
     md: true;
     lg: true;
     xl: true;
-    xxl: true;
   }
 }
 
@@ -62,6 +64,7 @@ declare module "@mui/material/Typography" {
     intro: true;
     label: true;
     body: true;
+    someSmall: true;
     small: true;
     mini: false;
     tiny: false;

@@ -13,6 +13,7 @@ import { AboutPage } from "./pages/About/AboutPage";
 import { RoomsPage } from "./pages/Rooms/RoomsPage";
 import { BookingPage } from "./pages/Booking/BookingPage";
 import { RoomPage } from "./pages/Room/RoomPage";
+import { ContactsPage } from "./pages/Contacts/ContactsPage";
 
 export const Routes = () => {
   return (
@@ -35,22 +36,25 @@ export const Routes = () => {
       <Route path="/reviews" exact>
         <ReviewsPage />
       </Route>
-      <Route path="/conferenceHalls" exact>
+      <Route path="/contacts" exact>
+        <ContactsPage />
+      </Route>
+      <Route path="/conference-halls" exact>
         <ConferenceHallsPage />
       </Route>
-      <Route path="/barsAndRestaurants" exact>
+      <Route path="/bars-and-restaurants" exact>
         <BarsAndRestaurantsPage />
       </Route>
-      <Route path="/weddingBanquets" exact>
+      <Route path="/wedding-banquets" exact>
         <WeddingBanquetsPage />
       </Route>
-      <Route path="/restaurantMir" exact>
+      <Route path="/restaurant-mir" exact>
         <RestaurantMirPage />
       </Route>
       <Route path="/events" exact>
         <EventsPage />
       </Route>
-      <Route path="/exclusiveOffers" exact>
+      <Route path="/exclusive-offers" exact>
         <ExclusiveOffersPage />
       </Route>
       <Route path="/vacancies" exact>

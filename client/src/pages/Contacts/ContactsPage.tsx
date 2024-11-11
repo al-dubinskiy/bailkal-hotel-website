@@ -3,11 +3,11 @@ import BasePageLayout from "../components/BasePageLayout";
 
 interface Props {}
 
-export const RoomsPage = (props: Props) => {
+export const ContactsPage = (props: Props) => {
   const {} = props;
   return (
     <BasePageLayout>
-      <div>RoomsPage</div>
+      <div>ContactsPage</div>
     </BasePageLayout>
   );
 };

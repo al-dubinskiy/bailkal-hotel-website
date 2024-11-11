@@ -1,8 +1,13 @@
 import React from "react";
+import BasePageLayout from "../components/BasePageLayout";
 
 interface Props {}
 
 export const ConferenceHallsPage = (props: Props) => {
   const {} = props;
-  return <div>ConferenceHallsPage</div>;
+  return (
+    <BasePageLayout>
+      <div>ConferenceHallsPage</div>
+    </BasePageLayout>
+  );
 };
