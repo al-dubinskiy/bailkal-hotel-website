@@ -1,16 +1,20 @@
 import React from "react";
-import { Button, Container, Stack, Theme, Typography } from "@mui/material";
+import {
+  Button,
+  Container,
+  Link,
+  Stack,
+  Theme,
+  Typography,
+} from "@mui/material";
 import { Header } from "./Header/Header";
-import { Footer } from "./Footer";
+import { Footer } from "./Footer/Footer";
 import { PhoneIcon } from "../../assets/icons/PhoneIcon";
 import { EmailIcon } from "../../assets/icons/EmailIcon";
 import { EyeIcon } from "../../assets/icons/EyeIcon";
-import FacebookIcon from "@mui/icons-material/Facebook";
-import InstagramIcon from "@mui/icons-material/Instagram";
-import TwitterIcon from "@mui/icons-material/Twitter";
-import LinkedInIcon from "@mui/icons-material/LinkedIn";
-import YouTubeIcon from "@mui/icons-material/YouTube";
 import { theme } from "../../theme";
+import { SocialButtons } from "./SocialButtons";
+import { IconLabel } from "./shared/IconLabel";
 
 interface Props {
   children: React.ReactNode;
@@ -27,15 +31,18 @@ const BasePageLayout = (props: Props) => {
         }}
       >
         <Container
-          maxWidth="xl"
           sx={{
             padding: "5px 24px",
             display: "flex",
             alignItems: "center",
-            justifyContent: "space-between",
+            justifyContent: { xs: "center", sm: "space-between" },
             flexDirection: "row",
             flexWrap: "wrap",
             rowGap: "10px",
+            maxWidth: {
+              xs: theme.breakpoints.values.xl,
+              xxl: theme.breakpoints.values.xxl,
+            },
           }}
         >
           <Stack
@@ -45,79 +52,55 @@ const BasePageLayout = (props: Props) => {
               rowGap: "10px",
               display: "flex",
               alignItems: "center",
-              justifyContent: "space-between",
+              justifyContent: { xs: "center", sm: "space-between" },
               flexDirection: "row",
               flexWrap: "wrap",
               flex: 0.9,
             }}
           >
+            <IconLabel
+              icon={<PhoneIcon sx={{ fontSize: "16px" }} />}
+              labelComponent={
+                <Link href="tel:+73952250100" sx={{ fontSize: "14px" }}>
+                  +7 3952 250-100 - отдел бронирования
+                </Link>
+              }
+            />
+
+            <IconLabel
+              icon={<EmailIcon sx={{ fontSize: "16px" }} />}
+              labelComponent={
+                <Link
+                  href="mailto:reservation@eastland.ru"
+                  sx={{ fontSize: "14px" }}
+                >
+                  reservation@eastland.ru
+                </Link>
+              }
+            />
+
             <Button
               variant="text"
-              startIcon={<PhoneIcon />}
-              sx={{ fontSize: "20px" }}
+              startIcon={<EyeIcon sx={{ fontSize: "16px" }} />}
             >
-              <Typography variant="someSmall">
-                +7 3952 250-100 - отдел бронирования
-              </Typography>
-            </Button>
-
-            <Button variant="text" startIcon={<EmailIcon />}>
-              <Typography variant="someSmall">
-                reservation@eastland.ru
-              </Typography>
-            </Button>
-
-            <Button variant="text" startIcon={<EyeIcon />}>
               <Typography variant="someSmall">
                 Версия для слабовидящих
               </Typography>
             </Button>
           </Stack>
 
-          <Stack flexDirection={"row"} gap="24px">
-            <Button>
-              <FacebookIcon
-                htmlColor={theme.palette.primary.dark}
-                sx={{ fontSize: "20px" }}
-              />
-            </Button>
-
-            <Button>
-              <InstagramIcon
-                htmlColor={theme.palette.primary.dark}
-                sx={{ fontSize: "20px" }}
-              />
-            </Button>
-
-            <Button>
-              <TwitterIcon
-                htmlColor={theme.palette.primary.dark}
-                sx={{ fontSize: "20px" }}
-              />
-            </Button>
-
-            <Button>
-              <LinkedInIcon
-                htmlColor={theme.palette.primary.dark}
-                sx={{ fontSize: "20px" }}
-              />
-            </Button>
-
-            <Button>
-              <YouTubeIcon
-                htmlColor={theme.palette.primary.dark}
-                sx={{ fontSize: "20px" }}
-              />
-            </Button>
-          </Stack>
+          <SocialButtons iconSize="16px" />
         </Container>
       </Stack>
 
       <Container
-        maxWidth="xl"
         sx={{
           paddingLeft: "24px",
           paddingRight: "24px",
+          maxWidth: {
+            xs: theme.breakpoints.values.xl,
+            xxl: theme.breakpoints.values.xxl,
+          },
         }}
       >
         <Header></Header>

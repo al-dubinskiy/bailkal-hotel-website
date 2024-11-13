@@ -50,11 +50,8 @@ export const Nav = (props: Props) => {
             padding: "24px",
           }}
         >
-          {/* {window.innerWidth > theme.breakpoints.values.md ? ( */}
           <img height={"50px"} src={HotelLogo} />
-          {/* ) : (
-            <img height={"50px"} src={HotelLogoIcon} />
-         )} */}
+
           <Stack gap="16px" flexDirection={"row"}>
             <LocaleButton />
 
@@ -64,18 +61,9 @@ export const Nav = (props: Props) => {
             />
           </Stack>
         </Box>
+
         <NavList />
 
-        {/* <Button
-          variant="contained"
-          size="medium"
-          color="buttonDark"
-          sx={{ alignSelf: "center", margin: "24px 0" }}
-        >
-          <Typography variant="label" color="inherit">
-            Забронировать
-          </Typography>
-        </Button> */}
         <Button
           variant="contained"
           size="medium"
@@ -90,6 +78,7 @@ export const Nav = (props: Props) => {
           </Typography>
         </Button>
       </Drawer>
+
       <NavList
         sx={{
           marginRight: { md: 0, lg: "24px" },

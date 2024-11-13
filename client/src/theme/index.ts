@@ -14,6 +14,7 @@ const themeOptions: ThemeOptions = {
       md: 768,
       lg: 1024,
       xl: 1320, // 1650 (on Figma layout) for 1920, but for 1536 (current width screen) is 1272 - (24*2 padding left and right)
+      xxl: 1650,
     },
   },
   components: {
@@ -32,6 +33,19 @@ const themeOptions: ThemeOptions = {
         openOnFocus: true,
       },
     },
+    MuiLink: {
+      styleOverrides: {
+        root: {
+          textDecoration: "none",
+          fontFamily: "Raleway",
+          fontSize: "16px",
+          fontWeight: 400,
+          lineHeight: 1,
+          letterSpacing: "0.04em",
+          color: "#1a1a1a",
+        },
+      },
+    },
     MuiTextField: {
       styleOverrides: {
         root: {
@@ -41,7 +55,7 @@ const themeOptions: ThemeOptions = {
             fontSize: "16px",
             fontWeight: 500,
             lineHeight: 1,
-            letterSpacing: "4%",
+            letterSpacing: "0.04em",
           },
         },
       },
@@ -59,7 +73,7 @@ const themeOptions: ThemeOptions = {
           fontSize: "16px",
           fontWeight: 400,
           lineHeight: 1,
-          letterSpacing: "4%",
+          letterSpacing: "0.04em",
         },
       },
     },
@@ -76,7 +90,7 @@ const themeOptions: ThemeOptions = {
               fontSize: "16px",
               lineHeight: 1,
               fontWeight: 500,
-              letterSpacing: "4%",
+              letterSpacing: "0.04em",
               padding: "7.5px 24px",
             },
           },
@@ -94,14 +108,13 @@ const themeOptions: ThemeOptions = {
             padding: "0px 15px",
             background: "#2F70D9",
             color: "#ffffff",
+            display: "flex",
 
             "&:after": {
               content: '"🡢"',
               overflow: "hidden",
               opacity: 0,
               marginLeft: "-15px",
-              width: "15px",
-              height: "15px",
               transition: "all 0.3s ease-in",
             },
 
@@ -124,15 +137,14 @@ const themeOptions: ThemeOptions = {
             minHeight: "50px",
             height: "50px",
             padding: "0px 15px",
-            background: "#DAE8FF",
+            background: "#B1CFFF",
+            display: "flex",
 
             "&:after": {
               content: '"🡢"',
               overflow: "hidden",
               opacity: 0,
               marginLeft: "-15px",
-              width: "15px",
-              height: "15px",
               transition: "all 0.3s ease-in",
             },
 

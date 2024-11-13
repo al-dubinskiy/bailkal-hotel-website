@@ -9,6 +9,7 @@ export const typography: TypographyOptions = {
     letterSpacing: "0",
     color: "#1a1a1a",
     textDecoration: "none",
+    textTransform: "capitalize",
   },
   h2: {
     fontFamily: "CormorantInfant",
@@ -18,6 +19,7 @@ export const typography: TypographyOptions = {
     letterSpacing: "0",
     color: "#1a1a1a",
     textDecoration: "none",
+    textTransform: "capitalize",
   },
   h3: {
     fontFamily: "CormorantInfant",
@@ -27,6 +29,7 @@ export const typography: TypographyOptions = {
     letterSpacing: "0",
     color: "#1a1a1a",
     textDecoration: "none",
+    textTransform: "capitalize",
   },
   h4: {
     fontFamily: "CormorantInfant",
@@ -36,6 +39,7 @@ export const typography: TypographyOptions = {
     letterSpacing: "0",
     color: "#1a1a1a",
     textDecoration: "none",
+    textTransform: "capitalize",
   },
   intro: {
     fontFamily: "CormorantInfant",

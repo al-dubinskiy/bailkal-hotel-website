@@ -32,7 +32,11 @@ export const palette: PaletteOptions = {
     dark: "#1a1a1a",
   },
   gray: {
+    extraLight: "#D9D9D9",
     light: "#606060",
     dark: "#1a1a1a",
+  },
+  error: {
+    main: "#d32f2f",
   },
 };

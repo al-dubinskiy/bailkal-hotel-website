@@ -13,5 +13,5 @@ export const EyeIcon = createSvgIcon(
       fill="#2F70D9"
     />
   </svg>,
-  "EyeIcon"
+  "Eye"
 );

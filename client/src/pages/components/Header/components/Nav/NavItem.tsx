@@ -149,12 +149,6 @@ export const NavItem = (props: Props) => {
                 >
                   <Typography variant="label">{subItem.name}</Typography>
                 </MenuItem>
-                // <Link
-                //   key={subItem_index}
-                //   href={subItem.link ? subItem.link : "/"}
-                // >
-                //   {subItem.name}
-                // </Link>
               );
             }
           )}

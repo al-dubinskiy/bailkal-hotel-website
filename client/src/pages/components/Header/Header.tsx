@@ -46,7 +46,13 @@ export const Header = (props: Props) => {
         >
           <img height={"50px"} src={HotelLogo} />
 
-          <Stack flexDirection="row" alignItems={"center"} gap={"16px"}>
+          <Stack
+            flex="1"
+            flexDirection="row"
+            alignItems={"center"}
+            justifyContent={"flex-end"}
+            gap={"16px"}
+          >
             <Nav />
 
             <LocaleButton />
