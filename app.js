@@ -25,6 +25,10 @@ app.use(
   require("./routes/transferVariants.routes.js")
 );
 app.use("/api/transferCars", require("./routes/transferCars.routes.js"));
+app.use(
+  "/api/unavailableBookingDates",
+  require("./routes/unavailableBookingDates.routes.js")
+);
 
 async function start() {
   try {

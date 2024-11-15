@@ -7,6 +7,7 @@ export const navItems: NavItemType[] = [
     link: "/",
   },
   { name: "Номера", id: "rooms", link: "/rooms" },
+  { name: "Бронирование номера", id: "booking", link: "/booking" },
   { name: "Об отеле", id: "about", link: "/about" },
   { name: "Отзывы", id: "reviews", link: "/reviews" },
   { name: "Контакты", id: "contacts", link: "/contacts" },

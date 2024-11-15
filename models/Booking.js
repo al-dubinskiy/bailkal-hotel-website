@@ -7,6 +7,12 @@ const schema = new Schema({
     unique: true,
     ref: "Room",
   },
+  room_category_id: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    unique: true,
+    ref: "RoomCategory",
+  },
   user: {
     name: { type: String, required: true },
     lastname: { type: String, required: true },

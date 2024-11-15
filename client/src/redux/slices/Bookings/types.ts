@@ -9,6 +9,7 @@ export type BookingUserInfoType = {
 
 export type CreateBookingType = {
   room_id: string;
+  room_category_id: string;
   user: BookingUserInfoType;
   adults_count: number;
   children_count: number;

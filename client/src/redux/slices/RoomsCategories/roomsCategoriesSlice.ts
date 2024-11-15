@@ -19,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetRoomsCategories = createAsyncThunk(
   "roomsCategories/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getRoomsCategories.url}`, {
         method: getRoomsCategories.method,
