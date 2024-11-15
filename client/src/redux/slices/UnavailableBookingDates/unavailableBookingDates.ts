@@ -294,8 +294,8 @@ export const bookingTariffsSlice = createSlice({
         if (state.unavailableBookingDates)
           state.unavailableBookingDates = state.unavailableBookingDates.map(
             (unavailableBookingDate) => {
-              return unavailableBookingDate.id ===
-                updatedUnavailableBookingDate.id
+              return unavailableBookingDate._id ===
+                updatedUnavailableBookingDate._id
                 ? updatedUnavailableBookingDate
                 : unavailableBookingDate;
             }
@@ -328,7 +328,8 @@ export const bookingTariffsSlice = createSlice({
         state.updateUnavailableBookingDate.isLoading = false;
         if (state.unavailableBookingDates)
           state.unavailableBookingDates = state.unavailableBookingDates.filter(
-            (unavailableBookingDate) => unavailableBookingDate.id !== payload.id
+            (unavailableBookingDate) =>
+              unavailableBookingDate._id !== payload.id
           );
 
         if (DEBUG)

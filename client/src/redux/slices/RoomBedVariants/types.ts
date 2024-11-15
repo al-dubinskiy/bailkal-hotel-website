@@ -7,7 +7,7 @@ export type CreateRoomBedVariantType = {
 export type UpdateRoomBedVariantType = CreateRoomBedVariantType;
 
 export type RoomBedVariantType = CreateRoomBedVariantType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

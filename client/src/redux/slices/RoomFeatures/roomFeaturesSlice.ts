@@ -87,7 +87,7 @@ export const UpdateRoomFeature = createAsyncThunk(
     try {
       const { roomFeature } = payload;
 
-      const res = await fetch(`${updateRoomFeature.url}/${roomFeature.id}`, {
+      const res = await fetch(`${updateRoomFeature.url}/${roomFeature._id}`, {
         method: updateRoomFeature.method,
         headers: {
           ...updateRoomFeature.headers,
@@ -247,7 +247,7 @@ export const roomFeaturesSlice = createSlice({
         const updatedRoomFeature = payload.data;
         if (state.roomFeatures)
           state.roomFeatures = state.roomFeatures.map((roomFeature) => {
-            return roomFeature.id === updatedRoomFeature.id
+            return roomFeature._id === updatedRoomFeature._id
               ? updatedRoomFeature
               : roomFeature;
           });
@@ -272,7 +272,7 @@ export const roomFeaturesSlice = createSlice({
 
         if (state.roomFeatures)
           state.roomFeatures = state.roomFeatures.filter(
-            (roomFeature) => roomFeature.id !== payload.id
+            (roomFeature) => roomFeature._id !== payload.id
           );
 
         if (DEBUG)

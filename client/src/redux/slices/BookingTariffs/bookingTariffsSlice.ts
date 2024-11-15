@@ -263,7 +263,7 @@ export const bookingTariffsSlice = createSlice({
         const updatedBookingTariff = payload.data;
         if (state.bookingTariffs)
           state.bookingTariffs = state.bookingTariffs.map((bookingTariff) => {
-            return bookingTariff.id === updatedBookingTariff.id
+            return bookingTariff._id === updatedBookingTariff._id
               ? updatedBookingTariff
               : bookingTariff;
           });
@@ -287,7 +287,7 @@ export const bookingTariffsSlice = createSlice({
         state.updateBookingTariff.isLoading = false;
         if (state.bookingTariffs)
           state.bookingTariffs = state.bookingTariffs.filter(
-            (bookingTariff) => bookingTariff.id !== payload.id
+            (bookingTariff) => bookingTariff._id !== payload.id
           );
 
         if (DEBUG)

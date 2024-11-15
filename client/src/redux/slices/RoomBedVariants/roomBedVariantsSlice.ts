@@ -280,7 +280,7 @@ export const roomBedVariantsSlice = createSlice({
         if (state.roomBedVariants)
           state.roomBedVariants = state.roomBedVariants.map(
             (roomBedVariant) => {
-              return roomBedVariant.id === updatedRoomBedVariant.id
+              return roomBedVariant._id === updatedRoomBedVariant._id
                 ? updatedRoomBedVariant
                 : roomBedVariant;
             }
@@ -305,7 +305,7 @@ export const roomBedVariantsSlice = createSlice({
         state.updateRoomBedVariant.isLoading = false;
         if (state.roomBedVariants)
           state.roomBedVariants = state.roomBedVariants.filter(
-            (roomBedVariant) => roomBedVariant.id !== payload.id
+            (roomBedVariant) => roomBedVariant._id !== payload.id
           );
 
         if (DEBUG)

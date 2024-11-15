@@ -5,7 +5,7 @@ export type CreateRoomFeatureType = {
 };
 
 export type RoomFeatureType = CreateRoomFeatureType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

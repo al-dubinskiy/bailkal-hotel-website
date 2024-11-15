@@ -11,7 +11,7 @@ export type CreateTransferVariantType = {
 export type UpdateTransferVariantType = CreateTransferVariantType;
 
 export type TransferVariantType = CreateTransferVariantType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

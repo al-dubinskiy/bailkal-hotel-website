@@ -18,6 +18,7 @@ import { BookingInfoWidget } from "./components/BookingInfoWidget";
 import { GroupObjectByKey } from "./utils";
 import { GetRoomsCategories } from "../../redux/slices/RoomsCategories/roomsCategoriesSlice";
 import { GetBookings } from "../../redux/slices/Bookings/bookingsSlice";
+import BasePageLayout from "../components/BasePageLayout";
 
 // Типы
 type RoomCategoryPriceType = {
@@ -39,6 +40,7 @@ interface Props {}
 export const BookingPage = () => {
   const dispatch = useAppDispatch();
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
+  const { bookings } = useAppSelector((state) => state.bookings);
   const [filterParams, setFilterParams] = useState<{
     arrival_datetime: Moment;
     departure_datetime: Moment;
@@ -58,11 +60,11 @@ export const BookingPage = () => {
     phone: "",
     email: "",
   });
-  const [bookings, setBookings] = useState<CreateBookingType[]>([]);
+  const [newBookings, setNewBookings] = useState<CreateBookingType[]>([]);
   const [currentBookingStepIdx, setCurrentBookingStepIdx] = useState(0);
 
   const checkDateAvailable = () => {
-    if (roomsCategories) {
+    if (roomsCategories && bookings) {
       /* Сортировка бронирований по категориям комнат, где 
       "ключ" - id категории комнаты, а 
       "value" - массив дат "заезда" и "выезда" каждого бронирования на эту категорию:
@@ -80,14 +82,14 @@ export const BookingPage = () => {
 
       const availableRoomCategories: RoomCategoryPriceType[] = [];
 
-      Object.entries(sortedBookings).map((key: any, value: any) => {
-        const bookingCategoryId = key;
-        const bookingsOnCategoryCount = value;
+      Object.entries(sortedBookings).map((item: any, index) => {
+        const bookingCategoryId: string = item[0];
+        const bookingsOnCategoryCount = item[1];
         const questsCount =
           filterParams.adults_count + filterParams.children_count;
         // Поиск "категории комнат" по id
         const categoryRoom = roomsCategories.find(
-          (roomCategory) => roomCategory.id === bookingCategoryId
+          (roomCategory) => roomCategory._id === bookingCategoryId
         );
 
         if (categoryRoom) {
@@ -98,7 +100,7 @@ export const BookingPage = () => {
           if (bookingsOnCategoryCount.length < categoryRoomCount) {
             // То записываем данные "категории комнат" в перечень доступных "категорий комнат", а именно id и price (в зав. от кол. гостей)
             availableRoomCategories.push({
-              id: categoryRoom.id,
+              id: categoryRoom._id,
               price:
                 questsCount === 1
                   ? categoryRoom.price_per_night_for_one_quest
@@ -137,8 +139,9 @@ export const BookingPage = () => {
     GetBookingsList();
   }, [GetBookingsList]);
 
-  console.log("roomCategories", roomsCategories);
-  console.log("bookings", bookings);
+  useEffect(() => {
+    checkDateAvailable();
+  }, [bookings, roomsCategories]);
 
   // Тригер для типа визуального интерфейса 1-го шага
   const isMultiRoomBooking = useMemo(() => {
@@ -151,14 +154,14 @@ export const BookingPage = () => {
     roomCategoryId,
     allCategoryRoomsIDs,
     bookedCategoryRoomsIDs,
-    tariffId,
+    tariff_id,
     adultsCount,
     childrenCount,
   }: {
     roomCategoryId: string;
     allCategoryRoomsIDs: string[];
     bookedCategoryRoomsIDs: string[];
-    tariffId?: string;
+    tariff_id?: string;
     adultsCount?: number;
     childrenCount?: number;
   }) => {
@@ -187,7 +190,7 @@ export const BookingPage = () => {
         arrival_datetime: filterParams.arrival_datetime.format(dateTimeFormat),
         departure_datetime:
           filterParams.departure_datetime.format(dateTimeFormat),
-        tariff_id: tariffId ? tariffId : "",
+        tariff_id: tariff_id ? tariff_id : "",
         service_id: [],
         bed_type_id: "",
         view_from_window_id: "",
@@ -197,20 +200,20 @@ export const BookingPage = () => {
         price: -1,
       };
 
-      if (!isMultiRoomBooking) setBookings((prev) => [newBooking]);
-      else setBookings((prev) => [...prev, newBooking]);
+      if (!isMultiRoomBooking) setNewBookings((prev) => [newBooking]);
+      else setNewBookings((prev) => [...prev, newBooking]);
     }
   };
 
   const removeBooking = (index: number) => {
-    setBookings((prev) => prev.filter((_, idx) => idx !== index));
+    setNewBookings((prev) => prev.filter((_, idx) => idx !== index));
   };
 
   const bookingSteps = useMemo((): BookingStepType[] => {
     const steps: BookingStepType[] = [];
     // Для бронирования одного номера
     if (!isMultiRoomBooking) {
-      const booking = bookings.length ? bookings[0] : null;
+      const booking = newBookings.length ? newBookings[0] : null;
       if (!booking) {
         steps.push("Select a room");
       } else if (booking && !booking.tariff_id) {
@@ -223,30 +226,31 @@ export const BookingPage = () => {
     // Для бронирования нескольких номеров
     else {
       steps.push("Select a room");
-      const bookingsTotal = bookings.length;
+      const bookingsTotal = newBookings.length;
       Array.from({ length: bookingsTotal }, () => steps.push("Order services"));
       steps.push("Enter guest details");
     }
     return steps;
-  }, [bookings, isMultiRoomBooking]);
+  }, [newBookings, isMultiRoomBooking]);
 
   // Тип интерфейса для множественного выбора номеров (со списком номеров и тарифов)
   if (isMultiRoomBooking)
     return (
       <Box>
         {roomsCategories && roomsCategories?.length
-          ? roomsCategories.map((roomCategory) => {
+          ? roomsCategories.map((roomCategory, index) => {
               return (
                 <Button
+                  key={index}
                   onClick={() =>
                     addBookingBaseInfo({
-                      roomCategoryId: roomCategory.id,
+                      roomCategoryId: roomCategory._id,
                       allCategoryRoomsIDs: roomCategory.room_id,
                       bookedCategoryRoomsIDs: Array.from(
                         roomCategory.booked_rooms,
                         (i) => i.room_id
                       ),
-                      tariffId: "672bb2c0424b6e7d9c94376a",
+                      tariff_id: "672bb2c0424b6e7d9c94376a",
                       adultsCount: 1,
                       childrenCount: 0,
                     })
@@ -269,44 +273,46 @@ export const BookingPage = () => {
 
   // Тип интерфейса для выбора одного номера (со списком номеров)
   return (
-    <Box>
-      {roomsCategories && roomsCategories?.length
-        ? roomsCategories.map((roomCategory) => {
-            return (
-              <Card>
-                <Typography>{roomCategory.title}</Typography>
-                {/* Проверка нет ли уже забронированого номера на выбранную дату "заезда" и "выезда" */}
-                {!roomCategory.booked_rooms.findIndex((i) =>
-                  moment(i.arrival_datetime).isSame(
-                    filterParams.arrival_datetime?.format(dateTimeFormat)
-                  )
-                ) &&
-                !roomCategory.booked_rooms.findIndex((i) =>
-                  moment(i.departure_datetime).isSame(
-                    filterParams.departure_datetime?.format(dateTimeFormat)
-                  )
-                ) ? (
-                  <Button
-                    onClick={() =>
-                      addBookingBaseInfo({
-                        roomCategoryId: roomCategory.id,
-                        allCategoryRoomsIDs: roomCategory.room_id,
-                        bookedCategoryRoomsIDs: Array.from(
-                          roomCategory.booked_rooms,
-                          (i) => i.room_id
-                        ),
-                      })
-                    }
-                  >
-                    Выбрать
-                  </Button>
-                ) : (
-                  <Button>Доступные даты для заезда</Button>
-                )}
-              </Card>
-            );
-          })
-        : null}
-    </Box>
+    <BasePageLayout>
+      <Box>
+        {roomsCategories && roomsCategories?.length
+          ? roomsCategories.map((roomCategory, index) => {
+              return (
+                <Card key={index}>
+                  <Typography>{roomCategory.title}</Typography>
+                  {/* Проверка нет ли уже забронированого номера на выбранную дату "заезда" и "выезда" */}
+                  {!roomCategory.booked_rooms.findIndex((i) =>
+                    moment(i.arrival_datetime).isSame(
+                      filterParams.arrival_datetime?.format(dateTimeFormat)
+                    )
+                  ) &&
+                  !roomCategory.booked_rooms.findIndex((i) =>
+                    moment(i.departure_datetime).isSame(
+                      filterParams.departure_datetime?.format(dateTimeFormat)
+                    )
+                  ) ? (
+                    <Button
+                      onClick={() =>
+                        addBookingBaseInfo({
+                          roomCategoryId: roomCategory._id,
+                          allCategoryRoomsIDs: roomCategory.room_id,
+                          bookedCategoryRoomsIDs: Array.from(
+                            roomCategory.booked_rooms,
+                            (i) => i.room_id
+                          ),
+                        })
+                      }
+                    >
+                      Выбрать
+                    </Button>
+                  ) : (
+                    <Button>Доступные даты для заезда</Button>
+                  )}
+                </Card>
+              );
+            })
+          : null}
+      </Box>
+    </BasePageLayout>
   );
 };

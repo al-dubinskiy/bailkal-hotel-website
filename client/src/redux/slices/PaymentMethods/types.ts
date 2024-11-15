@@ -9,7 +9,7 @@ export type CreatePaymentMethodType = {
 export type UpdatePaymentMethodType = CreatePaymentMethodType;
 
 export type PaymentMethodType = CreatePaymentMethodType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

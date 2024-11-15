@@ -11,7 +11,7 @@ export type CreateBookingServiceType = {
 export type UpdateBookingServiceType = CreateBookingServiceType;
 
 export type BookingServiceType = CreateBookingServiceType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

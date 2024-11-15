@@ -6,6 +6,11 @@ const router = Router();
 // Get rooms сategories
 router.get("/", async (req, res) => {
   try {
+    const roomsCategories = await RoomCategory.find();
+
+    res.status(200).json({
+      data: roomsCategories,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get rooms сategories: статус 500. Ошибка сервера.",

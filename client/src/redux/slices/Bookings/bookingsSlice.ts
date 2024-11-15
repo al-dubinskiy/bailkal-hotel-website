@@ -21,6 +21,7 @@ export const GetBookings = createAsyncThunk(
   "bookings/getAll",
   async (_, thunkAPI) => {
     try {
+      console.log(getBookings.url);
       const res = await fetch(`${getBookings.url}`, {
         method: getBookings.method,
         headers: {
@@ -88,7 +89,7 @@ export const UpdateBooking = createAsyncThunk(
     try {
       const { booking } = payload;
 
-      const res = await fetch(`${updateBooking.url}/${booking.id}`, {
+      const res = await fetch(`${updateBooking.url}/${booking._id}`, {
         method: updateBooking.method,
         headers: {
           ...updateBooking.headers,
@@ -246,7 +247,9 @@ export const bookingsSlice = createSlice({
         const updatedBooking = payload.data;
         if (state.bookings)
           state.bookings = state.bookings.map((booking) => {
-            return booking.id === updatedBooking.id ? updatedBooking : booking;
+            return booking._id === updatedBooking._id
+              ? updatedBooking
+              : booking;
           });
 
         if (DEBUG) console.log("CreateBooking (API): booking was updated.");
@@ -267,7 +270,7 @@ export const bookingsSlice = createSlice({
         state.updateBooking.isLoading = false;
         if (state.bookings)
           state.bookings = state.bookings.filter(
-            (booking) => booking.id !== payload.id
+            (booking) => booking._id !== payload.id
           );
 
         if (DEBUG) console.log("CreateBooking (API): booking was deleted.");

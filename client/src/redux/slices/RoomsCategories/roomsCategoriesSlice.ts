@@ -248,7 +248,7 @@ export const roomsCategoriesSlice = createSlice({
         const updatedRoomCategory = payload.data;
         if (state.roomsCategories)
           state.roomsCategories = state.roomsCategories.map((roomType) => {
-            return roomType.id === updatedRoomCategory.id
+            return roomType._id === updatedRoomCategory._id
               ? updatedRoomCategory
               : roomType;
           });
@@ -272,7 +272,7 @@ export const roomsCategoriesSlice = createSlice({
         state.updateRoomCategory.isLoading = false;
         if (state.roomsCategories)
           state.roomsCategories = state.roomsCategories.filter(
-            (roomCategory) => roomCategory.id !== payload.id
+            (roomCategory) => roomCategory._id !== payload.id
           );
 
         if (DEBUG)

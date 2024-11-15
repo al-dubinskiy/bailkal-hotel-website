@@ -7,7 +7,7 @@ export type CreateViewFromRoomWindowType = {
 export type UpdateViewFromRoomWindowType = CreateViewFromRoomWindowType;
 
 export type ViewFromRoomWindowType = CreateViewFromRoomWindowType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

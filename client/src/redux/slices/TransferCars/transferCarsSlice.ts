@@ -250,7 +250,7 @@ export const transfersVariantsSlice = createSlice({
         const updatedTransferCar = payload.data;
         if (state.transferCars)
           state.transferCars = state.transferCars.map((transferCar) => {
-            return transferCar.id === updatedTransferCar.id
+            return transferCar._id === updatedTransferCar._id
               ? updatedTransferCar
               : transferCar;
           });
@@ -274,7 +274,7 @@ export const transfersVariantsSlice = createSlice({
         state.updateTransferCar.isLoading = false;
         if (state.transferCars)
           state.transferCars = state.transferCars.filter(
-            (transferCar) => transferCar.id !== payload.id
+            (transferCar) => transferCar._id !== payload.id
           );
 
         if (DEBUG)

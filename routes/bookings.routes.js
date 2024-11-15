@@ -6,6 +6,10 @@ const router = Router();
 // Get bookings
 router.get("/", async (req, res) => {
   try {
+    const bookings = await Booking.find();
+    res.status(200).json({
+      data: bookings,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get bookings: статус 500. Ошибка сервера.",

@@ -36,6 +36,7 @@
   "homepage": "https://github.com/al-dubinskiy/bailkal-hotel-website#readme",
   "dependencies": {
     "config": "^3.3.12",
+    "cors": "^2.8.5",
     "express": "^4.21.1",
     "moment": "^2.30.1",
     "mongoose": "^8.8.0"

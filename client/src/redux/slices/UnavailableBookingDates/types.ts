@@ -6,7 +6,7 @@ export type CreateUnavailableBookingDateType = {
 export type UpdateUnavailableBookingDateType = CreateUnavailableBookingDateType;
 
 export type UnavailableBookingDateType = CreateUnavailableBookingDateType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

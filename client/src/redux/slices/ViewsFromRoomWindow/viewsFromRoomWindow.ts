@@ -280,7 +280,7 @@ export const viewsFromRoomWindowSlice = createSlice({
         if (state.viewsFromRoomWindow)
           state.viewsFromRoomWindow = state.viewsFromRoomWindow.map(
             (viewFromRoomWindow) => {
-              return viewFromRoomWindow.id === updatedViewFromRoomWindow.id
+              return viewFromRoomWindow._id === updatedViewFromRoomWindow._id
                 ? updatedViewFromRoomWindow
                 : viewFromRoomWindow;
             }
@@ -305,7 +305,7 @@ export const viewsFromRoomWindowSlice = createSlice({
         state.updateViewFromRoomWindow.isLoading = false;
         if (state.viewsFromRoomWindow)
           state.viewsFromRoomWindow = state.viewsFromRoomWindow.filter(
-            (viewFromRoomWindow) => viewFromRoomWindow.id !== payload.id
+            (viewFromRoomWindow) => viewFromRoomWindow._id !== payload.id
           );
 
         if (DEBUG)

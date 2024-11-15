@@ -20,7 +20,7 @@ export type CreateRoomCategoryType = {
 export type UpdateRoomCategoryType = CreateRoomCategoryType;
 
 export type RoomCategoryType = CreateRoomCategoryType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

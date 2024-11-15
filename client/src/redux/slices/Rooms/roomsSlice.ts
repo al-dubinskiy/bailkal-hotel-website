@@ -83,7 +83,7 @@ export const UpdateRoom = createAsyncThunk(
     try {
       const { room } = payload;
 
-      const res = await fetch(`${updateRoom.url}/${room.id}`, {
+      const res = await fetch(`${updateRoom.url}/${room._id}`, {
         method: updateRoom.method,
         headers: {
           ...updateRoom.headers,
@@ -241,7 +241,7 @@ export const roomsSlice = createSlice({
         const updatedRoom = payload.data;
         if (state.rooms)
           state.rooms = state.rooms.map((room) => {
-            return room.id === updatedRoom.id ? updatedRoom : room;
+            return room._id === updatedRoom._id ? updatedRoom : room;
           });
 
         if (DEBUG) console.log("CreateRoom (API): room was updated.");
@@ -262,7 +262,7 @@ export const roomsSlice = createSlice({
         state.deleteRoom.isLoading = false;
 
         if (state.rooms)
-          state.rooms = state.rooms.filter((room) => room.id !== payload.id);
+          state.rooms = state.rooms.filter((room) => room._id !== payload.id);
 
         if (DEBUG) console.log("DeleteRoom (API): room was deleted.");
       }

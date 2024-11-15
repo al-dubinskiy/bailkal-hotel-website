@@ -270,7 +270,7 @@ export const bookingServicesSlice = createSlice({
         if (state.bookingServices)
           state.bookingServices = state.bookingServices.map(
             (bookingService) => {
-              return bookingService.id === updatedBookingService.id
+              return bookingService._id === updatedBookingService._id
                 ? updatedBookingService
                 : bookingService;
             }
@@ -295,7 +295,7 @@ export const bookingServicesSlice = createSlice({
         state.updateBookingService.isLoading = false;
         if (state.bookingServices)
           state.bookingServices = state.bookingServices.filter(
-            (bookingService) => bookingService.id !== payload.id
+            (bookingService) => bookingService._id !== payload.id
           );
 
         if (DEBUG)

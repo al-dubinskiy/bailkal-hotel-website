@@ -9,7 +9,7 @@ export type CreateTransferCarType = {
 export type UpdateTransferCarType = CreateTransferCarType;
 
 export type TransferCarType = CreateTransferCarType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };
