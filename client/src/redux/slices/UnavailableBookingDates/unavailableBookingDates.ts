@@ -19,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetUnavailableBookingDates = createAsyncThunk(
   "unavailableBookingDates/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getUnavailableBookingDates.url}`, {
         method: getUnavailableBookingDates.method,
@@ -212,7 +212,7 @@ const initialState: IRoomTypeState = {
   },
 };
 
-export const bookingTariffsSlice = createSlice({
+export const unavailableBookingDatesSlice = createSlice({
   name: "unavailableBookingDates",
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
@@ -356,4 +356,4 @@ export const bookingTariffsSlice = createSlice({
   },
 });
 
-export const {} = bookingTariffsSlice.actions;
+export const {} = unavailableBookingDatesSlice.actions;

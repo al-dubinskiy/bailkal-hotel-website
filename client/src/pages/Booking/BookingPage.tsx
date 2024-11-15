@@ -19,6 +19,7 @@ import { GroupObjectByKey } from "./utils";
 import { GetRoomsCategories } from "../../redux/slices/RoomsCategories/roomsCategoriesSlice";
 import { GetBookings } from "../../redux/slices/Bookings/bookingsSlice";
 import BasePageLayout from "../components/BasePageLayout";
+import { GetUnavailableBookingDates } from "../../redux/slices/UnavailableBookingDates/unavailableBookingDates";
 
 // Типы
 type RoomCategoryPriceType = {
@@ -39,6 +40,9 @@ interface Props {}
 
 export const BookingPage = () => {
   const dispatch = useAppDispatch();
+  const { unavailableBookingDates } = useAppSelector(
+    (state) => state.unavailableBookingDates
+  );
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
   const { bookings } = useAppSelector((state) => state.bookings);
   const [filterParams, setFilterParams] = useState<{
@@ -63,24 +67,25 @@ export const BookingPage = () => {
   const [newBookings, setNewBookings] = useState<CreateBookingType[]>([]);
   const [currentBookingStepIdx, setCurrentBookingStepIdx] = useState(0);
 
-  const checkDateAvailable = () => {
-    if (roomsCategories && bookings) {
-      /* Сортировка бронирований по категориям комнат, где 
-      "ключ" - id категории комнаты, а 
-      "value" - массив дат "заезда" и "выезда" каждого бронирования на эту категорию:
-      {"room_category_id": {
-          arrival_datetime: string;
-          departure_datetime: string;
-        }[]
-      } 
-    */
+  const availableRoomCategories = useMemo(():
+    | RoomCategoryPriceType[]
+    | null => {
+    if (roomsCategories && bookings && unavailableBookingDates) {
+      const availableRoomCategories: RoomCategoryPriceType[] = [];
 
+      /* Сортировка бронирований по категориям комнат, где 
+        "ключ" - id категории комнаты, а 
+        "value" - массив дат "заезда" и "выезда" каждого бронирования на эту категорию:
+        {"room_category_id": {
+            arrival_datetime: string;
+            departure_datetime: string;
+          }[]
+        } 
+      */
       const sortedBookings: SortedBookingType[] = GroupObjectByKey(
         "room_category_id",
         bookings
       );
-
-      const availableRoomCategories: RoomCategoryPriceType[] = [];
 
       Object.entries(sortedBookings).map((item: any, index) => {
         const bookingCategoryId: string = item[0];
@@ -110,12 +115,38 @@ export const BookingPage = () => {
         }
       });
 
-      console.log(availableRoomCategories);
-
-      const roomCategoryMinPrice = 0;
-
-      // Проверка на наличие свободной комнаты в каждой категории
+      return availableRoomCategories;
+    } else {
+      return null;
     }
+  }, [bookings, roomsCategories, unavailableBookingDates]);
+
+  const roomMinPrice = useMemo((): number | null => {
+    if (availableRoomCategories && availableRoomCategories.length) {
+      const prices = Array.from(availableRoomCategories, (i) => i.price);
+      return Math.min(...prices);
+    } else return null;
+  }, [availableRoomCategories]);
+
+  const checkDateAvailable = ({
+    date,
+  }: {
+    date: string;
+  }): { isAvailable: boolean; roomMinPrice: number | null } | null => {
+    if (
+      unavailableBookingDates &&
+      roomMinPrice !== null &&
+      availableRoomCategories
+    ) {
+      return {
+        isAvailable:
+          !unavailableBookingDates.find((i) => i.date === date) &&
+          availableRoomCategories.length > 0,
+        roomMinPrice: roomMinPrice,
+      };
+    }
+
+    return null;
   };
 
   // Get data from API
@@ -139,9 +170,21 @@ export const BookingPage = () => {
     GetBookingsList();
   }, [GetBookingsList]);
 
+  const GetUnavailableBookingDatesList = useCallback(() => {
+    if (!unavailableBookingDates) {
+      dispatch(GetUnavailableBookingDates());
+    }
+  }, [bookings]);
+
   useEffect(() => {
-    checkDateAvailable();
-  }, [bookings, roomsCategories]);
+    GetUnavailableBookingDatesList();
+  }, [GetUnavailableBookingDatesList]);
+
+  useEffect(() => {
+    checkDateAvailable({
+      date: "2024-11-17",
+    });
+  }, [bookings, roomsCategories, unavailableBookingDates]);
 
   // Тригер для типа визуального интерфейса 1-го шага
   const isMultiRoomBooking = useMemo(() => {

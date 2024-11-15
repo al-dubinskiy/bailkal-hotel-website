@@ -6,6 +6,11 @@ const router = Router();
 // Get unavailable booking dates
 router.get("/", async (req, res) => {
   try {
+    const unavailableBookingDates = await UnavailableBookingDate.find();
+
+    res.status(200).json({
+      data: unavailableBookingDates,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get unavailable booking dates: статус 500. Ошибка сервера.",

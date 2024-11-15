@@ -1,7 +1,8 @@
+import { baseUrl } from "../../constants";
 import { RequestTypeHTTP } from "../../types";
 
 export const getUnavailableBookingDates: RequestTypeHTTP = {
-  url: "/api/unavailableBookingDates",
+  url: baseUrl + "/api/unavailableBookingDates",
   method: "GET",
   headers: {
     Accept: "application/json",
@@ -9,7 +10,7 @@ export const getUnavailableBookingDates: RequestTypeHTTP = {
 };
 
 export const createUnavailableBookingDate: RequestTypeHTTP = {
-  url: "/api/unavailableBookingDates",
+  url: baseUrl + "/api/unavailableBookingDates",
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -18,7 +19,7 @@ export const createUnavailableBookingDate: RequestTypeHTTP = {
 };
 
 export const updateUnavailableBookingDate: RequestTypeHTTP = {
-  url: "/api/unavailableBookingDates",
+  url: baseUrl + "/api/unavailableBookingDates",
   method: "PUT" /* .../{id} */,
   headers: {
     "Content-Type": "application/json",
@@ -27,6 +28,6 @@ export const updateUnavailableBookingDate: RequestTypeHTTP = {
 };
 
 export const deleteUnavailableBookingDate: RequestTypeHTTP = {
-  url: "/api/unavailableBookingDates",
+  url: baseUrl + "/api/unavailableBookingDates",
   method: "DELETE" /* .../{id} */,
 };

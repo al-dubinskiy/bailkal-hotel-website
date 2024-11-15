@@ -8,7 +8,7 @@ import { paymentMethodsSlice } from "./slices/PaymentMethods/paymentMethodsSlice
 import { transfersVariantsSlice } from "./slices/TransferVariants/transferVariantsSlice";
 import { roomBedVariantsSlice } from "./slices/RoomBedVariants/roomBedVariantsSlice";
 import { viewsFromRoomWindowSlice } from "./slices/ViewsFromRoomWindow/viewsFromRoomWindow";
-import { useDispatch } from "react-redux";
+import { unavailableBookingDatesSlice } from "./slices/UnavailableBookingDates/unavailableBookingDates";
 
 export const store = configureStore({
   reducer: {
@@ -21,6 +21,7 @@ export const store = configureStore({
     bookingServices: bookingServicesSlice.reducer,
     paymentMethods: paymentMethodsSlice.reducer,
     transfersVariants: transfersVariantsSlice.reducer,
+    unavailableBookingDates: unavailableBookingDatesSlice.reducer,
   },
 });
 
