@@ -1,3 +1,7 @@
+.react-datepicker-popper {
+    z-index: 2;
+}
+
 .react-datepicker {
     padding: 24px;
     background-color: #fff;
@@ -45,6 +49,12 @@ input.range-date-picker {
     text-align: start;
     text-decoration: none;
 }
+
+
+input.range-date-picker.focused {
+    border: 1px solid #1a1a1a
+}
+
 
 .react-datepicker__input-container .react-datepicker__calendar-icon {
     padding: 0;
@@ -191,7 +201,7 @@ input.range-date-picker {
 }
 
 .react-datepicker__day--today  .react-datepicker__day-cost {
-    color: #fff;
+    color: #fff !important;
 }
 
 .react-datepicker__day--in-selecting-range .react-datepicker__day-cost {

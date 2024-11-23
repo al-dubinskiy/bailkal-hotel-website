@@ -10,7 +10,6 @@ export const navItems: NavItemType[] = [
   { name: "Бронирование номера", id: "booking", link: "/booking" },
   { name: "Об отеле", id: "about", link: "/about" },
   { name: "Отзывы", id: "reviews", link: "/reviews" },
-  { name: "Контакты", id: "contacts", link: "/contacts" },
   {
     name: "Услуги",
     id: "services",
@@ -51,6 +50,7 @@ export const navItems: NavItemType[] = [
     name: "Еще",
     id: "more",
     subItems: [
+      { name: "Контакты", id: "contacts", link: "/contacts" },
       {
         name: "Ресторан “Mir”",
         id: "restaurant-mir",

@@ -12,7 +12,7 @@ export type CreateBookingType = {
   room_category_id: string;
   user: BookingUserInfoType;
   adults_count: number;
-  children_count: number;
+  childrens_count: number;
   arrival_datetime: string;
   departure_datetime: string;
   tariff_id: string;

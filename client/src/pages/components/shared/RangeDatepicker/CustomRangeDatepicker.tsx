@@ -9,20 +9,21 @@ import { theme } from "../../../../theme";
 
 interface Props {}
 
-export const RangeDatepicker = (props: Props) => {
+export const CustomRangeDatepicker = (props: Props) => {
   const {} = props;
   const [startDate, setStartDate] = useState<Date>(new Date());
   const [endDate, setEndDate] = useState<Date>(new Date());
+  const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const onChange = (dates: any) => {
-    console.log(dates);
+    // console.log(dates);
     const [start, end] = dates;
     setStartDate(start);
     setEndDate(end);
   };
 
   const CustomDay = ({ date }: { date: Date }) => {
-    console.log(date);
+    // console.log(date);
     return (
       <Stack flexDirection={"column"} gap={"15px"}>
         {date.getDate()}
@@ -53,12 +54,14 @@ export const RangeDatepicker = (props: Props) => {
         icon={<CalendarIcon sx={{ fontSize: "24px" }} />}
         selected={startDate}
         onChange={onChange}
+        onFocus={() => setIsOpen(true)}
+        onBlur={() => setIsOpen(false)}
         startDate={startDate}
         endDate={endDate}
         selectsRange
         monthsShown={2}
         dateFormat={"dd MMMM"}
-        className={"range-date-picker"}
+        className={`range-date-picker ${isOpen ? "focused" : ""}`}
         popperPlacement="bottom-end"
         focusSelectedMonth
         renderDayContents={(...props) => <CustomDay date={props[1]} />}

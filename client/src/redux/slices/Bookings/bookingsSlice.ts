@@ -144,6 +144,7 @@ export const DeleteBooking = createAsyncThunk(
 );
 
 interface IBookingState {
+  roomQuestsMax: number;
   bookings: BookingType[] | null;
   getBookings: {
     successMessage: string | null;
@@ -169,6 +170,7 @@ interface IBookingState {
 }
 
 const initialState: IBookingState = {
+  roomQuestsMax: 2,
   bookings: null,
   getBookings: {
     successMessage: null,

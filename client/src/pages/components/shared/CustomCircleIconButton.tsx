@@ -8,7 +8,7 @@ interface Props {
   onClick: () => void;
 }
 
-export const CircleIconButton = (props: Props) => {
+export const CustomCircleIconButton = (props: Props) => {
   const { icon, sx, onClick } = props;
 
   return (

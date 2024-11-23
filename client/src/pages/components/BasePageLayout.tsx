@@ -14,7 +14,7 @@ import { EmailIcon } from "../../assets/icons/EmailIcon";
 import { EyeIcon } from "../../assets/icons/EyeIcon";
 import { theme } from "../../theme";
 import { SocialButtons } from "./SocialButtons";
-import { IconLabel } from "./shared/IconLabel";
+import { CustomIconLabel } from "./shared/CustomIconLabel";
 
 interface Props {
   children: React.ReactNode;
@@ -58,7 +58,7 @@ const BasePageLayout = (props: Props) => {
               flex: 0.9,
             }}
           >
-            <IconLabel
+            <CustomIconLabel
               icon={<PhoneIcon sx={{ fontSize: "16px" }} />}
               labelComponent={
                 <Link href="tel:+73952250100" sx={{ fontSize: "14px" }}>
@@ -67,7 +67,7 @@ const BasePageLayout = (props: Props) => {
               }
             />
 
-            <IconLabel
+            <CustomIconLabel
               icon={<EmailIcon sx={{ fontSize: "16px" }} />}
               labelComponent={
                 <Link

@@ -5,8 +5,9 @@ import CloseIcon from "@mui/icons-material/Close";
 import { NavList } from "./NavList";
 import { theme } from "../../../../../theme";
 import HotelLogo from "../../../../../assets/images/hotel_logo_ru.png";
-import { CircleIconButton } from "../../../shared/CircleIconButton";
+import { CustomCircleIconButton } from "../../../shared/CustomCircleIconButton";
 import { LocaleButton } from "../LocaleButton";
+import { CustomButton } from "../../../shared/CustomButton";
 
 interface Props {}
 
@@ -20,7 +21,7 @@ export const Nav = (props: Props) => {
 
   return (
     <>
-      <CircleIconButton
+      <CustomCircleIconButton
         icon={<MenuIcon />}
         sx={{
           order: 1,
@@ -55,7 +56,7 @@ export const Nav = (props: Props) => {
           <Stack gap="16px" flexDirection={"row"}>
             <LocaleButton />
 
-            <CircleIconButton
+            <CustomCircleIconButton
               icon={<CloseIcon />}
               onClick={() => toggleDrawer(false)}
             />
@@ -64,19 +65,15 @@ export const Nav = (props: Props) => {
 
         <NavList />
 
-        <Button
-          variant="contained"
-          size="medium"
-          color="buttonDark"
-          sx={{
+        <CustomButton
+          label={"Забронировать"}
+          containerStyle={{
+            minWidth: "210px",
             alignSelf: "center",
             margin: "24px 0",
           }}
-        >
-          <Typography variant="label" color="inherit">
-            Забронировать
-          </Typography>
-        </Button>
+          onClick={() => null}
+        />
       </Drawer>
 
       <NavList

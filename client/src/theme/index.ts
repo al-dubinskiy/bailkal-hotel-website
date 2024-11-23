@@ -102,13 +102,21 @@ const themeOptions: ThemeOptions = {
         {
           props: { variant: "contained", size: "medium", color: "buttonDark" },
           style: {
-            width: "210px",
+            minWidth: 0,
             minHeight: "50px",
             height: "50px",
             padding: "0px 15px",
             background: "#2F70D9",
             color: "#ffffff",
             display: "flex",
+
+            "& .MuiButton-startIcon": {
+              margin: 0,
+            },
+
+            "& .MuiButton-endIcon": {
+              margin: 0,
+            },
 
             "&:after": {
               content: '"🡢"',
@@ -133,12 +141,20 @@ const themeOptions: ThemeOptions = {
             color: "buttonLight",
           },
           style: {
-            width: "210px",
+            minWidth: 0,
             minHeight: "50px",
             height: "50px",
             padding: "0px 15px",
             background: "#B1CFFF",
             display: "flex",
+
+            "& .MuiButton-startIcon": {
+              margin: 0,
+            },
+
+            "& .MuiButton-endIcon": {
+              margin: 0,
+            },
 
             "&:after": {
               content: '"🡢"',
@@ -159,11 +175,20 @@ const themeOptions: ThemeOptions = {
         {
           props: { variant: "outlined", size: "medium" },
           style: {
-            border: "1px solid #173236",
+            minWidth: 0,
+            border: "1px solid #1a1a1a",
             minHeight: "50px",
             height: "50px",
             padding: "0px 15px",
             background: "#ffffff",
+
+            "& .MuiButton-startIcon": {
+              margin: 0,
+            },
+
+            "& .MuiButton-endIcon": {
+              margin: 0,
+            },
 
             "&:hover": {
               boxShadow: "none",

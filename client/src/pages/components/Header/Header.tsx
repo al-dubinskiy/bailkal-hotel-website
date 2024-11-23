@@ -13,6 +13,7 @@ import { Nav } from "./components/Nav/Nav";
 import HotelLogo from "../../../assets/images/hotel_logo_ru.png";
 import { theme } from "../../../theme";
 import { LocaleButton } from "./components/LocaleButton";
+import { CustomButton } from "../shared/CustomButton";
 
 interface Props {}
 
@@ -57,21 +58,17 @@ export const Header = (props: Props) => {
 
             <LocaleButton />
 
-            <Button
-              variant="contained"
-              size="medium"
-              color="buttonDark"
-              sx={{
+            <CustomButton
+              containerStyle={{
                 display: {
                   xs: "none",
                   sm_md: "initial",
                 },
+                minWidth: "210px",
               }}
-            >
-              <Typography variant="label" color="inherit">
-                Забронировать
-              </Typography>
-            </Button>
+              label="Забронировать"
+              onClick={() => null}
+            />
           </Stack>
         </Stack>
       </Toolbar>

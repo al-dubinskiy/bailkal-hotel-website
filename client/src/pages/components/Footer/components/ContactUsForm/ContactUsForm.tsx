@@ -1,10 +1,9 @@
 import React from "react";
-import ReactDOM from "react-dom";
 import { useFormik } from "formik";
 import * as yup from "yup";
 import { Button, TextField, Typography } from "@mui/material";
 import { theme } from "../../../../../theme";
-import { Input } from "../../../shared/FormElements/Input";
+import { CustomInput } from "../../../shared/FormElements/CustomInput";
 
 const validationSchema = yup.object({
   name: yup.string().required("Поле обязательно для заполнения"),
@@ -34,7 +33,7 @@ export const ContactUsForm = () => {
         onSubmit={formik.handleSubmit}
         style={{ display: "flex", flexDirection: "column", gap: "15px" }}
       >
-        <Input
+        <CustomInput
           id="name"
           name="name"
           label="Имя"
@@ -45,7 +44,7 @@ export const ContactUsForm = () => {
           helperText={formik.touched.name && formik.errors.name}
         />
 
-        <Input
+        <CustomInput
           id="lastname"
           name="lastname"
           label="Фамилия"
@@ -56,7 +55,7 @@ export const ContactUsForm = () => {
           helperText={formik.touched.lastname && formik.errors.lastname}
         />
 
-        <Input
+        <CustomInput
           id="email"
           name="email"
           label="Email"

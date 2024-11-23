@@ -21,7 +21,8 @@ import { GetBookings } from "../../redux/slices/Bookings/bookingsSlice";
 import BasePageLayout from "../components/BasePageLayout";
 import { GetUnavailableBookingDates } from "../../redux/slices/UnavailableBookingDates/unavailableBookingDates";
 import { theme } from "../../theme";
-import { RangeDatepicker } from "../components/shared/RangeDatepicker/RangeDatepicker";
+import { CustomRangeDatepicker } from "../components/shared/RangeDatepicker/CustomRangeDatepicker";
+import { SelectQuestsDropdown } from "./components/FiltersBar/SelectQuestsDropdown";
 
 // Типы
 type RoomCategoryPriceType = {
@@ -50,13 +51,14 @@ export const BookingPage = () => {
   const [filterParams, setFilterParams] = useState<{
     arrival_datetime: Moment;
     departure_datetime: Moment;
-    adults_count: number;
-    children_count: number;
+    roomsQuestsCount: {
+      adults: number;
+      children: number;
+    }[];
   }>({
     arrival_datetime: moment(),
     departure_datetime: moment().add(1, "days"),
-    adults_count: 1,
-    children_count: 0,
+    roomsQuestsCount: [{ adults: 1, children: 0 }],
   });
   const [promoCode, setPromoCode] = useState<string | null>(null);
   const [userInfo, setUserInfo] = useState<BookingUserInfoType>({
@@ -69,9 +71,16 @@ export const BookingPage = () => {
   const [newBookings, setNewBookings] = useState<CreateBookingType[]>([]);
   const [currentBookingStepIdx, setCurrentBookingStepIdx] = useState(0);
 
-  const questsCount = useMemo(() => {
-    return filterParams.adults_count + filterParams.children_count;
-  }, [filterParams.adults_count, filterParams.children_count]);
+  const allQuestsCount = useMemo(() => {
+    const { roomsQuestsCount } = filterParams;
+    const adultsCount = Array.from(roomsQuestsCount, (i) => i.adults).length;
+    const childrensCount = Array.from(
+      roomsQuestsCount,
+      (i) => i.children
+    ).length;
+
+    return adultsCount + childrensCount;
+  }, [filterParams.roomsQuestsCount]);
 
   const bookingsByRoomCategories = useMemo((): SortedBookingType[] | null => {
     if (roomsCategories && bookings) {
@@ -137,10 +146,7 @@ export const BookingPage = () => {
             // То записываем данные "категории комнат" в перечень доступных "категорий комнат", а именно id и price (в зав. от кол. гостей)
             availableRoomCategories.push({
               id: categoryRoom._id,
-              price:
-                questsCount === 1
-                  ? categoryRoom.price_per_night_for_one_quest
-                  : categoryRoom.price_per_night_for_two_quest,
+              price: categoryRoom.price_per_night_for_one_quest,
             });
           }
         }
@@ -216,10 +222,9 @@ export const BookingPage = () => {
 
   // Тригер для типа визуального интерфейса 1-го шага
   const isMultiRoomBooking = useMemo(() => {
-    if (filterParams.adults_count + filterParams.children_count > 2)
-      return true;
+    if (allQuestsCount > 2) return true;
     return false;
-  }, [filterParams.adults_count, filterParams.children_count]);
+  }, [allQuestsCount]);
 
   const addBookingBaseInfo = ({
     roomCategoryId,
@@ -227,14 +232,14 @@ export const BookingPage = () => {
     bookedCategoryRoomsIDs,
     tariff_id,
     adultsCount,
-    childrenCount,
+    childrensCount,
   }: {
     roomCategoryId: string;
     allCategoryRoomsIDs: string[];
     bookedCategoryRoomsIDs: string[];
     tariff_id?: string;
     adultsCount?: number;
-    childrenCount?: number;
+    childrensCount?: number;
   }) => {
     // Поиск доступного номера, который не состоит в списке забронированных номеров
     const availableRoomId = allCategoryRoomsIDs.find((roomId) => {
@@ -254,10 +259,12 @@ export const BookingPage = () => {
               phone: "",
               email: "",
             },
-        adults_count: adultsCount ? adultsCount : filterParams.adults_count,
-        children_count: childrenCount
-          ? childrenCount
-          : filterParams.children_count,
+        adults_count: adultsCount
+          ? adultsCount
+          : filterParams.roomsQuestsCount[0].adults,
+        childrens_count: childrensCount
+          ? childrensCount
+          : filterParams.roomsQuestsCount[0].children,
         arrival_datetime: filterParams.arrival_datetime.format(dateTimeFormat),
         departure_datetime:
           filterParams.departure_datetime.format(dateTimeFormat),
@@ -308,13 +315,26 @@ export const BookingPage = () => {
     return (
       <Stack
         sx={{
+          flexDirection: "row",
+          alignItems: "center",
           backgroundColor: theme.palette.primary.lighter,
           borderRadius: "20px",
           padding: "24px",
           maxHeight: "150px",
+          gap: "24px",
         }}
       >
-        <RangeDatepicker />
+        <CustomRangeDatepicker />
+
+        <SelectQuestsDropdown
+          roomsQuestsCount={filterParams.roomsQuestsCount}
+          setRoomsQuestsCount={(val) =>
+            setFilterParams((prev) => ({
+              ...prev,
+              roomsQuestsCount: val,
+            }))
+          }
+        />
       </Stack>
     );
   };
@@ -339,7 +359,7 @@ export const BookingPage = () => {
                         ),
                         tariff_id: "672bb2c0424b6e7d9c94376a",
                         adultsCount: 1,
-                        childrenCount: 0,
+                        childrensCount: 0,
                       })
                     }
                   >

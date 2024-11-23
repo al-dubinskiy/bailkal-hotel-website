@@ -13,7 +13,7 @@ interface Props {
   helperText: string | false | undefined;
 }
 
-export const Input = (props: Props) => {
+export const CustomInput = (props: Props) => {
   const { id, name, label, value, onChange, onBlur, error, helperText } = props;
 
   return (

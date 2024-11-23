@@ -3,7 +3,7 @@ import Grid from "@mui/material/Grid2";
 import { Link, Stack, Typography } from "@mui/material";
 import HotelLogo from "../../../assets/images/hotel_logo_ru.png";
 import { SocialButtons } from "../SocialButtons";
-import { IconLabel } from "../shared/IconLabel";
+import { CustomIconLabel } from "../shared/CustomIconLabel";
 import { LocationIcon } from "../../../assets/icons/LocationIcon";
 import { PhoneIcon } from "../../../assets/icons/PhoneIcon";
 import { EmailIcon } from "../../../assets/icons/EmailIcon";
@@ -62,12 +62,12 @@ export const Footer = (props: Props) => {
         <Stack gap="15px" width={"80%"}>
           <Typography variant="h4">Наши контакты</Typography>
 
-          <IconLabel
+          <CustomIconLabel
             icon={<LocationIcon sx={{ fontSize: "24px" }} />}
             label="Отель Байкал пос. Листвянка Академическая ул., 13"
           />
 
-          <IconLabel
+          <CustomIconLabel
             icon={<PhoneIcon sx={{ fontSize: "24px" }} />}
             labelComponent={
               <Typography variant="label" fontWeight={400}>
@@ -89,7 +89,7 @@ export const Footer = (props: Props) => {
             sx={{ alignItems: "flex-start" }}
           />
 
-          <IconLabel
+          <CustomIconLabel
             icon={<EmailIcon sx={{ fontSize: "24px" }} />}
             labelComponent={
               <Typography variant="label" fontWeight={400}>

@@ -8,7 +8,7 @@ interface Props {
   sx?: SxProps;
 }
 
-export const IconLabel = (props: Props) => {
+export const CustomIconLabel = (props: Props) => {
   const { icon, label, labelComponent, sx } = props;
 
   return (
