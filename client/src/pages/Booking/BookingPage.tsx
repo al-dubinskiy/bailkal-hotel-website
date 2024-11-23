@@ -178,10 +178,11 @@ export const BookingPage = () => {
           }
         }
       });
-
+      // Получение id "категорий комнат" на которые забронированы комнаты
+      const bookedOnCategoriesIds = Object.keys(bookingsByRoomCategories);
       // Добавить "категории комнат" на которые еще нет забронированных комнат
       roomsCategories.map((roomCategory) =>
-        !roomCategory.booked_rooms.length
+        !bookedOnCategoriesIds.includes(roomCategory._id)
           ? availableRoomCategories.push({
               id: roomCategory._id,
               price: roomCategory.price_per_night_for_one_quest,
@@ -250,11 +251,11 @@ export const BookingPage = () => {
     GetUnavailableBookingDatesList();
   }, [GetUnavailableBookingDatesList]);
 
-  useEffect(() => {
-    checkDateAvailable({
-      date: "2024-11-17",
-    });
-  }, [bookings, roomsCategories, unavailableBookingDates]);
+  // useEffect(() => {
+  //   checkDateAvailable({
+  //     date: "2024-11-17",
+  //   });
+  // }, [bookings, roomsCategories, unavailableBookingDates]);
 
   const availableRoomCategories = useMemo(() => {
     return getAvailableRoomCategories(
