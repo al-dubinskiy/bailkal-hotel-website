@@ -15,13 +15,15 @@ import { EyeIcon } from "../../assets/icons/EyeIcon";
 import { theme } from "../../theme";
 import { SocialButtons } from "./SocialButtons";
 import { CustomIconLabel } from "./shared/CustomIconLabel";
+import { PageTitleBanner } from "./shared/PageTitleBanner";
 
 interface Props {
   children: React.ReactNode;
+  isShowPageTitleBanner?: boolean;
 }
 
 const BasePageLayout = (props: Props) => {
-  const { children } = props;
+  const { children, isShowPageTitleBanner = false } = props;
 
   return (
     <Stack gap="24px">
@@ -104,6 +106,7 @@ const BasePageLayout = (props: Props) => {
         }}
       >
         <Header></Header>
+        {isShowPageTitleBanner ? <PageTitleBanner /> : null}
         {children}
         <Footer></Footer>
       </Container>

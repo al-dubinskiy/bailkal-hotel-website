@@ -30,7 +30,15 @@ export const NavList = (props: Props) => {
       width={{ xs: "100%", md: "initial" }}
       sx={{
         ...sx,
-        columnGap: { xs: "0px", md: "22px", lg: "43.2px" },
+        flex: 1,
+        justifyContent: "flex-end",
+        columnGap: {
+          xs: "0px",
+          md: "22px",
+          lg: "30px",
+          xl: "35px",
+          xxl: "43px",
+        },
         rowGap: { xs: "24px", md: "10px" },
         flexWrap: { xs: "nowrap", md: "wrap" },
         padding: { xs: "24px", md: "0" },

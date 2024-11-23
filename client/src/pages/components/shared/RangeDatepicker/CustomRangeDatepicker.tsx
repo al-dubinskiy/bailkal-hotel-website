@@ -6,20 +6,33 @@ import "react-datepicker/dist/react-datepicker.css";
 import "./style.css";
 import { CalendarIcon } from "../../../../assets/icons/CalendarIcon";
 import { theme } from "../../../../theme";
+import moment, { Moment } from "moment";
 
-interface Props {}
+export type DateRangeType = {
+  arrival: Moment;
+  departure: Moment;
+};
+interface Props {
+  date: DateRangeType;
+  setDate: (date: DateRangeType) => void;
+}
 
 export const CustomRangeDatepicker = (props: Props) => {
-  const {} = props;
-  const [startDate, setStartDate] = useState<Date>(new Date());
-  const [endDate, setEndDate] = useState<Date>(new Date());
+  const { date, setDate } = props;
+  const [startDate, setStartDate] = useState<Date>(date.arrival.toDate());
+  const [endDate, setEndDate] = useState<Date>(date.departure.toDate());
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
   const onChange = (dates: any) => {
-    // console.log(dates);
     const [start, end] = dates;
     setStartDate(start);
     setEndDate(end);
+    if (start && end) {
+      setDate({
+        arrival: moment(start),
+        departure: moment(end),
+      });
+    }
   };
 
   const CustomDay = ({ date }: { date: Date }) => {

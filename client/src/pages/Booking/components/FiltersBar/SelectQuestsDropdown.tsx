@@ -17,6 +17,7 @@ import { CustomButton } from "../../../components/shared/CustomButton";
 import { isEqual } from "lodash";
 import { CustomSelect } from "../../../components/shared/FormElements/CustomSelect";
 import { useAppSelector } from "../../../../hooks/redux";
+import { RemoveCircleOutline } from "@mui/icons-material";
 
 type RoomQuestsCountType = {
   adults: number;
@@ -67,6 +68,14 @@ export const SelectQuestsDropdown = (props: Props) => {
         children: 0,
       },
     ]);
+  };
+
+  const removeRoom = (index: number) => {
+    if (roomsQuestsCountLocal.length > 1) {
+      setRoomsQuestsCountLocal((prev) =>
+        prev.filter((_, idx) => idx !== index)
+      );
+    }
   };
 
   const save = () => {
@@ -183,7 +192,11 @@ export const SelectQuestsDropdown = (props: Props) => {
                               Номер {index + 1}
                             </Typography>
 
-                            <Button></Button>
+                            {index > 0 ? (
+                              <Button onClick={() => removeRoom(index)}>
+                                <RemoveCircleOutline />
+                              </Button>
+                            ) : null}
                           </Stack>
 
                           <Stack

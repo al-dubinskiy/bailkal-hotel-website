@@ -105,7 +105,7 @@ const themeOptions: ThemeOptions = {
             minWidth: 0,
             minHeight: "50px",
             height: "50px",
-            padding: "0px 15px",
+            padding: "0px 24px",
             background: "#2F70D9",
             color: "#ffffff",
             display: "flex",
@@ -144,7 +144,7 @@ const themeOptions: ThemeOptions = {
             minWidth: 0,
             minHeight: "50px",
             height: "50px",
-            padding: "0px 15px",
+            padding: "0px 24px",
             background: "#B1CFFF",
             display: "flex",
 
@@ -179,7 +179,7 @@ const themeOptions: ThemeOptions = {
             border: "1px solid #1a1a1a",
             minHeight: "50px",
             height: "50px",
-            padding: "0px 15px",
+            padding: "0px 24px",
             background: "#ffffff",
 
             "& .MuiButton-startIcon": {
