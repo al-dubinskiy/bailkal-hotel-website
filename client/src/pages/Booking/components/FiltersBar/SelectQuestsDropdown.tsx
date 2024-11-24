@@ -1,4 +1,5 @@
 import React, { useMemo, useState } from "react";
+import { v4 as uuidv4 } from "uuid";
 import {
   Box,
   Button,
@@ -15,11 +16,11 @@ import { useButtonDropdownCardStyles } from "../../../components/shared/styles";
 import { CustomCounterButton } from "../../../components/shared/CustomCounterButton";
 import { CustomButton } from "../../../components/shared/CustomButton";
 import { isEqual } from "lodash";
-import { CustomSelect } from "../../../components/shared/FormElements/CustomSelect";
 import { useAppSelector } from "../../../../hooks/redux";
 import { RemoveCircleOutline } from "@mui/icons-material";
 
-type RoomQuestsCountType = {
+export type RoomQuestsCountType = {
+  id: string;
   adults: number;
   children: number;
 };
@@ -27,21 +28,21 @@ type RoomQuestsCountType = {
 type Rooms = RoomQuestsCountType[];
 
 interface Props {
-  roomsQuestsCount: Rooms;
-  setRoomsQuestsCount: (val: Rooms) => void;
+  rooms: Rooms;
+  setRooms: (val: Rooms) => void;
 }
 
 export const SelectQuestsDropdown = (props: Props) => {
-  const { roomsQuestsCount, setRoomsQuestsCount } = props;
+  const { rooms, setRooms } = props;
   const { roomQuestsMax } = useAppSelector((state) => state.bookings);
 
   const [roomsQuestsCountLocal, setRoomsQuestsCountLocal] =
-    useState<Rooms>(roomsQuestsCount);
+    useState<Rooms>(rooms);
   const classes = useButtonDropdownCardStyles();
 
-  const roomsCount = roomsQuestsCount.length;
-  const adultsCount = Array.from(roomsQuestsCount, (i) => i.adults).length;
-  const childrensCount = Array.from(roomsQuestsCount, (i) => i.children).length;
+  const roomsCount = rooms.length;
+  const adultsCount = Array.from(rooms, (i) => i.adults).length;
+  const childrensCount = Array.from(rooms, (i) => i.children).length;
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [arrowRef, setArrowRef] = React.useState(null);
@@ -64,6 +65,7 @@ export const SelectQuestsDropdown = (props: Props) => {
     setRoomsQuestsCountLocal((prev) => [
       ...prev,
       {
+        id: uuidv4(),
         adults: 1,
         children: 0,
       },
@@ -80,16 +82,16 @@ export const SelectQuestsDropdown = (props: Props) => {
 
   const save = () => {
     if (isChanged) {
-      setRoomsQuestsCount(roomsQuestsCountLocal);
+      setRooms(roomsQuestsCountLocal);
     }
   };
 
   const isChanged = useMemo(() => {
-    if (isEqual(roomsQuestsCountLocal, roomsQuestsCount)) {
+    if (isEqual(roomsQuestsCountLocal, rooms)) {
       return false;
     }
     return true;
-  }, [roomsQuestsCount, roomsQuestsCountLocal]);
+  }, [rooms, roomsQuestsCountLocal]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -127,7 +129,11 @@ export const SelectQuestsDropdown = (props: Props) => {
             : childrensCount > 0
             ? `${childrensCount} ребен${childrensCount === 1 ? "ок" : "ка"}`
             : null}
-          {roomsCount > 0 ? `, ${roomsCount} номера` : null}
+          {roomsCount > 0
+            ? `, ${roomsCount} номер${
+                roomsCount === 1 ? "" : roomsCount > 4 ? "ов" : "a"
+              }`
+            : null}
         </Typography>
 
         <ArrowDropDownIcon
