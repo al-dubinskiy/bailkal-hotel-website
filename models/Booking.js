@@ -21,7 +21,7 @@ const schema = new Schema({
     email: { type: String, required: true },
   },
   adults_count: { type: Number, required: true },
-  childrens_count: { type: Number, required: true },
+  children_count: { type: Number, required: true },
   arrival_datetime: { type: Date, required: true },
   departure_datetime: { type: Date, required: true },
   tariff_id: {

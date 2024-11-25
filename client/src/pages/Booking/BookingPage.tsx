@@ -395,24 +395,35 @@ export const BookingPage = () => {
 
   const updateBookingSteps = useCallback(() => {
     const actionType = newBookings.actionType;
-    console.log("actionType ", actionType);
+    // console.log("actionType ", actionType);
     if (actionType !== "") {
       let steps: BookingStepType[] = bookingSteps;
       const rooms = filterParams.rooms;
       const roomsCount = rooms.length;
+      const { bookings } = newBookings;
 
       if (actionType === "addRooms") {
-        console.log("roomsCount ", roomsCount);
+        // console.log("roomsCount ", roomsCount);
 
         // Если список шагов еще пустой
         if (!steps.length) {
-          rooms.map((item, index) =>
-            steps.push({
-              roomId: item.id,
-              name: "Select a tariff",
-              isCurrent: roomsCount === 1 ? false : index === 0 ? true : false, // Делаем активным первый шаг
-            })
-          );
+          if (roomsCount === 1) {
+            rooms.map((item, index) =>
+              steps.push({
+                roomId: item.id,
+                name: "Select a room",
+                isCurrent: index === 0 ? true : false, // Делаем активным первый шаг
+              })
+            );
+          } else if (roomsCount > 1) {
+            rooms.map((item, index) =>
+              steps.push({
+                roomId: item.id,
+                name: "Select a tariff",
+                isCurrent: index === 0 ? true : false, // Делаем активным первый шаг
+              })
+            );
+          }
           rooms.map((item, index) =>
             steps.push({
               roomId: item.id,
@@ -428,25 +439,28 @@ export const BookingPage = () => {
         }
         // Если список шагов не пустой тогда делаем дозапись
         else {
-          const { bookings } = newBookings;
+          // Заменяем имя шага "Select a room" (для одиночного бронирования) на "Select a tariff"
+          // (для множественного бронирования)
+          if (roomsCount > 1) {
+            // Если есть название шага с таким именем, то...
+            steps = steps.map((i) =>
+              i.name === "Select a room" ? { ...i, name: "Select a tariff" } : i
+            );
+          }
           // Подсчет количества комнат на которые расчитаны шаги по "Select a tariff"
           const prevRoomsCount = steps.reduce(
             (acc, i) => (acc = i.name === "Select a tariff" ? acc + 1 : acc),
             0
           );
-          const newRooms = Array.from({ length: prevRoomsCount });
-          console.log("newRooms ", newRooms);
-          const lastRoomId = rooms[rooms.length - 1].id;
-          // Убираем для текущего шага статус "текущий шаг"
-          steps = steps.map((i) =>
-            i.isCurrent ? { ...i, isCurrent: false } : i
-          );
+          // Исключить предудущие и оставить новые комнаты
+          const newRooms = rooms.slice(prevRoomsCount);
+          // console.log("newRooms ", newRooms);
 
           const a: BookingStepType[] = newRooms.map((i) => {
             return {
-              roomId: lastRoomId,
+              roomId: i.id,
               name: "Select a tariff",
-              isCurrent: true,
+              isCurrent: false,
             };
           });
           // Получаем индекс последнего вхождения шага "select a tariff"
@@ -454,15 +468,15 @@ export const BookingPage = () => {
             steps,
             (step) => step.name === "Select a tariff"
           );
-          console.log("a", a);
+          // console.log("a", a);
           // Вставляем дополнительный шаг "select a tariff" и делаем его "текущим шагом"
           steps.splice(lastSelectTariffStepIdx, 0, ...a);
 
           const b: BookingStepType[] = newRooms.map((i) => {
             return {
-              roomId: lastRoomId,
+              roomId: i.id,
               name: "Order services",
-              isCurrent: true,
+              isCurrent: false,
             };
           });
           // Получаем индекс последнего вхождения шага "order services"
@@ -470,75 +484,129 @@ export const BookingPage = () => {
             steps,
             (step) => step.name === "Order services"
           );
-          console.log("b", b);
+          // console.log("b", b);
 
           // Вставляем дополнительный шаг "order services"
           steps.splice(lastOrderServicesStepIdx, 0, ...b);
         }
+        // Если для всех предыдущих комнат тарифы уже были выбраны,
+        // то убираем для текущего шага статус "текущий шаг"...
+        steps = steps.map((i) =>
+          i.isCurrent ? { ...i, isCurrent: false } : i
+        );
+        // ... и ставим его для нового шага
+        const idx = bookings.findIndex((item, i) => !item.tariff_id);
+        steps = steps.map((item, i) => {
+          if (i === idx) {
+            return { ...item, isCurrent: true };
+          }
+          return item;
+        });
       } else if (actionType === "removeRooms") {
+        // Получаем индексы комнат после удаления в фильтре "Гости"
         const roomsIds = Array.from(rooms, (i) => i.id);
-        let lastCurrentStepName = "";
-        let lastCurrentStepIdx = -1;
+
+        let currentItemIdx = steps.findIndex((i) => i.isCurrent);
+        // let isRemoveItemsBeforeCurrent = false;
+        // let isRemoveItemsAfterCurrent = false;
+        const lastCurrentStepIdx = steps.findIndex((i) => i.isCurrent);
+        let newCurrentStepIdx = -1;
+        let isSomeRemoveItemMatchCurrent = false;
+        let prevRemoveItemsCount = 0;
+        let nextRemoveItemsCount = 0;
+        // Gодсчета количества удаляемых элементов...
+        for (let i = 0; i < steps.length; i++) {
+          if (!roomsIds.includes(steps[i].roomId)) {
+            // ... до текущего элемента
+            if (i < currentItemIdx) {
+              prevRemoveItemsCount += 1;
+            }
+            // ...является текущим элементом
+            else if (i === currentItemIdx) {
+              isSomeRemoveItemMatchCurrent = true;
+            }
+            // ...больше текущего элемента
+            else if (i > currentItemIdx) {
+              nextRemoveItemsCount += 1;
+            }
+          }
+        }
 
         // Удалить все шаги, id комнат которых уже нет в списке фильтра "Гости"
-        steps = steps.filter((i, idx) => {
-          const includes = roomsIds.includes(i.roomId);
-          if (!includes && i.isCurrent) {
-            lastCurrentStepName = i.name;
-            lastCurrentStepIdx = idx;
-          }
-          return includes;
-        });
-        // Установить статус "текущий" для нового шага, относительно это формулы
-        // b, g, f | r, m, n | o - элементы (если текущий шар "выбор тарифа" (применяем для прошлого индекса))
-        // 0  1  2 | 3  4  5 | 6 - индексы
-        // f | n | o - элементы после удаления
-        // 0 | 1 | 2 - индексы после удаления
-        // ------
-        // b, g, f | r, m, n | o - элементы (если текущий шар "выбор услуг" (применяем для прошлого индекса - 2))
-        // 0  1  2 | 3  4  5 | 6 - индексы
-        // b, f | r, n | o  элементы после удаления
-        // 0, 1 | 2, 3 | 4 - индексы после удаления
-
-        const newCurrentStepIdx =
-          lastCurrentStepName === "Select a tariff"
-            ? lastCurrentStepIdx
-            : lastCurrentStepName === "Order services"
-            ? lastCurrentStepIdx - 2
-            : lastCurrentStepIdx;
+        steps = steps.filter((i) => roomsIds.includes(i.roomId));
 
         // Убираем для текущего шага статус "текущий шаг"
         steps = steps.map((i) =>
           i.isCurrent ? { ...i, isCurrent: false } : i
         );
-        // Ставим новый "текущий шаг"
-        steps = steps.map((item, index) =>
-          index === newCurrentStepIdx ? { ...item, isCurrent: true } : item
-        );
-      }
-      console.log(steps.findIndex((i) => i.name === "Select a room"));
-      // Если комнат в фильтре "Гости" == 1,
-      // то добавляем шаг (для бронирования одной комнаты) "Select a room"
-      if (
-        roomsCount === 1 &&
-        steps.findIndex((i) => i.name === "Select a room") === -1
-      ) {
-        console.log(456);
-        steps.splice(0, 0, {
-          roomId: rooms[0].id,
-          name: "Select a room",
-          isCurrent: true,
-        });
-      }
-      // Если комнат в фильтре "Гости" было выбрано больше одной,
-      // то удаляем (если существует) шаг для бронирования одной комнаты "Select a room"
-      else if (
-        roomsCount > 1 &&
-        steps.findIndex((i) => i.name === "Select a room") !== -1
-      ) {
-        steps = steps.filter((i) => i.name !== "Select a room");
-      }
 
+        // Если удаляемые элементы расположены только до текущего элемента
+        if (
+          prevRemoveItemsCount > 0 &&
+          !isSomeRemoveItemMatchCurrent &&
+          nextRemoveItemsCount === 0
+        ) {
+          // в примере индексация элементов начинается с "1"
+          // a b c | f g h | o -
+          // 1 2 3 | 4 5 6 | 7
+          // --- 1 ---
+          // a c | f h | o -> b g элементы были удалены
+          // 1 2 | 3 4 | 5
+          // --- 2 ---
+          // c | h | o -> a b f g элементы были удалены
+          // 1 | 2 | 3
+          newCurrentStepIdx = lastCurrentStepIdx - prevRemoveItemsCount;
+        } else if (
+          prevRemoveItemsCount > 0 &&
+          isSomeRemoveItemMatchCurrent &&
+          nextRemoveItemsCount === 0
+        ) {
+          // a b c | f g h | o -
+          // 1 2 3 | 4 5 6 | 7
+          // --- 1 ---
+          // c | h | o -> g (current) a b f g элементы были удалены
+          // 1 | 2 | 3
+          // --- 2 ---
+          // b c | g h | o -> f (current) a f элементы были удалены
+          // 1 2 | 3 4 | 5
+          newCurrentStepIdx = lastCurrentStepIdx - prevRemoveItemsCount + 1;
+        } else if (
+          prevRemoveItemsCount > 0 &&
+          isSomeRemoveItemMatchCurrent &&
+          nextRemoveItemsCount > 0
+        ) {
+          // a b c | f g h | o -
+          // 1 2 3 | 4 5 6 | 7
+          // --- 1 ---
+          // a | f | o -> g (current) b c g h элементы были удалены
+          // 1 | 2 | 3
+          // --- 2 ---
+          // b c | g h | o -> f (current) b c g h элементы были удалены
+          // 1 2 | 3 4 | 5
+          newCurrentStepIdx =
+            lastCurrentStepIdx -
+            prevRemoveItemsCount +
+            1 +
+            nextRemoveItemsCount;
+        }
+
+        if (newCurrentStepIdx < 0) newCurrentStepIdx = 0;
+        // Устанавливаем состояние "текущий" для нового шага
+        steps = steps.map((item, i) =>
+          i === newCurrentStepIdx ? { ...item, isCurrent: true } : item
+        );
+
+        // Заменяем имя шага "Select a tariff" (для множественного бронирования) на "Select a room"
+        // (для одиночного бронирования)
+        if (roomsCount === 1) {
+          // Если есть название шага с таким именем, то...
+          steps = steps.map((item, i) =>
+            item.name === "Select a tariff" && i === 0
+              ? { ...item, name: "Select a room" }
+              : item
+          );
+        }
+      }
       setBookingSteps(steps);
     }
   }, [newBookings]);
@@ -557,6 +625,7 @@ export const BookingPage = () => {
     const { bookings } = newBookings;
     // 1. Если фильтр "Гости" был установлен первый раз список букингов еще пустой
     if (rooms.length && !bookings.length) {
+      // Создать черновики букингов по количеству выбранных комнат в фильтре "Гости"
       const data = rooms.map((i): CreateBookingLocalType => {
         return createNewBookingDraft({
           tempId: i.id,
@@ -574,9 +643,9 @@ export const BookingPage = () => {
       setNewBookings((prev) => {
         const data = newRooms.map((i) => {
           return createNewBookingDraft({
-            tempId: rooms[rooms.length - 1].id,
-            adultsCount: rooms[rooms.length - 1].adults,
-            childrenCount: rooms[rooms.length - 1].children,
+            tempId: i.id,
+            adultsCount: i.adults,
+            childrenCount: i.children,
           });
         });
         return {
@@ -628,6 +697,31 @@ export const BookingPage = () => {
   useEffect(() => {
     updateNewBookingsDates();
   }, [updateNewBookingsDates]);
+
+  // Обновить количество гостей для букингов если был изменен фильтр "Гости"
+  const updateNewBookingsQuests = useCallback(() => {
+    const { rooms } = filterParams;
+    const { bookings } = newBookings;
+
+    if (rooms.length === bookings.length) {
+      setNewBookings((prev) => {
+        return {
+          bookings: prev.bookings.map((item, i) => {
+            return {
+              ...item,
+              adults_count: rooms[i].adults,
+              children_count: rooms[i].children,
+            };
+          }),
+          actionType: "",
+        };
+      });
+    }
+  }, [filterParams.rooms]);
+
+  useEffect(() => {
+    updateNewBookingsQuests();
+  }, [updateNewBookingsQuests]);
 
   const FiltersBar = () => {
     return (

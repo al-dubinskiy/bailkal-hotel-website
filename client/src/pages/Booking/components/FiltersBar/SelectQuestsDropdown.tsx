@@ -198,7 +198,7 @@ export const SelectQuestsDropdown = (props: Props) => {
                               Номер {index + 1}
                             </Typography>
 
-                            {index > 0 ? (
+                            {rooms.length > 1 ? (
                               <Button onClick={() => removeRoom(index)}>
                                 <RemoveCircleOutline />
                               </Button>
