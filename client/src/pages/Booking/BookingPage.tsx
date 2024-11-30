@@ -84,6 +84,7 @@ type BookingStepType = {
   roomId: string;
   name: BookingStepNameType;
   isCurrent: boolean;
+  isComplete: boolean;
 };
 
 const locales: LocaleType[] = [
@@ -430,6 +431,7 @@ export const BookingPage = () => {
                 roomId: item.id,
                 name: "Select a room",
                 isCurrent: index === 0 ? true : false, // Делаем активным первый шаг
+                isComplete: false,
               })
             );
           } else if (roomsCount > 1) {
@@ -438,6 +440,7 @@ export const BookingPage = () => {
                 roomId: item.id,
                 name: "Select a tariff",
                 isCurrent: index === 0 ? true : false, // Делаем активным первый шаг
+                isComplete: false,
               })
             );
           }
@@ -446,12 +449,14 @@ export const BookingPage = () => {
               roomId: item.id,
               name: "Order services",
               isCurrent: false,
+              isComplete: false,
             })
           );
           steps.push({
             roomId: "",
             name: "Enter guest details",
             isCurrent: false,
+            isComplete: false,
           });
         }
         // Если список шагов не пустой тогда делаем дозапись
@@ -478,6 +483,7 @@ export const BookingPage = () => {
               roomId: i.id,
               name: "Select a tariff",
               isCurrent: false,
+              isComplete: false,
             };
           });
           // Получаем индекс последнего вхождения шага "select a tariff"
@@ -494,6 +500,7 @@ export const BookingPage = () => {
               roomId: i.id,
               name: "Order services",
               isCurrent: false,
+              isComplete: false,
             };
           });
           // Получаем индекс последнего вхождения шага "order services"
@@ -804,6 +811,34 @@ export const BookingPage = () => {
   };
 
   const prevBookingStepLabel = useMemo(() => {
+    const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
+    if (curIdx) {
+      const prevCurIdx = curIdx > 0 ? curIdx - 1 : 0;
+      const prevCur = bookingSteps.find((_, idx) => idx === prevCurIdx);
+      if (prevCur) {
+        if (prevCur.name === "Select a room") {
+          return "К номерам";
+        } else if (prevCur.name === "Select a tariff") {
+          const elements = bookingSteps.filter(
+            (i) => i.name === "Select a tariff"
+          );
+          const idx = elements.findIndex((i) => i.roomId === prevCur.roomId);
+          // Если индекс не равен последнем элементу данного типа шага
+          return idx && idx < elements.length - 1
+            ? `К тарифам ${idx + 1}-го номера`
+            : "К тарифам";
+        } else if (prevCur.name === "Order services") {
+          const elements = bookingSteps.filter(
+            (i) => i.name === "Order services"
+          );
+          const idx = elements.findIndex((i) => i.roomId === prevCur.roomId);
+          // Если индекс не равен последнем элементу данного типа шага
+          return idx && idx < elements.length - 1
+            ? `К услугам ${idx + 1}-го номера`
+            : "К услугам";
+        }
+      }
+    }
     return "";
   }, [bookingSteps]);
 
@@ -812,20 +847,22 @@ export const BookingPage = () => {
     if (curName === "Select a room") {
       return "Выберите номер";
     } else if (curName === "Select a tariff") {
-      const idx = bookingSteps
-        .filter((i) => i.name === "Select a tariff")
-        .findIndex((i) => i.isCurrent);
+      const elements = bookingSteps.filter((i) => i.name === "Select a tariff");
+      const idx = elements.findIndex((i) => i.isCurrent);
 
       if (idx) {
-        return `Выберите номер для ${idx + 1}-го номера`;
+        return elements.length > 1
+          ? `Выберите тариф для ${idx + 1}-го номера`
+          : "Выберите тариф";
       }
     } else if (curName === "Order services") {
-      const idx = bookingSteps
-        .filter((i) => i.name === "Order services")
-        .findIndex((i) => i.isCurrent);
+      const elements = bookingSteps.filter((i) => i.name === "Order services");
+      const idx = elements.findIndex((i) => i.isCurrent);
 
       if (idx) {
-        return `Закажите услуги для ${idx + 1}-го номера`;
+        return elements.length > 1
+          ? `Закажите услуги для ${idx + 1}-го номера`
+          : "Выберите услуги";
       }
     } else if (curName === "Enter guest details") {
       return "Введите данные гостей";
@@ -834,8 +871,50 @@ export const BookingPage = () => {
   }, [bookingSteps]);
 
   const nextBookingStepLabel = useMemo(() => {
+    const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
+    if (curIdx) {
+      const nextCurIdx =
+        curIdx < bookingSteps.length - 1 ? curIdx + 1 : bookingSteps.length - 1;
+      const nextCur = bookingSteps.find((_, idx) => idx === nextCurIdx);
+      if (nextCur) {
+        if (nextCur.isComplete) {
+          return "Продолжить бронирование";
+        }
+      }
+    }
     return "";
   }, [bookingSteps]);
+
+  const toPrevStep = () => {
+    const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
+    if (curIdx) {
+      const prevCurIdx = curIdx > 0 ? curIdx - 1 : 0;
+      if (prevCurIdx !== curIdx) {
+        setBookingSteps((prev) =>
+          prev.map((item, idx) => ({
+            ...item,
+            isCurrent: idx === prevCurIdx ? true : false,
+          }))
+        );
+      }
+    }
+  };
+
+  const toNextStep = () => {
+    const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
+    if (curIdx) {
+      const nextCurIdx =
+        curIdx < bookingSteps.length - 1 ? curIdx + 1 : bookingSteps.length - 1;
+      if (nextCurIdx !== curIdx) {
+        setBookingSteps((prev) =>
+          prev.map((item, idx) => ({
+            ...item,
+            isCurrent: idx === nextCurIdx ? true : false,
+          }))
+        );
+      }
+    }
+  };
 
   const RoomCategoriesCards = () => {
     if (roomsCategories && roomsCategories?.length) {
@@ -892,10 +971,12 @@ export const BookingPage = () => {
         >
           <BookingStepsIndicatorBaner
             currentStepLabel={currentBookingStepLabel}
-            prevStepLabel="К тарифам"
-            prevStepHandler={() => null}
-            nextStepLabel="Продолжить бронирование"
-            nextStepHandler={() => null}
+            prevStepLabel={prevBookingStepLabel}
+            prevStepHandler={toPrevStep}
+            nextStepLabel={nextBookingStepLabel}
+            nextStepHandler={toNextStep}
+            currentStep={bookingSteps.findIndex((i) => i.isCurrent) + 1 || 1}
+            stepsTotal={bookingSteps.length}
           />
 
           <Grid container spacing={2}>

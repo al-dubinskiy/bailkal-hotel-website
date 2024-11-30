@@ -11,6 +11,8 @@ interface Props {
   prevStepHandler: () => void;
   nextStepLabel: string;
   nextStepHandler: () => void;
+  stepsTotal: number;
+  currentStep: number;
 }
 
 export const BookingStepsIndicatorBaner = (props: Props) => {
@@ -20,6 +22,8 @@ export const BookingStepsIndicatorBaner = (props: Props) => {
     prevStepHandler,
     nextStepLabel,
     nextStepHandler,
+    stepsTotal,
+    currentStep,
   } = props;
   return (
     <Stack
@@ -31,7 +35,6 @@ export const BookingStepsIndicatorBaner = (props: Props) => {
         borderTopRightRadius: "20px",
         backgroundColor: "#EEF4FF",
         height: "90px",
-        padding: "24px",
       }}
     >
       <Stack
@@ -42,22 +45,26 @@ export const BookingStepsIndicatorBaner = (props: Props) => {
           justifyContent: "space-between",
           gap: "24px",
           position: "relative",
+          padding: "0 24px",
+          height: "80px",
         }}
       >
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
-          <CustomCircleIconButton
-            icon={<SolarArrowLeftOutlineIcon sx={{ fontSize: "32px" }} />}
-            onClick={prevStepHandler}
-          />
-          <Typography variant="label">{prevStepLabel}</Typography>
-        </Box>
+        {prevStepLabel ? (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <CustomCircleIconButton
+              icon={<SolarArrowLeftOutlineIcon sx={{ fontSize: "32px" }} />}
+              onClick={prevStepHandler}
+            />
+            <Typography variant="label">{prevStepLabel}</Typography>
+          </Box>
+        ) : null}
 
         <Typography
           variant="label"
@@ -71,34 +78,43 @@ export const BookingStepsIndicatorBaner = (props: Props) => {
           {currentStepLabel}
         </Typography>
 
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "row",
-            alignItems: "center",
-            gap: "10px",
-          }}
-        >
-          <Typography variant="label">{nextStepLabel}</Typography>
-          <CustomCircleIconButton
-            icon={<SolarArrowRightOutlineIcon sx={{ fontSize: "32px" }} />}
-            onClick={nextStepHandler}
-          />
-        </Box>
+        {nextStepLabel ? (
+          <Box
+            sx={{
+              display: "flex",
+              flexDirection: "row",
+              alignItems: "center",
+              gap: "10px",
+            }}
+          >
+            <Typography variant="label">{nextStepLabel}</Typography>
+            <CustomCircleIconButton
+              icon={<SolarArrowRightOutlineIcon sx={{ fontSize: "32px" }} />}
+              onClick={nextStepHandler}
+            />
+          </Box>
+        ) : null}
       </Stack>
 
       <Box
         sx={{
-          height: "10px",
-          background: theme.palette.primary.dark,
+          width: "100%",
+          height: "8px",
+          background: theme.palette.primary.lighter,
           borderRadius: "20px",
           overflow: "hidden",
+          position: "relative",
         }}
       >
         <Box
           sx={{
-            width: "30%",
-            background: theme.palette.primary.lighter,
+            width: `${(currentStep * 100) / stepsTotal}%`,
+            height: "100%",
+            background: theme.palette.primary.dark,
+            position: "absolute",
+            top: 0,
+            left: 0,
+            borderRadius: "20px",
           }}
         ></Box>
       </Box>
