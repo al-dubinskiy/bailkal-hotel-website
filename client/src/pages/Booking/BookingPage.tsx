@@ -13,6 +13,7 @@ import {
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import moment, { Moment } from "moment";
 import { Box, Button, Card, Stack, Typography } from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Grid from "@mui/material/Grid2";
 import { dateTimeFormat } from "../../constants";
 import { BookingInfoWidget } from "./components/BookingInfoWidget";
@@ -32,8 +33,24 @@ import {
 } from "./components/FiltersBar/SelectQuestsDropdown";
 import { CustomButton } from "../components/shared/CustomButton";
 import { CustomSelect } from "../components/shared/FormElements/CustomSelect";
-import { setLocale } from "yup";
 import { findLastIndex } from "lodash";
+import { CustomIconLabel } from "../components/shared/CustomIconLabel";
+import { OneQuestIcon } from "../../assets/icons/OneQuestIcon";
+import { RoomSizeIcon } from "../../assets/icons/RoomSizeIcon";
+import { RoomsCountIcon } from "../../assets/icons/RoomsCountIcon";
+import { CustomCircleIconButton } from "../components/shared/CustomCircleIconButton";
+import { ShowerIcon } from "../../assets/icons/ShowerIcon";
+import { TwoPersonsBedIcon } from "../../assets/icons/TwoPersonsBedIcon";
+import { BalconyIcon } from "../../assets/icons/BalconyIcon";
+import { WifiIcon } from "../../assets/icons/WifiIcon";
+import { SafeIcon } from "../../assets/icons/SafeIcon";
+import { CustomSimpleImageSlider } from "../components/shared/CustomSimpleSlider.ts/CustomSimpleImageSlider";
+import {
+  deluxeKingRooms,
+  deluxeTwinRooms,
+  suiteRooms,
+} from "../../assets/images";
+import { BookingStepsIndicatorBaner } from "./components/BookingStepsIndicatorBaner";
 
 // Типы
 type RoomCategoryPriceType = {
@@ -786,10 +803,44 @@ export const BookingPage = () => {
     );
   };
 
+  const prevBookingStepLabel = useMemo(() => {
+    return "";
+  }, [bookingSteps]);
+
+  const currentBookingStepLabel = useMemo(() => {
+    const curName = bookingSteps.find((i) => i.isCurrent)?.name;
+    if (curName === "Select a room") {
+      return "Выберите номер";
+    } else if (curName === "Select a tariff") {
+      const idx = bookingSteps
+        .filter((i) => i.name === "Select a tariff")
+        .findIndex((i) => i.isCurrent);
+
+      if (idx) {
+        return `Выберите номер для ${idx + 1}-го номера`;
+      }
+    } else if (curName === "Order services") {
+      const idx = bookingSteps
+        .filter((i) => i.name === "Order services")
+        .findIndex((i) => i.isCurrent);
+
+      if (idx) {
+        return `Закажите услуги для ${idx + 1}-го номера`;
+      }
+    } else if (curName === "Enter guest details") {
+      return "Введите данные гостей";
+    }
+    return "";
+  }, [bookingSteps]);
+
+  const nextBookingStepLabel = useMemo(() => {
+    return "";
+  }, [bookingSteps]);
+
   const RoomCategoriesCards = () => {
     if (roomsCategories && roomsCategories?.length) {
       // Тип интерфейса для множественного выбора номеров (со списком номеров и тарифов)
-      if (filterParams.rooms.length > 1)
+      if (filterParams.rooms.length > 1) {
         return (
           <Box>
             {roomsCategories && roomsCategories?.length
@@ -826,49 +877,276 @@ export const BookingPage = () => {
             />
           </Box>
         );
+      }
+
       // Тип интерфейса для выбора одного номера (со списком номеров)
       return (
-        <Box sx={{ flexGrow: 1 }}>
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "column",
+            alignItems: "stretch",
+            gap: "24px",
+            margin: "24px 0",
+          }}
+        >
+          <BookingStepsIndicatorBaner
+            currentStepLabel={currentBookingStepLabel}
+            prevStepLabel="К тарифам"
+            prevStepHandler={() => null}
+            nextStepLabel="Продолжить бронирование"
+            nextStepHandler={() => null}
+          />
+
           <Grid container spacing={2}>
-            {roomsCategories.map((roomCategory, index) => {
-              return (
-                <Grid size={{ xs: 12, md: 3 }} key={index}>
-                  <Typography>{roomCategory.title}</Typography>
-                  {/* Проверка нет ли уже забронированого номера на выбранную дату "заезда" и "выезда" */}
-                  {availableRoomCategories?.findIndex(
-                    (i) => i.id === roomCategory._id
-                  ) ? (
-                    <CustomButton
-                      label={"Выбрать"}
-                      onClick={
-                        () => null
-                        // addBookingBaseInfo({
-                        //   roomCategoryId: roomCategory._id,
-                        //   allCategoryRoomsIDs: roomCategory.room_id,
-                        //   bookedCategoryRoomsIDs: Array.from(
-                        //     roomCategory.booked_rooms,
-                        //     (i) => i.room_id
-                        //   ),
-                        //   adultsCount: filterParams.rooms[0].adults,
-                        //   childrenCount: filterParams.rooms[0].children,
-                        // })
-                      }
-                      containerVariant="contained"
-                      containerBackgroundColor="buttonDark"
-                      withoutAnimation
-                    />
-                  ) : (
-                    <CustomButton
-                      label={"Доступные даты для заезда"}
-                      onClick={() => null}
-                      containerVariant="outlined"
-                      containerBackgroundColor="buttonLight"
-                      withoutAnimation
-                    />
-                  )}
-                </Grid>
-              );
-            })}
+            {availableRoomCategories &&
+              roomsCategories.map((roomCategory, index) => {
+                const isRoomExist = availableRoomCategories.findIndex(
+                  (i) => i.id === roomCategory._id
+                );
+                const roomPhotos =
+                  roomCategory._id === "672cd21f0ae43935e03a79dd" ||
+                  roomCategory._id === "672cd2a790ef8a2d0cdfcac3"
+                    ? deluxeKingRooms
+                    : roomCategory._id === "672cd30090ef8a2d0cdfcac6" ||
+                      roomCategory._id === "672cd34e90ef8a2d0cdfcac9"
+                    ? deluxeTwinRooms
+                    : roomCategory._id === "672cd65af65cf0e5caff9686"
+                    ? suiteRooms
+                    : [];
+
+                return (
+                  <Grid size={{ xs: 12, md: 6, lg: 4 }} key={index}>
+                    <Stack
+                      sx={{
+                        overflow: "hidden",
+                        flexDirection: "column",
+                        alignItems: "stretch",
+                        flex: 1,
+                        borderRadius: "20px",
+                        border: `1px solid ${theme.palette.primary.light}`,
+                        "&:hover": {
+                          border: `1px solid ${theme.palette.primary.dark}`,
+                        },
+                      }}
+                    >
+                      <Stack sx={{ height: "350px", position: "relative" }}>
+                        <Box
+                          sx={{
+                            display: "flex",
+                            flexDirection: "row",
+                            alignItems: "center",
+                            height: "40px",
+                            gap: "10px",
+                            position: "absolute",
+                            top: "10px",
+                            right: "10px",
+                            backgroundColor: "rgba(217,217,217, 0.7)",
+                            borderRadius: "10px",
+                            padding: "10px",
+                            zIndex: 1,
+                          }}
+                        >
+                          <ShowerIcon sx={{ fontSize: "24px" }} />
+                          <TwoPersonsBedIcon sx={{ fontSize: "24px" }} />
+                          <BalconyIcon sx={{ fontSize: "24px" }} />
+                          <WifiIcon sx={{ fontSize: "24px" }} />
+                          <SafeIcon sx={{ fontSize: "24px" }} />
+                        </Box>
+
+                        <CustomSimpleImageSlider images={roomPhotos} />
+                      </Stack>
+
+                      <Stack sx={{ flex: 1, padding: "24px", gap: "24px" }}>
+                        <Stack
+                          sx={{
+                            flexDirection: "row",
+                            alignItems: "flex-start",
+                            justifyContent: "space-between",
+                            gap: "24px",
+                          }}
+                        >
+                          <Typography variant="h5">
+                            {roomCategory.title}
+                          </Typography>
+
+                          <CustomCircleIconButton
+                            icon={<KeyboardArrowDownIcon />}
+                            onClick={() => null}
+                          />
+                        </Stack>
+
+                        <Stack
+                          sx={{
+                            flexDirection: "row",
+                            gap: "24px",
+                            flexWrap: "wrap",
+                          }}
+                        >
+                          <CustomIconLabel
+                            icon={<OneQuestIcon sx={{ fontSize: "16px" }} />}
+                            labelComponent={
+                              <Typography variant="label">до 2 мест</Typography>
+                            }
+                          />
+                          <CustomIconLabel
+                            icon={<RoomSizeIcon sx={{ fontSize: "16px" }} />}
+                            labelComponent={
+                              <Typography variant="label">20 м²</Typography>
+                            }
+                          />
+                          <CustomIconLabel
+                            icon={<RoomsCountIcon sx={{ fontSize: "16px" }} />}
+                            labelComponent={
+                              <Typography variant="label">16 комнат</Typography>
+                            }
+                          />
+                        </Stack>
+
+                        <Stack
+                          sx={{
+                            flexDirection: isRoomExist ? "row" : "column",
+                            alignItems: isRoomExist ? "flex-end" : "stretch",
+                            justifyContent: isRoomExist
+                              ? "space-between"
+                              : "center",
+                            gap: "24px",
+                          }}
+                        >
+                          {isRoomExist ? (
+                            <Stack
+                              sx={{
+                                flexDirection: "column",
+                                alignItems: "flex-start",
+                                gap: "0px",
+                              }}
+                            >
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                }}
+                              >
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    backgroundColor:
+                                      theme.palette.secondary.main,
+                                  }}
+                                >
+                                  <Typography variant="body">-15%</Typography>
+                                </Box>
+
+                                <Typography
+                                  variant="body"
+                                  sx={{
+                                    color: theme.palette.gray.light,
+                                    textDecoration: "line-through",
+                                  }}
+                                >
+                                  -6600 ₽
+                                </Typography>
+                              </Box>
+
+                              <Box
+                                sx={{
+                                  display: "flex",
+                                  flexDirection: "row",
+                                  alignItems: "center",
+                                  gap: "10px",
+                                }}
+                              >
+                                <Typography
+                                  variant="body"
+                                  sx={{ color: theme.palette.gray.light }}
+                                >
+                                  от
+                                </Typography>
+
+                                <Typography
+                                  variant="body"
+                                  sx={{
+                                    color: theme.palette.primary.dark,
+                                    fontSize: "20.8px",
+                                  }}
+                                >
+                                  5610 ₽
+                                </Typography>
+                              </Box>
+                              <Typography variant="body">
+                                1 ночь / 1 гость
+                              </Typography>
+                            </Stack>
+                          ) : (
+                            <Box
+                              sx={{
+                                display: "flex",
+                                flexDirection: "column",
+                                alignItems: "center",
+                                gap: "5px",
+                              }}
+                            >
+                              <Typography
+                                variant="label"
+                                sx={{
+                                  fontWeight: "400",
+                                  color: theme.palette.primary.dark,
+                                }}
+                              >
+                                Ближайшая дата (2 дня подряд)
+                              </Typography>
+                              <Typography
+                                variant="label"
+                                sx={{
+                                  fontWeight: "600",
+                                  color: theme.palette.primary.dark,
+                                }}
+                              >
+                                14 октября - 16 октября
+                              </Typography>
+                            </Box>
+                          )}
+
+                          {/* Проверка нет ли уже забронированого номера на выбранную дату "заезда" и "выезда" */}
+                          {isRoomExist ? (
+                            <CustomButton
+                              label={"Выбрать"}
+                              onClick={
+                                () => null
+                                // addBookingBaseInfo({
+                                //   roomCategoryId: roomCategory._id,
+                                //   allCategoryRoomsIDs: roomCategory.room_id,
+                                //   bookedCategoryRoomsIDs: Array.from(
+                                //     roomCategory.booked_rooms,
+                                //     (i) => i.room_id
+                                //   ),
+                                //   adultsCount: filterParams.rooms[0].adults,
+                                //   childrenCount: filterParams.rooms[0].children,
+                                // })
+                              }
+                              containerVariant="contained"
+                              containerBackgroundColor="buttonDark"
+                              withoutAnimation
+                            />
+                          ) : (
+                            <CustomButton
+                              label={"Доступные даты для заезда"}
+                              onClick={() => null}
+                              containerVariant="outlined"
+                              containerBackgroundColor="buttonLight"
+                              withoutAnimation
+                            />
+                          )}
+                        </Stack>
+                      </Stack>
+                    </Stack>
+                  </Grid>
+                );
+              })}
           </Grid>
         </Box>
       );

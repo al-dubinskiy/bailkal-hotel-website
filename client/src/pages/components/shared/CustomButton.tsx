@@ -36,7 +36,6 @@ export const CustomButton = (props: Props) => {
       startIcon={startIcon}
       endIcon={endIcon}
       sx={{
-        ...containerStyle,
         opacity: !disabled ? 1 : 0.7,
         "&:hover": {
           opacity: !withoutAnimation ? 1 : 0.7,
@@ -45,6 +44,7 @@ export const CustomButton = (props: Props) => {
           content: withoutAnimation ? "''" : '"🡢"',
           display: withoutAnimation ? "none" : "unset",
         },
+        ...containerStyle,
       }}
       onClick={onClick}
       disabled={disabled}

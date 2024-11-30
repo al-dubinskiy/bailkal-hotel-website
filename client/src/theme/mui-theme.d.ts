@@ -69,7 +69,6 @@ declare module "@mui/material/Typography" {
     small: true;
     mini: false;
     tiny: false;
-    h5: false;
     h6: false;
     subtitle1: false;
     subtitle2: false;

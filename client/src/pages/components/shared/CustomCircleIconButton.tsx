@@ -22,7 +22,7 @@ export const CustomCircleIconButton = (props: Props) => {
         padding: "15px",
         width: "50px",
         height: "50px",
-        minWidth: "0px",
+        minWidth: "50px",
         color: theme.palette.gray.dark,
         background: theme.palette.layoutBackground.light,
 
