@@ -1,20 +1,14 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
 import { v4 as uuidv4 } from "uuid";
 import {
   BookingType,
   BookingUserInfoType,
   CreateBookingType,
 } from "../../redux/slices/Bookings/types";
-import {
-  BookedRoomType,
-  RoomCategoryType,
-} from "../../redux/slices/RoomsCategories/types";
+import { RoomCategoryType } from "../../redux/slices/RoomsCategories/types";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import moment, { Moment } from "moment";
 import { Box, Button, Card, Stack, Typography } from "@mui/material";
-import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import Grid from "@mui/material/Grid2";
 import { dateTimeFormat } from "../../constants";
 import { BookingInfoWidget } from "./components/BookingInfoWidget";
 import { GroupObjectByKey } from "./utils";
@@ -31,29 +25,12 @@ import {
   RoomQuestsCountType,
   SelectQuestsDropdown,
 } from "./components/FiltersBar/SelectQuestsDropdown";
-import { CustomButton } from "../components/shared/CustomButton";
 import { CustomSelect } from "../components/shared/FormElements/CustomSelect";
 import { findLastIndex } from "lodash";
-import { CustomIconLabel } from "../components/shared/CustomIconLabel";
-import { OneQuestIcon } from "../../assets/icons/OneQuestIcon";
-import { RoomSizeIcon } from "../../assets/icons/RoomSizeIcon";
-import { RoomsCountIcon } from "../../assets/icons/RoomsCountIcon";
-import { CustomCircleIconButton } from "../components/shared/CustomCircleIconButton";
-import { ShowerIcon } from "../../assets/icons/ShowerIcon";
-import { TwoPersonsBedIcon } from "../../assets/icons/TwoPersonsBedIcon";
-import { BalconyIcon } from "../../assets/icons/BalconyIcon";
-import { WifiIcon } from "../../assets/icons/WifiIcon";
-import { SafeIcon } from "../../assets/icons/SafeIcon";
-import { CustomSimpleImageSlider } from "../components/shared/CustomSimpleSlider.ts/CustomSimpleImageSlider";
-import {
-  deluxeKingRooms,
-  deluxeTwinRooms,
-  suiteRooms,
-} from "../../assets/images";
-import { BookingStepsIndicatorBaner } from "./components/BookingStepsIndicatorBaner";
+import { SelectRoomSection } from "./components/SelectRoomSection";
 
 // Типы
-type RoomCategoryPriceType = {
+export type RoomCategoryPriceType = {
   id: string;
   price: number;
 };
@@ -73,14 +50,14 @@ type LocaleType = {
   value: string;
 };
 
-type BookingStepNameType =
+export type BookingStepNameType =
   | "Select a room"
   | "Select a tariff"
   | "Order services"
   | "Enter guest details"
   | "";
 
-type BookingStepType = {
+export type BookingStepType = {
   roomId: string;
   name: BookingStepNameType;
   isCurrent: boolean;
@@ -107,6 +84,17 @@ type CreateBookingLocalType = CreateBookingType & { tempId: string };
 type NewBookingsType = {
   bookings: CreateBookingLocalType[];
   actionType: ActionType;
+};
+
+export type BookingProgressStepType = {
+  step: BookingStepType | null;
+  label: string;
+};
+
+export type BookingProgressType = {
+  currentStep: BookingProgressStepType;
+  prevStep: BookingProgressStepType;
+  nextStep: BookingProgressStepType;
 };
 
 interface Props {}
@@ -210,7 +198,7 @@ export const BookingPage = () => {
   const getAvailableRoomCategories = (
     date: string
   ): RoomCategoryPriceType[] | null => {
-    if (roomsCategories && bookings && sortedBookingsByRoomCategories) {
+    if (roomsCategories && sortedBookingsByRoomCategories) {
       const availableRoomCategories: RoomCategoryPriceType[] = [];
 
       Object.entries(sortedBookingsByRoomCategories).map((item: any, index) => {
@@ -270,6 +258,12 @@ export const BookingPage = () => {
     return null;
   };
 
+  const availableRoomCategories = useMemo(() => {
+    return getAvailableRoomCategories(
+      filterParams.arrival_datetime.format(dateTimeFormat)
+    );
+  }, [filterParams.arrival_datetime, roomsCategories, bookings]);
+
   const checkDateAvailable = ({
     date,
   }: {
@@ -296,89 +290,44 @@ export const BookingPage = () => {
     return null;
   };
 
-  const availableRoomCategories = useMemo(() => {
-    return getAvailableRoomCategories(
-      filterParams.arrival_datetime.format(dateTimeFormat)
-    );
-  }, [filterParams.arrival_datetime, roomsCategories, bookings]);
+  const updateNewBookingDraft = useCallback(
+    ({
+      tempBookingId,
+      currentStep,
+      roomCategory,
+    }: {
+      tempBookingId: string;
+      currentStep: BookingStepType;
+      roomCategory: RoomCategoryType;
+    }) => {
+      // Проверяем правильно ли переданы данные и соответствуют ли они друг другу
+      if (tempBookingId && currentStep.roomId === tempBookingId) {
+        if (currentStep.name === "Select a room") {
+          const { rooms } = filterParams;
+          const roomQuestsCount = rooms[0].adults + rooms[0].children;
 
-  // const addBookingBaseInfo = ({
-  //   roomCategoryId,
-  //   allCategoryRoomsIDs,
-  //   bookedCategoryRoomsIDs,
-  //   tariffId,
-  //   adultsCount,
-  //   childrenCount,
-  // }: {
-  //   roomCategoryId: string;
-  //   allCategoryRoomsIDs: string[];
-  //   bookedCategoryRoomsIDs: string[];
-  //   tariffId?: string;
-  //   adultsCount: number;
-  //   childrenCount: number;
-  // }) => {
-  //   // Поиск доступного номера, который не состоит в списке забронированных номеров
-  //   const availableRoomId = allCategoryRoomsIDs.find((roomId) => {
-  //     if (!bookedCategoryRoomsIDs.includes(roomId)) return roomId;
-  //   });
-
-  //   if (availableRoomId) {
-  //     const newBooking: CreateBookingLocalType = {
-  //       tempId: "",
-  //       room_id: availableRoomId,
-  //       room_category_id: roomCategoryId,
-  //       user: false
-  //         ? userInfo // Если забронированных номеров на одного человека будет несколько, то его данные берутся з базы
-  //         : {
-  //             name: "",
-  //             lastname: "",
-  //             surname: "",
-  //             phone: "",
-  //             email: "",
-  //           },
-  //       adults_count: adultsCount,
-  //       children_count: childrenCount,
-  //       arrival_datetime: filterParams.arrival_datetime.format(dateTimeFormat),
-  //       departure_datetime:
-  //         filterParams.departure_datetime.format(dateTimeFormat),
-  //       tariff_id: tariffId ? tariffId : "",
-  //       service_id: [],
-  //       bed_type_id: "",
-  //       view_from_window_id: "",
-  //       payment_method_id: "",
-  //       transfer_id: "",
-  //       transfer_comment: "",
-  //       price: -1,
-  //     };
-
-  //     if (!false) setNewBookings([newBooking]);
-  //     else setNewBookings((prev) => [...prev, newBooking]);
-  //   }
-  // };
-
-  // const bookingSteps = useMemo((): BookingStepType[] => {
-  //   const steps: BookingStepType[] = [];
-  //   // Для бронирования одного номера
-  //   if (!isMultiRoomBooking) {
-  //     const booking = newBookings.length ? newBookings[0] : null;
-  //     if (!booking) {
-  //       steps.push("Select a room");
-  //     } else if (booking && !booking.tariff_id) {
-  //       steps.push("Select a tariff");
-  //     } else if (booking && booking.tariff_id)
-  //       steps.push("Order services", "Enter guest details");
-
-  //     return steps;
-  //   }
-  //   // Для бронирования нескольких номеров
-  //   else {
-  //     const rooms = filterParams.rooms.length;
-  //     Array.from({ length: rooms }, () => steps.push("Select a tariff"));
-  //     Array.from({ length: rooms }, () => steps.push("Order services"));
-  //     steps.push("Enter guest details");
-  //   }
-  //   return steps;
-  // }, [newBookings, isMultiRoomBooking]);
+          setNewBookings((prev) => ({
+            ...prev,
+            bookings: prev.bookings.map((i) => {
+              if (i.tempId === tempBookingId) {
+                return {
+                  ...i,
+                  room_category_id: roomCategory._id,
+                  price:
+                    roomQuestsCount > 1
+                      ? roomCategory.price_per_night_for_two_quest
+                      : roomCategory.price_per_night_for_one_quest,
+                };
+              }
+              return i;
+            }),
+          }));
+          toNextStep();
+        }
+      }
+    },
+    []
+  );
 
   const createNewBookingDraft = ({
     tempId,
@@ -434,16 +383,17 @@ export const BookingPage = () => {
                 isComplete: false,
               })
             );
-          } else if (roomsCount > 1) {
-            rooms.map((item, index) =>
-              steps.push({
-                roomId: item.id,
-                name: "Select a tariff",
-                isCurrent: index === 0 ? true : false, // Делаем активным первый шаг
-                isComplete: false,
-              })
-            );
           }
+
+          rooms.map((item, index) =>
+            steps.push({
+              roomId: item.id,
+              name: "Select a tariff",
+              isCurrent: index === 0 ? true : false, // Делаем активным первый шаг
+              isComplete: false,
+            })
+          );
+
           rooms.map((item, index) =>
             steps.push({
               roomId: item.id,
@@ -465,18 +415,15 @@ export const BookingPage = () => {
           // (для множественного бронирования)
           if (roomsCount > 1) {
             // Если есть название шага с таким именем, то...
-            steps = steps.map((i) =>
-              i.name === "Select a room" ? { ...i, name: "Select a tariff" } : i
-            );
+            steps = steps.filter((i) => i.name !== "Select a room");
           }
           // Подсчет количества комнат на которые расчитаны шаги по "Select a tariff"
-          const prevRoomsCount = steps.reduce(
+          let prevRoomsCount = steps.reduce(
             (acc, i) => (acc = i.name === "Select a tariff" ? acc + 1 : acc),
             0
           );
           // Исключить предудущие и оставить новые комнаты
           const newRooms = rooms.slice(prevRoomsCount);
-          // console.log("newRooms ", newRooms);
 
           const a: BookingStepType[] = newRooms.map((i) => {
             return {
@@ -491,7 +438,6 @@ export const BookingPage = () => {
             steps,
             (step) => step.name === "Select a tariff"
           );
-          // console.log("a", a);
           // Вставляем дополнительный шаг "select a tariff" и делаем его "текущим шагом"
           steps.splice(lastSelectTariffStepIdx, 0, ...a);
 
@@ -508,7 +454,6 @@ export const BookingPage = () => {
             steps,
             (step) => step.name === "Order services"
           );
-          // console.log("b", b);
 
           // Вставляем дополнительный шаг "order services"
           steps.splice(lastOrderServicesStepIdx, 0, ...b);
@@ -531,16 +476,14 @@ export const BookingPage = () => {
         const roomsIds = Array.from(rooms, (i) => i.id);
 
         let currentItemIdx = steps.findIndex((i) => i.isCurrent);
-        // let isRemoveItemsBeforeCurrent = false;
-        // let isRemoveItemsAfterCurrent = false;
         const lastCurrentStepIdx = steps.findIndex((i) => i.isCurrent);
         let newCurrentStepIdx = -1;
         let isSomeRemoveItemMatchCurrent = false;
         let prevRemoveItemsCount = 0;
         let nextRemoveItemsCount = 0;
-        // Gодсчета количества удаляемых элементов...
+        // Подсчет количества удаляемых элементов...
         for (let i = 0; i < steps.length; i++) {
-          if (!roomsIds.includes(steps[i].roomId)) {
+          if (!roomsIds.includes(steps[i].roomId) && steps[i].roomId !== "") {
             // ... до текущего элемента
             if (i < currentItemIdx) {
               prevRemoveItemsCount += 1;
@@ -556,8 +499,10 @@ export const BookingPage = () => {
           }
         }
 
-        // Удалить все шаги, id комнат которых уже нет в списке фильтра "Гости"
-        steps = steps.filter((i) => roomsIds.includes(i.roomId));
+        // Удалить все шаги, id комнат которых уже нет в списке фильтра "Гости", но оставить шаг для "Указания данных гостей"
+        steps = steps.filter(
+          (i) => roomsIds.includes(i.roomId) || i.roomId === ""
+        );
 
         // Убираем для текущего шага статус "текущий шаг"
         steps = steps.map((i) =>
@@ -624,16 +569,20 @@ export const BookingPage = () => {
         // (для одиночного бронирования)
         if (roomsCount === 1) {
           // Если есть название шага с таким именем, то...
-          steps = steps.map((item, i) =>
-            item.name === "Select a tariff" && i === 0
-              ? { ...item, name: "Select a room" }
-              : item
+          steps = steps.map((i) =>
+            i.isCurrent ? { ...i, isCurrent: false } : i
           );
+          steps.splice(0, 0, {
+            ...steps[0],
+            name: "Select a room",
+            isCurrent: true,
+          });
         }
       }
       setBookingSteps(steps);
     }
-  }, [newBookings]);
+    console.log("abcd");
+  }, [newBookings.bookings.length, newBookings.actionType]);
 
   useEffect(() => {
     updateBookingSteps();
@@ -810,79 +759,113 @@ export const BookingPage = () => {
     );
   };
 
-  const prevBookingStepLabel = useMemo(() => {
+  const bookingProgress = useMemo((): BookingProgressType => {
+    let currentStep: BookingProgressStepType = { step: null, label: "" };
+    let prevStep: BookingProgressStepType = { step: null, label: "" };
+    let nextStep: BookingProgressStepType = { step: null, label: "" };
+    // Определение индекса текущего шага
     const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
-    if (curIdx) {
-      const prevCurIdx = curIdx > 0 ? curIdx - 1 : 0;
-      const prevCur = bookingSteps.find((_, idx) => idx === prevCurIdx);
-      if (prevCur) {
-        if (prevCur.name === "Select a room") {
-          return "К номерам";
-        } else if (prevCur.name === "Select a tariff") {
-          const elements = bookingSteps.filter(
-            (i) => i.name === "Select a tariff"
-          );
-          const idx = elements.findIndex((i) => i.roomId === prevCur.roomId);
-          // Если индекс не равен последнем элементу данного типа шага
-          return idx && idx < elements.length - 1
-            ? `К тарифам ${idx + 1}-го номера`
-            : "К тарифам";
-        } else if (prevCur.name === "Order services") {
-          const elements = bookingSteps.filter(
-            (i) => i.name === "Order services"
-          );
-          const idx = elements.findIndex((i) => i.roomId === prevCur.roomId);
-          // Если индекс не равен последнем элементу данного типа шага
-          return idx && idx < elements.length - 1
-            ? `К услугам ${idx + 1}-го номера`
-            : "К услугам";
+    // Определение текущего шага
+    const cur = bookingSteps.find((i) => i.isCurrent);
+    if (cur) {
+      const curName = cur.name;
+      let curStepLabel = "";
+      if (curName === "Select a room") {
+        curStepLabel = "Выберите номер";
+      } else if (curName === "Select a tariff") {
+        const elements = bookingSteps.filter(
+          (i) => i.name === "Select a tariff"
+        );
+        const idx = elements.findIndex((i) => i.isCurrent);
+
+        if (idx) {
+          curStepLabel =
+            elements.length > 1
+              ? `Выберите тариф для ${idx + 1}-го номера`
+              : "Выберите тариф";
+        }
+      } else if (curName === "Order services") {
+        const elements = bookingSteps.filter(
+          (i) => i.name === "Order services"
+        );
+        const idx = elements.findIndex((i) => i.isCurrent);
+
+        if (idx) {
+          curStepLabel =
+            elements.length > 1
+              ? `Закажите услуги для ${idx + 1}-го номера`
+              : "Выберите услуги";
+        }
+      } else if (curName === "Enter guest details") {
+        curStepLabel = "Введите данные гостей";
+      }
+      currentStep = {
+        step: cur,
+        label: curStepLabel,
+      };
+    }
+    // Определение предыдущего шага
+    if (curIdx >= 0) {
+      const prevCurIdx = curIdx > 0 ? curIdx - 1 : null;
+      if (prevCurIdx) {
+        const prevCur = bookingSteps.find((_, idx) => idx === prevCurIdx);
+        if (prevCur) {
+          let prevStepLabel = "";
+          if (prevCur.name === "Select a room") {
+            prevStepLabel = "К номерам";
+          } else if (prevCur.name === "Select a tariff") {
+            const elements = bookingSteps.filter(
+              (i) => i.name === "Select a tariff"
+            );
+            const idx = elements.findIndex((i) => i.roomId === prevCur.roomId);
+            // Если индекс не равен последнем элементу данного типа шага
+            prevStepLabel =
+              idx && idx < elements.length - 1
+                ? `К тарифам ${idx + 1}-го номера`
+                : "К тарифам";
+          } else if (prevCur.name === "Order services") {
+            const elements = bookingSteps.filter(
+              (i) => i.name === "Order services"
+            );
+            const idx = elements.findIndex((i) => i.roomId === prevCur.roomId);
+            // Если индекс не равен последнем элементу данного типа шага
+            prevStepLabel =
+              idx && idx < elements.length - 1
+                ? `К услугам ${idx + 1}-го номера`
+                : "К услугам";
+          }
+          prevStep = {
+            step: prevCur,
+            label: prevStepLabel,
+          };
         }
       }
     }
-    return "";
-  }, [bookingSteps]);
+    // Определение следующего шага
+    if (curIdx >= 0) {
+      const nextCurIdx = curIdx < bookingSteps.length - 1 ? curIdx + 1 : null;
+      if (nextCurIdx) {
+        const nextCur = bookingSteps.find((_, idx) => idx === nextCurIdx);
+        if (nextCur) {
+          let nextStepLabel = "";
 
-  const currentBookingStepLabel = useMemo(() => {
-    const curName = bookingSteps.find((i) => i.isCurrent)?.name;
-    if (curName === "Select a room") {
-      return "Выберите номер";
-    } else if (curName === "Select a tariff") {
-      const elements = bookingSteps.filter((i) => i.name === "Select a tariff");
-      const idx = elements.findIndex((i) => i.isCurrent);
+          if (nextCur.isComplete) {
+            nextStepLabel = "Продолжить бронирование";
+          }
 
-      if (idx) {
-        return elements.length > 1
-          ? `Выберите тариф для ${idx + 1}-го номера`
-          : "Выберите тариф";
-      }
-    } else if (curName === "Order services") {
-      const elements = bookingSteps.filter((i) => i.name === "Order services");
-      const idx = elements.findIndex((i) => i.isCurrent);
-
-      if (idx) {
-        return elements.length > 1
-          ? `Закажите услуги для ${idx + 1}-го номера`
-          : "Выберите услуги";
-      }
-    } else if (curName === "Enter guest details") {
-      return "Введите данные гостей";
-    }
-    return "";
-  }, [bookingSteps]);
-
-  const nextBookingStepLabel = useMemo(() => {
-    const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
-    if (curIdx) {
-      const nextCurIdx =
-        curIdx < bookingSteps.length - 1 ? curIdx + 1 : bookingSteps.length - 1;
-      const nextCur = bookingSteps.find((_, idx) => idx === nextCurIdx);
-      if (nextCur) {
-        if (nextCur.isComplete) {
-          return "Продолжить бронирование";
+          nextStep = {
+            step: nextCur,
+            label: nextStepLabel,
+          };
         }
       }
     }
-    return "";
+
+    return {
+      currentStep,
+      prevStep,
+      nextStep,
+    };
   }, [bookingSteps]);
 
   const toPrevStep = () => {
@@ -902,10 +885,10 @@ export const BookingPage = () => {
 
   const toNextStep = () => {
     const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
-    if (curIdx) {
-      const nextCurIdx =
-        curIdx < bookingSteps.length - 1 ? curIdx + 1 : bookingSteps.length - 1;
-      if (nextCurIdx !== curIdx) {
+
+    if (curIdx >= 0) {
+      const nextCurIdx = curIdx < bookingSteps.length - 1 ? curIdx + 1 : null;
+      if (nextCurIdx && nextCurIdx !== curIdx) {
         setBookingSteps((prev) =>
           prev.map((item, idx) => ({
             ...item,
@@ -959,278 +942,22 @@ export const BookingPage = () => {
       }
 
       // Тип интерфейса для выбора одного номера (со списком номеров)
-      return (
-        <Box
-          sx={{
-            display: "flex",
-            flexDirection: "column",
-            alignItems: "stretch",
-            gap: "24px",
-            margin: "24px 0",
-          }}
-        >
-          <BookingStepsIndicatorBaner
-            currentStepLabel={currentBookingStepLabel}
-            prevStepLabel={prevBookingStepLabel}
-            prevStepHandler={toPrevStep}
-            nextStepLabel={nextBookingStepLabel}
-            nextStepHandler={toNextStep}
-            currentStep={bookingSteps.findIndex((i) => i.isCurrent) + 1 || 1}
+      if (bookingProgress.currentStep.step?.name === "Select a room") {
+        return (
+          <SelectRoomSection
+            currentStepIdx={bookingSteps.findIndex((i) => i.isCurrent) + 1 || 1}
             stepsTotal={bookingSteps.length}
+            availableRoomCategories={availableRoomCategories}
+            roomQuestsCount={
+              filterParams.rooms[0].adults + filterParams.rooms[0].children
+            }
+            updateNewBookingDraft={updateNewBookingDraft}
+            bookingProgress={bookingProgress}
+            nextStepHandler={toNextStep}
+            prevStepHandler={toPrevStep}
           />
-
-          <Grid container spacing={2}>
-            {availableRoomCategories &&
-              roomsCategories.map((roomCategory, index) => {
-                const isRoomExist = availableRoomCategories.findIndex(
-                  (i) => i.id === roomCategory._id
-                );
-                const roomPhotos =
-                  roomCategory._id === "672cd21f0ae43935e03a79dd" ||
-                  roomCategory._id === "672cd2a790ef8a2d0cdfcac3"
-                    ? deluxeKingRooms
-                    : roomCategory._id === "672cd30090ef8a2d0cdfcac6" ||
-                      roomCategory._id === "672cd34e90ef8a2d0cdfcac9"
-                    ? deluxeTwinRooms
-                    : roomCategory._id === "672cd65af65cf0e5caff9686"
-                    ? suiteRooms
-                    : [];
-
-                return (
-                  <Grid size={{ xs: 12, md: 6, lg: 4 }} key={index}>
-                    <Stack
-                      sx={{
-                        overflow: "hidden",
-                        flexDirection: "column",
-                        alignItems: "stretch",
-                        flex: 1,
-                        borderRadius: "20px",
-                        border: `1px solid ${theme.palette.primary.light}`,
-                        "&:hover": {
-                          border: `1px solid ${theme.palette.primary.dark}`,
-                        },
-                      }}
-                    >
-                      <Stack sx={{ height: "350px", position: "relative" }}>
-                        <Box
-                          sx={{
-                            display: "flex",
-                            flexDirection: "row",
-                            alignItems: "center",
-                            height: "40px",
-                            gap: "10px",
-                            position: "absolute",
-                            top: "10px",
-                            right: "10px",
-                            backgroundColor: "rgba(217,217,217, 0.7)",
-                            borderRadius: "10px",
-                            padding: "10px",
-                            zIndex: 1,
-                          }}
-                        >
-                          <ShowerIcon sx={{ fontSize: "24px" }} />
-                          <TwoPersonsBedIcon sx={{ fontSize: "24px" }} />
-                          <BalconyIcon sx={{ fontSize: "24px" }} />
-                          <WifiIcon sx={{ fontSize: "24px" }} />
-                          <SafeIcon sx={{ fontSize: "24px" }} />
-                        </Box>
-
-                        <CustomSimpleImageSlider images={roomPhotos} />
-                      </Stack>
-
-                      <Stack sx={{ flex: 1, padding: "24px", gap: "24px" }}>
-                        <Stack
-                          sx={{
-                            flexDirection: "row",
-                            alignItems: "flex-start",
-                            justifyContent: "space-between",
-                            gap: "24px",
-                          }}
-                        >
-                          <Typography variant="h5">
-                            {roomCategory.title}
-                          </Typography>
-
-                          <CustomCircleIconButton
-                            icon={<KeyboardArrowDownIcon />}
-                            onClick={() => null}
-                          />
-                        </Stack>
-
-                        <Stack
-                          sx={{
-                            flexDirection: "row",
-                            gap: "24px",
-                            flexWrap: "wrap",
-                          }}
-                        >
-                          <CustomIconLabel
-                            icon={<OneQuestIcon sx={{ fontSize: "16px" }} />}
-                            labelComponent={
-                              <Typography variant="label">до 2 мест</Typography>
-                            }
-                          />
-                          <CustomIconLabel
-                            icon={<RoomSizeIcon sx={{ fontSize: "16px" }} />}
-                            labelComponent={
-                              <Typography variant="label">20 м²</Typography>
-                            }
-                          />
-                          <CustomIconLabel
-                            icon={<RoomsCountIcon sx={{ fontSize: "16px" }} />}
-                            labelComponent={
-                              <Typography variant="label">16 комнат</Typography>
-                            }
-                          />
-                        </Stack>
-
-                        <Stack
-                          sx={{
-                            flexDirection: isRoomExist ? "row" : "column",
-                            alignItems: isRoomExist ? "flex-end" : "stretch",
-                            justifyContent: isRoomExist
-                              ? "space-between"
-                              : "center",
-                            gap: "24px",
-                          }}
-                        >
-                          {isRoomExist ? (
-                            <Stack
-                              sx={{
-                                flexDirection: "column",
-                                alignItems: "flex-start",
-                                gap: "0px",
-                              }}
-                            >
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                  gap: "10px",
-                                }}
-                              >
-                                <Box
-                                  sx={{
-                                    display: "flex",
-                                    alignItems: "center",
-                                    justifyContent: "center",
-                                    backgroundColor:
-                                      theme.palette.secondary.main,
-                                  }}
-                                >
-                                  <Typography variant="body">-15%</Typography>
-                                </Box>
-
-                                <Typography
-                                  variant="body"
-                                  sx={{
-                                    color: theme.palette.gray.light,
-                                    textDecoration: "line-through",
-                                  }}
-                                >
-                                  -6600 ₽
-                                </Typography>
-                              </Box>
-
-                              <Box
-                                sx={{
-                                  display: "flex",
-                                  flexDirection: "row",
-                                  alignItems: "center",
-                                  gap: "10px",
-                                }}
-                              >
-                                <Typography
-                                  variant="body"
-                                  sx={{ color: theme.palette.gray.light }}
-                                >
-                                  от
-                                </Typography>
-
-                                <Typography
-                                  variant="body"
-                                  sx={{
-                                    color: theme.palette.primary.dark,
-                                    fontSize: "20.8px",
-                                  }}
-                                >
-                                  5610 ₽
-                                </Typography>
-                              </Box>
-                              <Typography variant="body">
-                                1 ночь / 1 гость
-                              </Typography>
-                            </Stack>
-                          ) : (
-                            <Box
-                              sx={{
-                                display: "flex",
-                                flexDirection: "column",
-                                alignItems: "center",
-                                gap: "5px",
-                              }}
-                            >
-                              <Typography
-                                variant="label"
-                                sx={{
-                                  fontWeight: "400",
-                                  color: theme.palette.primary.dark,
-                                }}
-                              >
-                                Ближайшая дата (2 дня подряд)
-                              </Typography>
-                              <Typography
-                                variant="label"
-                                sx={{
-                                  fontWeight: "600",
-                                  color: theme.palette.primary.dark,
-                                }}
-                              >
-                                14 октября - 16 октября
-                              </Typography>
-                            </Box>
-                          )}
-
-                          {/* Проверка нет ли уже забронированого номера на выбранную дату "заезда" и "выезда" */}
-                          {isRoomExist ? (
-                            <CustomButton
-                              label={"Выбрать"}
-                              onClick={
-                                () => null
-                                // addBookingBaseInfo({
-                                //   roomCategoryId: roomCategory._id,
-                                //   allCategoryRoomsIDs: roomCategory.room_id,
-                                //   bookedCategoryRoomsIDs: Array.from(
-                                //     roomCategory.booked_rooms,
-                                //     (i) => i.room_id
-                                //   ),
-                                //   adultsCount: filterParams.rooms[0].adults,
-                                //   childrenCount: filterParams.rooms[0].children,
-                                // })
-                              }
-                              containerVariant="contained"
-                              containerBackgroundColor="buttonDark"
-                              withoutAnimation
-                            />
-                          ) : (
-                            <CustomButton
-                              label={"Доступные даты для заезда"}
-                              onClick={() => null}
-                              containerVariant="outlined"
-                              containerBackgroundColor="buttonLight"
-                              withoutAnimation
-                            />
-                          )}
-                        </Stack>
-                      </Stack>
-                    </Stack>
-                  </Grid>
-                );
-              })}
-          </Grid>
-        </Box>
-      );
+        );
+      }
     }
     return null;
   };

@@ -12,10 +12,10 @@ interface Props {
   nextStepLabel: string;
   nextStepHandler: () => void;
   stepsTotal: number;
-  currentStep: number;
+  currentStepIdx: number;
 }
 
-export const BookingStepsIndicatorBaner = (props: Props) => {
+export const BookingProgressIndicatorBaner = (props: Props) => {
   const {
     currentStepLabel,
     prevStepLabel,
@@ -23,7 +23,7 @@ export const BookingStepsIndicatorBaner = (props: Props) => {
     nextStepLabel,
     nextStepHandler,
     stepsTotal,
-    currentStep,
+    currentStepIdx,
   } = props;
   return (
     <Stack
@@ -108,7 +108,7 @@ export const BookingStepsIndicatorBaner = (props: Props) => {
       >
         <Box
           sx={{
-            width: `${(currentStep * 100) / stepsTotal}%`,
+            width: `${(currentStepIdx * 100) / stepsTotal}%`,
             height: "100%",
             background: theme.palette.primary.dark,
             position: "absolute",
