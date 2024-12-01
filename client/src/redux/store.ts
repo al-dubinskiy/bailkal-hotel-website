@@ -9,11 +9,13 @@ import { transfersVariantsSlice } from "./slices/TransferVariants/transferVarian
 import { roomBedVariantsSlice } from "./slices/RoomBedVariants/roomBedVariantsSlice";
 import { viewsFromRoomWindowSlice } from "./slices/ViewsFromRoomWindow/viewsFromRoomWindow";
 import { unavailableBookingDatesSlice } from "./slices/UnavailableBookingDates/unavailableBookingDates";
+import { roomFeaturesSlice } from "./slices/RoomFeatures/roomFeaturesSlice";
 
 export const store = configureStore({
   reducer: {
     bookings: bookingsSlice.reducer,
     roomsCategories: roomsCategoriesSlice.reducer,
+    roomFeatures: roomFeaturesSlice.reducer,
     rooms: roomsSlice.reducer,
     roomBedVariants: roomBedVariantsSlice.reducer,
     viewsFromRoomWindow: viewsFromRoomWindowSlice.reducer,

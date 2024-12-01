@@ -15,7 +15,6 @@ export const CustomCircleIconButton = (props: Props) => {
     <Button
       onClick={onClick}
       sx={{
-        ...sx,
         borderRadius: "100px",
         border: "1px solid",
         borderColor: theme.palette.gray.light,
@@ -29,6 +28,7 @@ export const CustomCircleIconButton = (props: Props) => {
         "&:hover": {
           opacity: 0.8,
         },
+        ...sx,
       }}
     >
       {icon}

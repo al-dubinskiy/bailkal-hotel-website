@@ -64,7 +64,9 @@ export const BookingProgressIndicatorBaner = (props: Props) => {
             />
             <Typography variant="label">{prevStepLabel}</Typography>
           </Box>
-        ) : null}
+        ) : (
+          <div></div>
+        )}
 
         <Typography
           variant="label"
@@ -93,14 +95,16 @@ export const BookingProgressIndicatorBaner = (props: Props) => {
               onClick={nextStepHandler}
             />
           </Box>
-        ) : null}
+        ) : (
+          <div></div>
+        )}
       </Stack>
 
       <Box
         sx={{
           width: "100%",
           height: "8px",
-          background: theme.palette.primary.lighter,
+          background: theme.palette.gray.extraLight,
           borderRadius: "20px",
           overflow: "hidden",
           position: "relative",

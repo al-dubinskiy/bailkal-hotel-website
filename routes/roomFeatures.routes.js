@@ -6,6 +6,11 @@ const router = Router();
 // Get room feature features
 router.get("/", async (req, res) => {
   try {
+    const roomsFeatures = await RoomFeature.find();
+
+    res.status(200).json({
+      data: roomsFeatures,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get room feature features: статус 500. Ошибка сервера.",

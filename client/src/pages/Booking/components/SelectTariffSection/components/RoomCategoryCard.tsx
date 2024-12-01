@@ -1,0 +1,232 @@
+import { Box, Stack, Typography } from "@mui/material";
+import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
+import Grid from "@mui/material/Grid2";
+import Add from "@mui/icons-material/Add";
+import React, { ReactNode, useCallback, useEffect } from "react";
+import { CustomSimpleImageSlider } from "../../../../components/shared/CustomSimpleSlider.ts/CustomSimpleImageSlider";
+import { RoomCategoryType } from "../../../../../redux/slices/RoomsCategories/types";
+import {
+  deluxeKingRooms,
+  deluxeTwinRooms,
+  suiteRooms,
+} from "../../../../../assets/images";
+import { theme } from "../../../../../theme";
+import { CustomCircleIconButton } from "../../../../components/shared/CustomCircleIconButton";
+import { useAppDispatch, useAppSelector } from "../../../../../hooks/redux";
+import { CustomIconLabel } from "../../../../components/shared/CustomIconLabel";
+import { GetRoomFeatures } from "../../../../../redux/slices/RoomFeatures/roomFeaturesSlice";
+import { OneQuestIcon } from "../../../../../assets/icons/OneQuestIcon";
+import { RoomSizeIcon } from "../../../../../assets/icons/RoomSizeIcon";
+import { RoomsCountIcon } from "../../../../../assets/icons/RoomsCountIcon";
+import { CustomButton } from "../../../../components/shared/CustomButton";
+import { ShowerIcon } from "../../../../../assets/icons/ShowerIcon";
+import { SafeIcon } from "../../../../../assets/icons/SafeIcon";
+import { BalconyIcon } from "../../../../../assets/icons/BalconyIcon";
+import { TwoPersonsBedIcon } from "../../../../../assets/icons/TwoPersonsBedIcon";
+import { WifiIcon } from "../../../../../assets/icons/WifiIcon";
+
+interface Props {
+  roomCategory: RoomCategoryType | null;
+}
+
+export const RoomCategoryCard = (props: Props) => {
+  const { roomCategory } = props;
+
+  const dispatch = useAppDispatch();
+
+  const { roomFeatures } = useAppSelector((state) => state.roomFeatures);
+
+  // Get data from API
+  const GetRoomsCategoriesList = useCallback(() => {
+    if (!roomFeatures) {
+      dispatch(GetRoomFeatures());
+    }
+  }, [roomFeatures]);
+
+  console.log(roomFeatures);
+  useEffect(() => {
+    GetRoomsCategoriesList();
+  }, [GetRoomsCategoriesList]);
+
+  if (!roomCategory) return null;
+
+  const roomPhotos =
+    roomCategory._id === "672cd21f0ae43935e03a79dd" ||
+    roomCategory._id === "672cd2a790ef8a2d0cdfcac3"
+      ? deluxeKingRooms
+      : roomCategory._id === "672cd30090ef8a2d0cdfcac6" ||
+        roomCategory._id === "672cd34e90ef8a2d0cdfcac9"
+      ? deluxeTwinRooms
+      : roomCategory._id === "672cd65af65cf0e5caff9686"
+      ? suiteRooms
+      : [];
+
+  const GridItem = ({
+    icon,
+    label,
+    value,
+  }: {
+    icon: ReactNode;
+    label: string;
+    value: string | number;
+  }) => {
+    return (
+      <Grid size={{ xs: 12, md: 6, lg: 4 }}>
+        <CustomIconLabel
+          icon={
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+                minWidth: "52px",
+                width: "52px",
+                height: "52px",
+                borderRadius: "16px",
+                border: `1px solid ${theme.palette.primary.dark}`,
+              }}
+            >
+              {icon}
+            </Box>
+          }
+          labelComponent={
+            <Stack sx={{ flexDirection: "column" }}>
+              <Typography variant="label" sx={{ fontWeight: 600 }}>
+                {label}
+              </Typography>
+              <Typography variant="label">{value}</Typography>
+            </Stack>
+          }
+          sx={{ gap: "15px" }}
+        />
+      </Grid>
+    );
+  };
+
+  const getFeatureIcon = (title: string): ReactNode => {
+    return title === "Душ" ? (
+      <ShowerIcon sx={{ fontSize: "16px" }} />
+    ) : title === "Сейф" ? (
+      <SafeIcon sx={{ fontSize: "16px" }} />
+    ) : title === "Балкон" ? (
+      <BalconyIcon sx={{ fontSize: "16px" }} />
+    ) : title === "Wi-Fi" ? (
+      <WifiIcon sx={{ fontSize: "16px" }} />
+    ) : title === "Кровать" ? (
+      <TwoPersonsBedIcon sx={{ fontSize: "16px" }} />
+    ) : (
+      <div></div>
+    );
+  };
+
+  return (
+    <Stack
+      sx={{
+        flex: 1,
+        borderRadius: "20px",
+        background: theme.palette.layoutBackground.light,
+        flexDirection: "column",
+        alignItems: "stretch",
+      }}
+    >
+      <Stack
+        sx={{
+          flexDirection: "row",
+        }}
+      >
+        <CustomSimpleImageSlider
+          images={roomPhotos}
+          containerStyle={{
+            width: "412px",
+            height: "294px",
+            borderRadius: "20px",
+          }}
+        />
+
+        <Stack
+          sx={{
+            flex: 1,
+            flexDirection: "column",
+            alignItems: "stretch",
+            position: "relative",
+            padding: "24px 24px 0",
+          }}
+        >
+          <Typography variant="h5">{roomCategory.title}</Typography>
+
+          <CustomCircleIconButton
+            icon={<KeyboardArrowDownIcon />}
+            onClick={() => null}
+            sx={{
+              position: "absolute",
+              top: "24px",
+              right: "24px",
+            }}
+          />
+
+          {roomFeatures ? (
+            <Box
+              sx={{
+                marginTop: "24px",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Grid container spacing={2}>
+                <GridItem
+                  icon={<OneQuestIcon sx={{ fontSize: "16px" }} />}
+                  label="Вместимость"
+                  value={`до ${roomCategory.guests_capacity}-х мест`}
+                />
+                <GridItem
+                  icon={<RoomSizeIcon sx={{ fontSize: "16px" }} />}
+                  label="Размер"
+                  value={`${roomCategory.square} м²`}
+                />
+                <GridItem
+                  icon={<RoomsCountIcon sx={{ fontSize: "16px" }} />}
+                  label="Количество комнат"
+                  value={roomCategory.room_id.length}
+                />
+                {roomFeatures
+                  .filter(
+                    (i) =>
+                      i.title === "Душ" ||
+                      i.title === "Кровать" ||
+                      i.title === "Wi-Fi"
+                  )
+                  .map((item, idx) => {
+                    return (
+                      <GridItem
+                        key={idx}
+                        icon={getFeatureIcon(item.title)}
+                        label={item.title}
+                        value={"Есть"}
+                      />
+                    );
+                  })}
+              </Grid>
+
+              <CustomButton
+                label={`еще ${roomFeatures.length - 3}`}
+                startIcon={
+                  <Add
+                    sx={{ fontSize: "24px", color: theme.palette.primary.dark }}
+                  />
+                }
+                onClick={() => null}
+                containerVariant="outlined"
+                withoutAnimation
+                containerStyle={{
+                  border: `1px solid ${theme.palette.primary.dark}`,
+                  marginTop: "24px",
+                  alignSelf: "center",
+                }}
+              />
+            </Box>
+          ) : null}
+        </Stack>
+      </Stack>
+    </Stack>
+  );
+};

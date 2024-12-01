@@ -18,7 +18,7 @@ const DEBUG = true;
 // API requests
 export const GetRoomFeatures = createAsyncThunk(
   "roomFeatures/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getRoomFeatures.url}`, {
         method: getRoomFeatures.method,

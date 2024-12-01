@@ -43,6 +43,16 @@ export const typography: TypographyOptions = {
   },
   h5: {
     fontFamily: "CormorantInfant",
+    fontSize: "35px",
+    fontWeight: 400,
+    lineHeight: 1.08,
+    letterSpacing: "0",
+    color: "#1a1a1a",
+    textDecoration: "none",
+    textTransform: "capitalize",
+  },
+  h6: {
+    fontFamily: "CormorantInfant",
     fontSize: "28px",
     fontWeight: 400,
     lineHeight: 1.08,

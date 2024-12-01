@@ -19,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetViewsFromRoomWindow = createAsyncThunk(
   "viewsFromRoomWindow/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getViewsFromRoomWindow.url}`, {
         method: getViewsFromRoomWindow.method,

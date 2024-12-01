@@ -15,10 +15,11 @@ import { Navigation, Pagination, Mousewheel, Keyboard } from "swiper/modules";
 
 interface Props {
   images: string[];
+  containerStyle?: React.CSSProperties;
 }
 
 export const CustomSimpleImageSlider = (props: Props) => {
-  const { images } = props;
+  const { images, containerStyle } = props;
   return (
     <Swiper
       cssMode={true}
@@ -27,9 +28,7 @@ export const CustomSimpleImageSlider = (props: Props) => {
       mousewheel={true}
       keyboard={true}
       modules={[Navigation, Pagination, Mousewheel, Keyboard]}
-      style={{
-        background: "red",
-      }}
+      style={containerStyle}
     >
       {images.map((item, idx) => {
         return (

@@ -6,6 +6,11 @@ const router = Router();
 // Get views from view from room window window
 router.get("/", async (req, res) => {
   try {
+    const viewsFromRoomWindow = await ViewFromRoomWindow.find();
+
+    res.status(200).json({
+      data: viewsFromRoomWindow,
+    });
   } catch (e) {
     res.status(500).json({
       error:

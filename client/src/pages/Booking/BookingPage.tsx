@@ -28,6 +28,8 @@ import {
 import { CustomSelect } from "../components/shared/FormElements/CustomSelect";
 import { findLastIndex } from "lodash";
 import { SelectRoomSection } from "./components/SelectRoomSection";
+import { BookingProgressIndicatorBaner } from "./components/BookingProgressIndicatorBaner";
+import { SelectTariffSection } from "./components/SelectTariffSection/SelectTariffSection";
 
 // Типы
 export type RoomCategoryPriceType = {
@@ -129,7 +131,6 @@ export const BookingPage = () => {
     actionType: "",
   });
   const [bookingSteps, setBookingSteps] = useState<BookingStepType[]>([]);
-  const [currentBookingStepIdx, setCurrentBookingStepIdx] = useState(0);
 
   // Get data from API
   const GetRoomsCategoriesList = useCallback(() => {
@@ -185,15 +186,6 @@ export const BookingPage = () => {
       return null;
     }
   }, [bookings, roomsCategories]);
-
-  // const allQuestsCount = useMemo(() => {
-  //   const { rooms } = filterParams;
-
-  //   return rooms.reduce(
-  //     (accumulator, i) => accumulator + (i.adults + i.children),
-  //     0
-  //   );
-  // }, [filterParams.rooms]);
 
   const getAvailableRoomCategories = (
     date: string
@@ -301,32 +293,62 @@ export const BookingPage = () => {
       roomCategory: RoomCategoryType;
     }) => {
       // Проверяем правильно ли переданы данные и соответствуют ли они друг другу
-      if (tempBookingId && currentStep.roomId === tempBookingId) {
+      if (
+        tempBookingId &&
+        currentStep.roomId === tempBookingId &&
+        bookings &&
+        roomsCategories
+      ) {
         if (currentStep.name === "Select a room") {
           const { rooms } = filterParams;
           const roomQuestsCount = rooms[0].adults + rooms[0].children;
+          // Получить id всех комнат, которые забронированы на данную категорию
+          const bookedRoomsOnCategory = Array.from(
+            bookings.filter((i) => i.room_category_id === roomCategory._id),
+            (i) => i.room_id
+          );
+          // Найти id доступной комнаты для бронирования
+          const freeRoomId = roomCategory.room_id.find(
+            (i) => !bookedRoomsOnCategory.includes(i)
+          );
 
-          setNewBookings((prev) => ({
-            ...prev,
-            bookings: prev.bookings.map((i) => {
-              if (i.tempId === tempBookingId) {
-                return {
-                  ...i,
-                  room_category_id: roomCategory._id,
-                  price:
-                    roomQuestsCount > 1
-                      ? roomCategory.price_per_night_for_two_quest
-                      : roomCategory.price_per_night_for_one_quest,
-                };
-              }
-              return i;
-            }),
-          }));
-          toNextStep();
+          if (freeRoomId) {
+            setNewBookings((prev) => ({
+              ...prev,
+              bookings: prev.bookings.map((i) => {
+                if (i.tempId === tempBookingId) {
+                  return {
+                    ...i,
+                    room_category_id: roomCategory._id,
+                    room_id: freeRoomId,
+                    price:
+                      roomQuestsCount > 1
+                        ? roomCategory.price_per_night_for_two_quest
+                        : roomCategory.price_per_night_for_one_quest,
+                    // Сбросить все остальные данные
+                    service_id: [],
+                    tariff_id: "",
+                    bed_type_id: "",
+                    view_from_window_id: "",
+                  };
+                }
+                return i;
+              }),
+            }));
+            // Установить флаг complete для текущего шага
+            setBookingSteps((prev) =>
+              prev.map((i) =>
+                i.roomId === tempBookingId && i.isCurrent
+                  ? { ...i, isComplete: true }
+                  : i
+              )
+            );
+            toNextStep();
+          }
         }
       }
     },
-    []
+    [bookings, roomsCategories]
   );
 
   const createNewBookingDraft = ({
@@ -581,7 +603,6 @@ export const BookingPage = () => {
       }
       setBookingSteps(steps);
     }
-    console.log("abcd");
   }, [newBookings.bookings.length, newBookings.actionType]);
 
   useEffect(() => {
@@ -778,7 +799,7 @@ export const BookingPage = () => {
         );
         const idx = elements.findIndex((i) => i.isCurrent);
 
-        if (idx) {
+        if (idx >= 0) {
           curStepLabel =
             elements.length > 1
               ? `Выберите тариф для ${idx + 1}-го номера`
@@ -790,7 +811,7 @@ export const BookingPage = () => {
         );
         const idx = elements.findIndex((i) => i.isCurrent);
 
-        if (idx) {
+        if (idx >= 0) {
           curStepLabel =
             elements.length > 1
               ? `Закажите услуги для ${idx + 1}-го номера`
@@ -807,7 +828,7 @@ export const BookingPage = () => {
     // Определение предыдущего шага
     if (curIdx >= 0) {
       const prevCurIdx = curIdx > 0 ? curIdx - 1 : null;
-      if (prevCurIdx) {
+      if (prevCurIdx !== null && prevCurIdx >= 0) {
         const prevCur = bookingSteps.find((_, idx) => idx === prevCurIdx);
         if (prevCur) {
           let prevStepLabel = "";
@@ -844,12 +865,12 @@ export const BookingPage = () => {
     // Определение следующего шага
     if (curIdx >= 0) {
       const nextCurIdx = curIdx < bookingSteps.length - 1 ? curIdx + 1 : null;
-      if (nextCurIdx) {
+      if (nextCurIdx !== null) {
         const nextCur = bookingSteps.find((_, idx) => idx === nextCurIdx);
         if (nextCur) {
           let nextStepLabel = "";
 
-          if (nextCur.isComplete) {
+          if (cur && cur.isComplete) {
             nextStepLabel = "Продолжить бронирование";
           }
 
@@ -899,65 +920,92 @@ export const BookingPage = () => {
     }
   };
 
-  const RoomCategoriesCards = () => {
+  console.log(JSON.stringify(bookingProgress));
+  const StepContent = () => {
     if (roomsCategories && roomsCategories?.length) {
-      // Тип интерфейса для множественного выбора номеров (со списком номеров и тарифов)
-      if (filterParams.rooms.length > 1) {
-        return (
-          <Box>
-            {roomsCategories && roomsCategories?.length
-              ? roomsCategories.map((roomCategory, index) => {
-                  return (
-                    <Button
-                      key={index}
-                      onClick={
-                        () => null
-                        // addBookingBaseInfo({
-                        //   roomCategoryId: roomCategory._id,
-                        //   allCategoryRoomsIDs: roomCategory.room_id,
-                        //   bookedCategoryRoomsIDs: Array.from(
-                        //     roomCategory.booked_rooms,
-                        //     (i) => i.room_id
-                        //   ),
-                        //   tariffId: "672bb2c0424b6e7d9c94376a",
-                        //   adultsCount: 1,
-                        //   childrenCount: 0,
-                        // })
-                      }
-                    >
-                      Выбрать
-                    </Button>
-                  );
-                })
-              : null}
+      return (
+        <Stack
+          sx={{
+            alignItems: "stretch",
+            margin: "24px 0",
+            background: theme.palette.layoutBackground.lightGray,
+            borderBottomLeftRadius: "20px",
+            borderBottomRightRadius: "20px",
+          }}
+        >
+          <BookingProgressIndicatorBaner
+            currentStepLabel={bookingProgress.currentStep.label}
+            prevStepLabel={bookingProgress.prevStep.label}
+            prevStepHandler={toPrevStep}
+            nextStepLabel={bookingProgress.nextStep.label}
+            nextStepHandler={toNextStep}
+            currentStepIdx={bookingSteps.findIndex((i) => i.isCurrent) + 1 || 1}
+            stepsTotal={bookingSteps.length}
+          />
 
-            <BookingInfoWidget
+          <Stack sx={{ flex: 1, padding: "24px" }}>
+            {/* Тип интерфейса для множественного выбора номеров (со списком номеров и тарифов) */}
+            {filterParams.rooms.length > 1 ? (
+              <Box>
+                {roomsCategories && roomsCategories?.length
+                  ? roomsCategories.map((roomCategory, index) => {
+                      return (
+                        <Button key={index} onClick={() => null}>
+                          Выбрать
+                        </Button>
+                      );
+                    })
+                  : null}
+
+                {/* <BookingInfoWidget
               currentBookingStepIdx={currentBookingStepIdx}
               setCurrentBookingStepIdx={(idx: number) =>
                 setCurrentBookingStepIdx(idx)
               }
-            />
-          </Box>
-        );
-      }
-
-      // Тип интерфейса для выбора одного номера (со списком номеров)
-      if (bookingProgress.currentStep.step?.name === "Select a room") {
-        return (
-          <SelectRoomSection
-            currentStepIdx={bookingSteps.findIndex((i) => i.isCurrent) + 1 || 1}
-            stepsTotal={bookingSteps.length}
-            availableRoomCategories={availableRoomCategories}
-            roomQuestsCount={
-              filterParams.rooms[0].adults + filterParams.rooms[0].children
-            }
-            updateNewBookingDraft={updateNewBookingDraft}
-            bookingProgress={bookingProgress}
-            nextStepHandler={toNextStep}
-            prevStepHandler={toPrevStep}
-          />
-        );
-      }
+            /> */}
+              </Box>
+            ) : //  Тип интерфейса для выбора одного номера (со списком номеров)
+            filterParams.rooms.length === 1 ? (
+              bookingProgress.currentStep.step?.name === "Select a room" ? (
+                <SelectRoomSection
+                  selectedRoomCategoryId={
+                    newBookings.bookings.find(
+                      (i) =>
+                        i.tempId === bookingProgress.currentStep.step?.roomId
+                    )?.room_category_id || null
+                  }
+                  availableRoomCategories={availableRoomCategories}
+                  roomQuestsCount={
+                    filterParams.rooms[0].adults +
+                    filterParams.rooms[0].children
+                  }
+                  updateNewBookingDraft={updateNewBookingDraft}
+                  bookingProgress={bookingProgress}
+                  nextStepHandler={toNextStep}
+                  prevStepHandler={toPrevStep}
+                />
+              ) : bookingProgress.currentStep.step?.name ===
+                "Select a tariff" ? (
+                <SelectTariffSection
+                  roomCategory={
+                    (roomsCategories &&
+                      roomsCategories.find(
+                        (i) =>
+                          i._id ===
+                          newBookings.bookings.find(
+                            (i) =>
+                              i.tempId ===
+                              bookingProgress.currentStep.step?.roomId
+                          )?.room_category_id
+                      )) ||
+                    null
+                  }
+                />
+              ) : null
+            ) : null}
+          </Stack>
+        </Stack>
+      );
     }
     return null;
   };
@@ -966,7 +1014,7 @@ export const BookingPage = () => {
     <BasePageLayout isShowPageTitleBanner>
       <FiltersBar />
 
-      <RoomCategoriesCards />
+      <StepContent />
     </BasePageLayout>
   );
 };

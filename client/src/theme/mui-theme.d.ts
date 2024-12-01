@@ -19,11 +19,13 @@ declare module "@mui/material/styles" {
   interface PaletteColor {
     lighter?: string;
     extraLight?: string;
+    lightGray?: string;
   }
 
   interface SimplePaletteColorOptions {
     lighter?: string;
     extraLight?: string;
+    lightGray?: string;
   }
 
   interface TypographyVariants {
@@ -69,7 +71,6 @@ declare module "@mui/material/Typography" {
     small: true;
     mini: false;
     tiny: false;
-    h6: false;
     subtitle1: false;
     subtitle2: false;
     body1: false;

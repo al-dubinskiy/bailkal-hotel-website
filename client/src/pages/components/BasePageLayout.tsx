@@ -29,7 +29,7 @@ const BasePageLayout = (props: Props) => {
     <Stack gap="24px">
       <Stack
         sx={{
-          background: theme.palette.primary.lighter,
+          background: theme.palette.layoutBackground.light,
         }}
       >
         <Container

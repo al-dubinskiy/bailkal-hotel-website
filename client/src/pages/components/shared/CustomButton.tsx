@@ -36,6 +36,12 @@ export const CustomButton = (props: Props) => {
       startIcon={startIcon}
       endIcon={endIcon}
       sx={{
+        "& .MuiButton-startIcon": {
+          marginRight: "5px",
+        },
+        "& .MuiButton-endIcon": {
+          marginLeft: "5px",
+        },
         opacity: !disabled ? 1 : 0.7,
         "&:hover": {
           opacity: !withoutAnimation ? 1 : 0.7,

@@ -181,6 +181,15 @@ const themeOptions: ThemeOptions = {
             height: "50px",
             padding: "0px 24px",
             background: "#ffffff",
+            color: "#1a1a1a",
+
+            "&.Mui-disabled": {
+              margin: 0,
+              background: "#ffffff",
+              color: "#1a1a1a",
+              border: "1px solid #1a1a1a",
+              opacity: 0.7,
+            },
 
             "& .MuiButton-startIcon": {
               margin: 0,

@@ -29,6 +29,7 @@ export const palette: PaletteOptions = {
   },
   layoutBackground: {
     light: "#ffffff",
+    lightGray: "#F7F7F7",
     dark: "#1a1a1a",
   },
   gray: {
