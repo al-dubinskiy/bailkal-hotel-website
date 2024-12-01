@@ -24,6 +24,7 @@ import { SafeIcon } from "../../../../../assets/icons/SafeIcon";
 import { BalconyIcon } from "../../../../../assets/icons/BalconyIcon";
 import { TwoPersonsBedIcon } from "../../../../../assets/icons/TwoPersonsBedIcon";
 import { WifiIcon } from "../../../../../assets/icons/WifiIcon";
+import { SpecialWishesSelector } from "./SpecialWishesSelector";
 
 interface Props {
   roomCategory: RoomCategoryType | null;
@@ -127,6 +128,7 @@ export const RoomCategoryCard = (props: Props) => {
         background: theme.palette.layoutBackground.light,
         flexDirection: "column",
         alignItems: "stretch",
+        gap: "24px",
       }}
     >
       <Stack
@@ -227,6 +229,8 @@ export const RoomCategoryCard = (props: Props) => {
           ) : null}
         </Stack>
       </Stack>
+
+      <SpecialWishesSelector roomCategory={roomCategory} />
     </Stack>
   );
 };

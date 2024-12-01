@@ -106,7 +106,7 @@ export const SpecialWishesSelector = (props: Props) => {
         flex: 1,
         flexDirection: "column",
         alignItems: "stretch",
-        marginTop: "24px",
+        padding: "0 24px",
       }}
     >
       <Typography

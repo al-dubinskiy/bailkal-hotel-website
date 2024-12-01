@@ -16,8 +16,6 @@ export const SelectTariffSection = (props: Props) => {
   return (
     <Stack sx={{ alignItems: "stretch", gap: "24px" }}>
       <RoomCategoryCard roomCategory={roomCategory} />
-
-      <SpecialWishesSelector roomCategory={roomCategory} />
     </Stack>
   );
 };
