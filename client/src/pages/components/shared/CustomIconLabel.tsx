@@ -1,18 +1,25 @@
 import React from "react";
-import { Stack, SxProps, Typography } from "@mui/material";
+import { Box, Stack, SxProps, Typography } from "@mui/material";
 
 interface Props {
   icon: React.ReactNode;
   label?: string;
   labelComponent?: React.ReactNode;
   sx?: SxProps;
+  onClick?: () => null;
 }
 
 export const CustomIconLabel = (props: Props) => {
-  const { icon, label, labelComponent, sx } = props;
+  const { icon, label, labelComponent, sx, onClick } = props;
 
   return (
-    <Stack flexDirection="row" gap="10px" alignItems={"center"} sx={{ ...sx }}>
+    <Stack
+      flexDirection="row"
+      gap="10px"
+      alignItems={"center"}
+      sx={{ ...sx }}
+      onClick={onClick}
+    >
       {icon}
       {labelComponent ? (
         labelComponent

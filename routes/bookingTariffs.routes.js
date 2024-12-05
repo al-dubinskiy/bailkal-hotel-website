@@ -6,6 +6,10 @@ const router = Router();
 // Get booking tariffs
 router.get("/", async (req, res) => {
   try {
+    const bookingsTariffs = await BookingTariff.find();
+    res.status(200).json({
+      data: bookingsTariffs,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get booking tariffs: статус 500. Ошибка сервера.",

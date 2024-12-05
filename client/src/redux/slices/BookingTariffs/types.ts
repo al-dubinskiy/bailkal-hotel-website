@@ -4,11 +4,12 @@ export type CreateBookingTariffType = {
   description: string;
   included_breakfast: boolean;
   terms_сancellation: string;
-  payment_method_id: string;
-  included_services_id?: string[];
+  payment_method_id: string[];
+  included_services?: string[];
   paymentAndCancellationTerms?: string[];
   note?: string;
   byPromoCode: boolean;
+  cost: number;
 };
 
 export type UpdateBookingTariffType = CreateBookingTariffType;

@@ -6,6 +6,10 @@ const router = Router();
 // Get payment methods
 router.get("/", async (req, res) => {
   try {
+    const paymetMethods = await PaymentMethod.find();
+    res.status(200).json({
+      data: paymetMethods,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get payment methods: статус 500. Ошибка сервера.",

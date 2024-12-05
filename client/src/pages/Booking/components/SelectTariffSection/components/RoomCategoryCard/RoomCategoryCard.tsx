@@ -3,31 +3,31 @@ import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Grid from "@mui/material/Grid2";
 import Add from "@mui/icons-material/Add";
 import React, { ReactNode, useCallback, useEffect } from "react";
-import { CustomSimpleImageSlider } from "../../../../components/shared/CustomSimpleSlider.ts/CustomSimpleImageSlider";
-import { RoomCategoryType } from "../../../../../redux/slices/RoomsCategories/types";
+import { CustomSimpleImageSlider } from "../../../../../components/shared/CustomSimpleSlider.ts/CustomSimpleImageSlider";
+import { RoomCategoryType } from "../../../../../../redux/slices/RoomsCategories/types";
 import {
   deluxeKingRooms,
   deluxeTwinRooms,
   suiteRooms,
-} from "../../../../../assets/images";
-import { theme } from "../../../../../theme";
-import { CustomCircleIconButton } from "../../../../components/shared/CustomCircleIconButton";
-import { useAppDispatch, useAppSelector } from "../../../../../hooks/redux";
-import { CustomIconLabel } from "../../../../components/shared/CustomIconLabel";
-import { GetRoomFeatures } from "../../../../../redux/slices/RoomFeatures/roomFeaturesSlice";
-import { OneQuestIcon } from "../../../../../assets/icons/OneQuestIcon";
-import { RoomSizeIcon } from "../../../../../assets/icons/RoomSizeIcon";
-import { RoomsCountIcon } from "../../../../../assets/icons/RoomsCountIcon";
-import { CustomButton } from "../../../../components/shared/CustomButton";
-import { ShowerIcon } from "../../../../../assets/icons/ShowerIcon";
-import { SafeIcon } from "../../../../../assets/icons/SafeIcon";
-import { BalconyIcon } from "../../../../../assets/icons/BalconyIcon";
-import { TwoPersonsBedIcon } from "../../../../../assets/icons/TwoPersonsBedIcon";
-import { WifiIcon } from "../../../../../assets/icons/WifiIcon";
-import { SpecialWishesSelector } from "./SpecialWishesSelector";
+} from "../../../../../../assets/images";
+import { theme } from "../../../../../../theme";
+import { CustomCircleIconButton } from "../../../../../components/shared/CustomCircleIconButton";
+import { useAppDispatch, useAppSelector } from "../../../../../../hooks/redux";
+import { CustomIconLabel } from "../../../../../components/shared/CustomIconLabel";
+import { GetRoomFeatures } from "../../../../../../redux/slices/RoomFeatures/roomFeaturesSlice";
+import { OneQuestIcon } from "../../../../../../assets/icons/OneQuestIcon";
+import { RoomSizeIcon } from "../../../../../../assets/icons/RoomSizeIcon";
+import { RoomsCountIcon } from "../../../../../../assets/icons/RoomsCountIcon";
+import { CustomButton } from "../../../../../components/shared/CustomButton";
+import { ShowerIcon } from "../../../../../../assets/icons/ShowerIcon";
+import { SafeIcon } from "../../../../../../assets/icons/SafeIcon";
+import { BalconyIcon } from "../../../../../../assets/icons/BalconyIcon";
+import { TwoPersonsBedIcon } from "../../../../../../assets/icons/TwoPersonsBedIcon";
+import { WifiIcon } from "../../../../../../assets/icons/WifiIcon";
+import { SpecialWishesSelector } from "./components/SpecialWishesSelector";
 
 interface Props {
-  roomCategory: RoomCategoryType | null;
+  roomCategory: RoomCategoryType;
 }
 
 export const RoomCategoryCard = (props: Props) => {
@@ -44,7 +44,6 @@ export const RoomCategoryCard = (props: Props) => {
     }
   }, [roomFeatures]);
 
-  console.log(roomFeatures);
   useEffect(() => {
     GetRoomsCategoriesList();
   }, [GetRoomsCategoriesList]);
@@ -129,6 +128,8 @@ export const RoomCategoryCard = (props: Props) => {
         flexDirection: "column",
         alignItems: "stretch",
         gap: "24px",
+        paddingBottom: "24px",
+        border: "1px solid #DAE8FF",
       }}
     >
       <Stack

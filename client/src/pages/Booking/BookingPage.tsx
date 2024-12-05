@@ -921,6 +921,21 @@ export const BookingPage = () => {
   };
 
   console.log(JSON.stringify(bookingProgress));
+
+  const currentRoomQuests = useMemo((): RoomQuestsCountType => {
+    const a = filterParams.rooms.find(
+      (i) => i.id === bookingProgress.currentStep.step?.roomId
+    );
+
+    return a
+      ? a
+      : {
+          id: "",
+          adults: -1,
+          children: -1,
+        };
+  }, [bookingProgress.currentStep]);
+
   const StepContent = () => {
     if (roomsCategories && roomsCategories?.length) {
       return (
@@ -1000,6 +1015,7 @@ export const BookingPage = () => {
                       )) ||
                     null
                   }
+                  roomQuestsCount={currentRoomQuests}
                 />
               ) : null
             ) : null}

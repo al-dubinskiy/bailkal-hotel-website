@@ -31,6 +31,13 @@ const schema = new Schema({
       ref: "RoomBedVariant",
     },
   ],
+  available_tariff_id: [
+    {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "BookingTariff",
+    },
+  ],
   guests_capacity: { type: Number, required: true },
   square: { type: Number, required: true },
   price_per_night_for_one_quest: { type: Number, required: true },

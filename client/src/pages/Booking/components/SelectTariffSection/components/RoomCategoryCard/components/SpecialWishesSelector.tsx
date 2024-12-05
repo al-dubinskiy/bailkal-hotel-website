@@ -3,15 +3,18 @@ import React, { useCallback, useEffect, useState } from "react";
 import {
   ToogleButtonModeType,
   ToogleModeButton,
-} from "../../../../components/shared/ToogleModeButton";
-import { useAppDispatch, useAppSelector } from "../../../../../hooks/redux";
-import { GetRoomFeatures } from "../../../../../redux/slices/RoomFeatures/roomFeaturesSlice";
-import { GetViewsFromRoomWindow } from "../../../../../redux/slices/ViewsFromRoomWindow/viewsFromRoomWindow";
-import { GetRoomBedVariants } from "../../../../../redux/slices/RoomBedVariants/roomBedVariantsSlice";
-import { CourtyardViewIcon } from "../../../../../assets/icons/CourtyardViewIcon";
-import { ForestViewIcon } from "../../../../../assets/icons/ForestViewIcon";
-import { TwoPersonsBedIcon } from "../../../../../assets/icons/TwoPersonsBedIcon";
-import { RoomCategoryType } from "../../../../../redux/slices/RoomsCategories/types";
+} from "../../../../../../components/shared/ToogleModeButton";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../../../../hooks/redux";
+import { GetRoomFeatures } from "../../../../../../../redux/slices/RoomFeatures/roomFeaturesSlice";
+import { GetViewsFromRoomWindow } from "../../../../../../../redux/slices/ViewsFromRoomWindow/viewsFromRoomWindow";
+import { GetRoomBedVariants } from "../../../../../../../redux/slices/RoomBedVariants/roomBedVariantsSlice";
+import { CourtyardViewIcon } from "../../../../../../../assets/icons/CourtyardViewIcon";
+import { ForestViewIcon } from "../../../../../../../assets/icons/ForestViewIcon";
+import { TwoPersonsBedIcon } from "../../../../../../../assets/icons/TwoPersonsBedIcon";
+import { RoomCategoryType } from "../../../../../../../redux/slices/RoomsCategories/types";
 
 interface Props {
   roomCategory: RoomCategoryType | null;
@@ -137,6 +140,11 @@ export const SpecialWishesSelector = (props: Props) => {
           setMode={setViewsFromWindowSpecialWish}
         />
       </Stack>
+
+      <Typography variant="small">
+        <span style={{ fontSize: "16px", marginTop: "10px" }}>*</span>{" "}
+        Выполнение особых пожеланий не гарантируется
+      </Typography>
     </Stack>
   );
 };

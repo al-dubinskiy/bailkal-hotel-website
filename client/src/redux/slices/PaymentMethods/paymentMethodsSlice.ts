@@ -19,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetPaymentMethods = createAsyncThunk(
   "paymentMethods/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getPaymentMethods.url}`, {
         method: getPaymentMethods.method,

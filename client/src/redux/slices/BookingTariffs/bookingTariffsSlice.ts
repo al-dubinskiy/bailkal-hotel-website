@@ -19,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetBookingTariffs = createAsyncThunk(
   "bookingTariffs/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getBookingTariffs.url}`, {
         method: getBookingTariffs.method,
