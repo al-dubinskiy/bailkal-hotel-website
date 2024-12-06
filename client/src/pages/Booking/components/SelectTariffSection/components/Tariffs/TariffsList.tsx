@@ -5,14 +5,16 @@ import { GetBookingTariffs } from "../../../../../../redux/slices/BookingTariffs
 import { RoomCategoryType } from "../../../../../../redux/slices/RoomsCategories/types";
 import { Stack } from "@mui/material";
 import { RoomQuestsCountType } from "../../../FiltersBar/SelectQuestsDropdown";
+import { BookingDateType } from "../../SelectTariffSection";
 
 interface Props {
   roomCategory: RoomCategoryType;
   roomQuestsCount: RoomQuestsCountType;
+  bookingDate: BookingDateType;
 }
 
 export const TariffsList = (props: Props) => {
-  const { roomCategory, roomQuestsCount } = props;
+  const { roomCategory, roomQuestsCount, bookingDate } = props;
   const dispatch = useAppDispatch();
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
 
@@ -51,6 +53,7 @@ export const TariffsList = (props: Props) => {
                       : roomCategory.price_per_night_for_one_quest
                   }
                   roomQuestsCount={roomQuestsCount}
+                  bookingDate={bookingDate}
                 />
               );
             })

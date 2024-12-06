@@ -7,7 +7,11 @@ export const useButtonDropdownCardStyles = makeStyles((theme: Theme) => ({
     zIndex: 2000,
 
     '&[data-popper-placement*="top"]': {
-      top: "-10px !important",
+      marginBottom: "10px !important",
+
+      "& .content": {
+        // display: "none",
+      },
     },
     '&[data-popper-placement*="bottom"] $arrow': {
       top: "10px",

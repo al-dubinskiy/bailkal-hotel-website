@@ -37,13 +37,13 @@ export type RoomCategoryPriceType = {
   price: number;
 };
 
-type BookingDateType = {
+export type BookingDateTimeType = {
   arrival_datetime: string;
   departure_datetime: string;
 };
 
 type SortedBookingType = {
-  [key: string]: BookingDateType[];
+  [key: string]: BookingDateTimeType[];
 };
 
 type LocaleType = {
@@ -208,7 +208,7 @@ export const BookingPage = () => {
 
           let bookedOnDateCount = 0;
 
-          bookingsOnCategory.map((i: BookingDateType) => {
+          bookingsOnCategory.map((i: BookingDateTimeType) => {
             // Подсчет забронированных комнат, диапазону "дата заезда/выезда"
             // которых принадлежит дата, переданная в ф-цию
             // (а значит на эту дату уже нельзя забронировать эти комнаты)
@@ -934,7 +934,7 @@ export const BookingPage = () => {
           adults: -1,
           children: -1,
         };
-  }, [bookingProgress.currentStep]);
+  }, [bookingProgress.currentStep, filterParams.rooms]);
 
   const StepContent = () => {
     if (roomsCategories && roomsCategories?.length) {
@@ -1015,6 +1015,10 @@ export const BookingPage = () => {
                       )) ||
                     null
                   }
+                  bookingDate={{
+                    arrival: filterParams.arrival_datetime,
+                    departure: filterParams.departure_datetime,
+                  }}
                   roomQuestsCount={currentRoomQuests}
                 />
               ) : null

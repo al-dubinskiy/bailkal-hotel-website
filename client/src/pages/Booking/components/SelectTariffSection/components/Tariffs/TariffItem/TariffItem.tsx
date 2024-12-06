@@ -11,17 +11,21 @@ import { CustomButton } from "../../../../../../components/shared/CustomButton";
 import { InfoOutlined } from "@mui/icons-material";
 import { PersonIcon } from "../../../../../../../assets/icons/PersonIconIcon";
 import { RoomQuestsCountType } from "../../../../FiltersBar/SelectQuestsDropdown";
+import { PriceDetailsPopup } from "./components/PriceDetailsPopup";
+import { BookingDateType } from "../../../SelectTariffSection";
 
 interface Props {
   tariff: BookingTariffType;
   roomCategoryPrice: number;
   roomQuestsCount: RoomQuestsCountType;
+  bookingDate: BookingDateType;
 }
 
 export const TariffItem = (props: Props) => {
-  const { tariff, roomCategoryPrice, roomQuestsCount } = props;
+  const { tariff, roomCategoryPrice, roomQuestsCount, bookingDate } = props;
 
   const isSelected = false;
+
   return (
     <Stack
       sx={{
@@ -31,6 +35,7 @@ export const TariffItem = (props: Props) => {
         position: "relative",
         flexDirection: "row",
         justifyContent: "space-between",
+        alignItems: "flex-end",
       }}
     >
       <CustomCircleIconButton
@@ -70,39 +75,44 @@ export const TariffItem = (props: Props) => {
       <Stack sx={{ flexDirection: "row", alignItems: "flex-end", gap: "24px" }}>
         <Stack
           sx={{
-            paddingTop: "74px",
+            paddingTop: "24px",
             gap: 0,
+            alignItems: "flex-end",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-            }}
-          >
+          {tariff.discount ? (
             <Box
               sx={{
                 display: "flex",
+                flexDirection: "row",
                 alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: theme.palette.secondary.main,
+                gap: "10px",
               }}
             >
-              <Typography variant="body">-15%</Typography>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: theme.palette.secondary.main,
+                }}
+              >
+                <Typography variant="body">-{tariff.discount}%</Typography>
+              </Box>
+
+              <Typography
+                variant="body"
+                sx={{
+                  color: theme.palette.gray.light,
+                  textDecoration: "line-through",
+                }}
+              >
+                {roomCategoryPrice +
+                  (tariff.cost * 100) / (100 - tariff.discount)}
+                ₽
+              </Typography>
             </Box>
-
-            <Typography
-              variant="body"
-              sx={{
-                color: theme.palette.gray.light,
-                textDecoration: "line-through",
-              }}
-            >
-              -6600 ₽
-            </Typography>
-          </Box>
-
+          ) : null}
           <Box
             sx={{
               display: "flex",
@@ -115,12 +125,15 @@ export const TariffItem = (props: Props) => {
               sx={{
                 display: "flex",
                 flexDirection: "row",
-                alignItems: "flex-start",
+                alignItems: "flex-end",
               }}
             >
+              {roomQuestsCount.children > 0 ? (
+                <PersonIcon sx={{ fontSize: "16px", marginRight: "-5px" }} />
+              ) : null}
               {roomQuestsCount.adults > 1 ? (
                 <>
-                  <PersonIcon sx={{ fontSize: "24px" }} />
+                  <PersonIcon sx={{ fontSize: "24px", marginRight: "-8px" }} />
                   <PersonIcon sx={{ fontSize: "24px" }} />
                 </>
               ) : (
@@ -128,10 +141,6 @@ export const TariffItem = (props: Props) => {
                   <PersonIcon sx={{ fontSize: "24px" }} />
                 </>
               )}
-
-              {roomQuestsCount.children > 0 ? (
-                <PersonIcon sx={{ fontSize: "16px" }} />
-              ) : null}
             </Box>
 
             <Typography
@@ -144,21 +153,8 @@ export const TariffItem = (props: Props) => {
               {roomCategoryPrice + tariff.cost}₽
             </Typography>
 
-            <CustomButton
-              startIcon={
-                <InfoOutlined
-                  sx={{ fontSize: "24px", color: theme.palette.gray.dark }}
-                />
-              }
-              containerStyle={{
-                padding: 0,
-                background: "transparent",
-              }}
-              withoutAnimation
-              onClick={() => null}
-            />
+            <PriceDetailsPopup bookingDate={bookingDate} />
           </Box>
-
           <Typography variant="body">стоимость за 1 ночь</Typography>
         </Stack>
 
@@ -177,6 +173,7 @@ export const TariffItem = (props: Props) => {
           containerVariant={!isSelected ? "contained" : "outlined"}
           disabled={Boolean(isSelected)}
           containerBackgroundColor={"buttonDark"}
+          containerStyle={{ padding: "0 40px" }}
           withoutAnimation
         />
       </Stack>

@@ -10,6 +10,7 @@ export type CreateBookingTariffType = {
   note?: string;
   byPromoCode: boolean;
   cost: number;
+  discount: number;
 };
 
 export type UpdateBookingTariffType = CreateBookingTariffType;

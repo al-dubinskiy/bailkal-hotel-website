@@ -93,6 +93,15 @@ export const SelectRoomSection = memo((props: Props) => {
                 selectedRoomCategoryId &&
                 selectedRoomCategoryId === roomCategory._id;
 
+              const roomPrice =
+                roomQuestsCount > 1
+                  ? roomCategory.price_per_night_for_two_quest
+                  : roomCategory.price_per_night_for_one_quest;
+
+              const roomDiscount = Number(
+                ((roomPrice * 100) / (100 - roomCategory.discount)).toFixed(0)
+              );
+
               return (
                 <Grid size={{ xs: 12, md: 6, lg: 4 }} key={index}>
                   <Stack
@@ -205,35 +214,41 @@ export const SelectRoomSection = memo((props: Props) => {
                               gap: "0px",
                             }}
                           >
-                            <Box
-                              sx={{
-                                display: "flex",
-                                flexDirection: "row",
-                                alignItems: "center",
-                                gap: "10px",
-                              }}
-                            >
+                            {roomCategory.discount > 0 ? (
                               <Box
                                 sx={{
                                   display: "flex",
+                                  flexDirection: "row",
                                   alignItems: "center",
-                                  justifyContent: "center",
-                                  backgroundColor: theme.palette.secondary.main,
+                                  gap: "10px",
                                 }}
                               >
-                                <Typography variant="body">-15%</Typography>
-                              </Box>
+                                <Box
+                                  sx={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    justifyContent: "center",
+                                    backgroundColor:
+                                      theme.palette.secondary.main,
+                                    padding: "0 5px",
+                                  }}
+                                >
+                                  <Typography variant="body">
+                                    -{roomCategory.discount}%
+                                  </Typography>
+                                </Box>
 
-                              <Typography
-                                variant="body"
-                                sx={{
-                                  color: theme.palette.gray.light,
-                                  textDecoration: "line-through",
-                                }}
-                              >
-                                -6600 ₽
-                              </Typography>
-                            </Box>
+                                <Typography
+                                  variant="body"
+                                  sx={{
+                                    color: theme.palette.gray.light,
+                                    textDecoration: "line-through",
+                                  }}
+                                >
+                                  {roomDiscount} ₽
+                                </Typography>
+                              </Box>
+                            ) : null}
 
                             <Box
                               sx={{
@@ -257,10 +272,7 @@ export const SelectRoomSection = memo((props: Props) => {
                                   fontSize: "20.8px",
                                 }}
                               >
-                                {roomQuestsCount > 1
-                                  ? roomCategory.price_per_night_for_two_quest
-                                  : roomCategory.price_per_night_for_one_quest}
-                                ₽
+                                {roomPrice} ₽
                               </Typography>
                             </Box>
                             <Typography variant="body">

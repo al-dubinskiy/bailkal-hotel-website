@@ -14,6 +14,7 @@ export type CreateRoomCategoryType = {
   room_id: string[];
   price_per_night_for_one_quest: number;
   price_per_night_for_two_quest: number;
+  discount: number;
   include_service_id: string[];
   available_bed_variant_id: string[];
   available_tariff_id: string[];

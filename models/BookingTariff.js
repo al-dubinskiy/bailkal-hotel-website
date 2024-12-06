@@ -16,6 +16,7 @@ const schema = new Schema({
   paymentAndCancellationTerms: [{ type: String }],
   note: { type: String },
   cost: { type: Number },
+  discount: { type: Number },
   byPromoCode: { type: Boolean, required: true },
   created_at: { type: Date, required: true, default: Date.now() },
   updated_at: { type: Date, required: true, default: Date.now() },

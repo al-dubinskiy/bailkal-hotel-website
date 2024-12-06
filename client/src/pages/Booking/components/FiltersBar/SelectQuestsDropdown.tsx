@@ -41,12 +41,15 @@ export const SelectQuestsDropdown = (props: Props) => {
   const classes = useButtonDropdownCardStyles();
 
   const roomsCount = rooms.length;
-  const adultsCount = Array.from(rooms, (i) => i.adults).length;
-  const childrensCount = Array.from(rooms, (i) => i.children).length;
+  const adultsCount = Array.from(rooms, (i) => i.adults).reduce(
+    (acc, cur) => acc + cur
+  );
+  const childrensCount = Array.from(rooms, (i) => i.children).reduce(
+    (acc, cur) => acc + cur
+  );
 
   const [anchorEl, setAnchorEl] = React.useState<HTMLElement | null>(null);
   const [arrowRef, setArrowRef] = React.useState(null);
-  const [childAge, setChildAge] = React.useState(8);
 
   const open = Boolean(anchorEl);
   const id = open ? "button-dropdown-card-popper" : undefined;

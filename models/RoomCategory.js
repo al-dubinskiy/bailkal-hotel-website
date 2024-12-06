@@ -42,6 +42,7 @@ const schema = new Schema({
   square: { type: Number, required: true },
   price_per_night_for_one_quest: { type: Number, required: true },
   price_per_night_for_two_quest: { type: Number, required: true },
+  discount: { type: Number },
   created_at: { type: Date, required: true, default: Date.now() },
   updated_at: { type: Date, required: true, default: Date.now() },
 });
