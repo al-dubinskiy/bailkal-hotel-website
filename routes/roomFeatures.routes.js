@@ -3,7 +3,7 @@ const RoomFeature = require("../models/RoomFeature");
 const moment = require("moment");
 const router = Router();
 
-// Get room feature features
+// Get room features
 router.get("/", async (req, res) => {
   try {
     const roomsFeatures = await RoomFeature.find();

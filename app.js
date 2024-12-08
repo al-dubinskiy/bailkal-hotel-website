@@ -21,6 +21,10 @@ app.use("/api/rooms", require("./routes/rooms.routes.js"));
 app.use("/api/roomBedVariants", require("./routes/roomBedVariants.routes.js"));
 app.use("/api/roomFeatures", require("./routes/roomFeatures.routes.js"));
 app.use(
+  "/api/roomFeaturesCategories",
+  require("./routes/roomFeaturesCategories.routes.js")
+);
+app.use(
   "/api/viewsFromRoomWindow",
   require("./routes/viewsFromRoomWindow.routes.js")
 );

@@ -13,7 +13,7 @@ const schema = new Schema({
     },
   ],
   included_services: [{ type: String }],
-  paymentAndCancellationTerms: [{ type: String }],
+  payment_and_cancellation_terms: [{ type: String }],
   note: { type: String },
   cost: { type: Number },
   discount: { type: Number },
