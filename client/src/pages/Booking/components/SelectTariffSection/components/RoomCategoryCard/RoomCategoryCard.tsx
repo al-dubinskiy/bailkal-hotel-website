@@ -2,7 +2,7 @@ import { Box, Stack, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Grid from "@mui/material/Grid2";
 import Add from "@mui/icons-material/Add";
-import React, { ReactNode, useCallback, useEffect } from "react";
+import React, { ReactNode, useCallback, useEffect, useState } from "react";
 import { CustomSimpleImageSlider } from "../../../../../components/shared/CustomSimpleSlider.ts/CustomSimpleImageSlider";
 import { RoomCategoryType } from "../../../../../../redux/slices/RoomsCategories/types";
 import {
@@ -25,6 +25,8 @@ import { BalconyIcon } from "../../../../../../assets/icons/BalconyIcon";
 import { TwoPersonsBedIcon } from "../../../../../../assets/icons/TwoPersonsBedIcon";
 import { WifiIcon } from "../../../../../../assets/icons/WifiIcon";
 import { SpecialWishesSelector } from "./components/SpecialWishesSelector";
+import { CustomMultiImagePreviewSlider } from "../../../../../components/shared/CustomMultiImagePreviewSlider/CustomMultiImagePreviewSlider";
+import { FeatureDetails } from "./components/FeatureDetails";
 
 interface Props {
   roomCategory: RoomCategoryType;
@@ -36,6 +38,8 @@ export const RoomCategoryCard = (props: Props) => {
   const dispatch = useAppDispatch();
 
   const { roomFeatures } = useAppSelector((state) => state.roomFeatures);
+
+  const [roomDetailsOpen, setRoomDetailsOpen] = useState<boolean>(false);
 
   // Get data from API
   const GetRoomsCategoriesList = useCallback(() => {
@@ -119,6 +123,10 @@ export const RoomCategoryCard = (props: Props) => {
     );
   };
 
+  const Title = () => {
+    return <Typography variant="h5">{roomCategory.title}</Typography>;
+  };
+
   return (
     <Stack
       sx={{
@@ -130,106 +138,119 @@ export const RoomCategoryCard = (props: Props) => {
         gap: "24px",
         paddingBottom: "24px",
         border: "1px solid #DAE8FF",
+        position: "relative",
       }}
     >
-      <Stack
+      <CustomCircleIconButton
+        icon={<KeyboardArrowDownIcon />}
+        onClick={() => setRoomDetailsOpen((prev) => !prev)}
         sx={{
-          flexDirection: "row",
+          position: "absolute",
+          top: "24px",
+          right: "24px",
+          transform: `rotate(${roomDetailsOpen ? 180 : 0}deg)`,
+          zIndex: 1,
         }}
-      >
-        <CustomSimpleImageSlider
-          images={roomPhotos}
-          containerStyle={{
-            width: "412px",
-            height: "294px",
-            borderRadius: "20px",
-          }}
-        />
+      />
 
+      {!roomDetailsOpen ? (
         <Stack
           sx={{
-            flex: 1,
-            flexDirection: "column",
-            alignItems: "stretch",
-            position: "relative",
-            padding: "24px 24px 0",
+            flexDirection: "row",
           }}
         >
-          <Typography variant="h5">{roomCategory.title}</Typography>
-
-          <CustomCircleIconButton
-            icon={<KeyboardArrowDownIcon />}
-            onClick={() => null}
-            sx={{
-              position: "absolute",
-              top: "24px",
-              right: "24px",
+          <CustomSimpleImageSlider
+            images={roomPhotos}
+            containerStyle={{
+              width: "412px",
+              height: "294px",
+              borderRadius: "20px",
             }}
           />
 
-          {roomFeatures ? (
-            <Box
-              sx={{
-                marginTop: "24px",
-                display: "flex",
-                flexDirection: "column",
-              }}
-            >
-              <Grid container spacing={2}>
-                <GridItem
-                  icon={<OneQuestIcon sx={{ fontSize: "16px" }} />}
-                  label="Вместимость"
-                  value={`до ${roomCategory.guests_capacity}-х мест`}
-                />
-                <GridItem
-                  icon={<RoomSizeIcon sx={{ fontSize: "16px" }} />}
-                  label="Размер"
-                  value={`${roomCategory.square} м²`}
-                />
-                <GridItem
-                  icon={<RoomsCountIcon sx={{ fontSize: "16px" }} />}
-                  label="Количество комнат"
-                  value={roomCategory.room_id.length}
-                />
-                {roomFeatures
-                  .filter(
-                    (i) =>
-                      i.title === "Душ" ||
-                      i.title === "Кровать" ||
-                      i.title === "Wi-Fi"
-                  )
-                  .map((item, idx) => {
-                    return (
-                      <GridItem
-                        key={idx}
-                        icon={getFeatureIcon(item.title)}
-                        label={item.title}
-                        value={"Есть"}
-                      />
-                    );
-                  })}
-              </Grid>
+          <Stack
+            sx={{
+              flex: 1,
+              flexDirection: "column",
+              alignItems: "stretch",
+              position: "relative",
+              padding: "24px 24px 0",
+            }}
+          >
+            <Title />
 
-              <CustomButton
-                label={`еще ${roomFeatures.length - 3}`}
-                startIcon={
-                  <Add
-                    sx={{ fontSize: "24px", color: theme.palette.primary.dark }}
-                  />
-                }
-                onClick={() => null}
-                containerVariant="outlined"
-                withoutAnimation
-                containerStyle={{
-                  border: `1px solid ${theme.palette.primary.dark}`,
+            {roomFeatures ? (
+              <Box
+                sx={{
                   marginTop: "24px",
-                  alignSelf: "center",
+                  display: "flex",
+                  flexDirection: "column",
                 }}
-              />
-            </Box>
-          ) : null}
+              >
+                <Grid container spacing={2}>
+                  <GridItem
+                    icon={<OneQuestIcon sx={{ fontSize: "16px" }} />}
+                    label="Вместимость"
+                    value={`до ${roomCategory.guests_capacity}-х мест`}
+                  />
+                  <GridItem
+                    icon={<RoomSizeIcon sx={{ fontSize: "16px" }} />}
+                    label="Размер"
+                    value={`${roomCategory.square} м²`}
+                  />
+                  <GridItem
+                    icon={<RoomsCountIcon sx={{ fontSize: "16px" }} />}
+                    label="Количество комнат"
+                    value={roomCategory.room_id.length}
+                  />
+                  {roomFeatures
+                    .filter(
+                      (i) =>
+                        i.title === "Душ" ||
+                        i.title === "Кровать" ||
+                        i.title === "Wi-Fi"
+                    )
+                    .map((item, idx) => {
+                      return (
+                        <GridItem
+                          key={idx}
+                          icon={getFeatureIcon(item.title)}
+                          label={item.title}
+                          value={"Есть"}
+                        />
+                      );
+                    })}
+                </Grid>
+
+                <CustomButton
+                  label={`еще ${roomFeatures.length - 3}`}
+                  startIcon={
+                    <Add
+                      sx={{
+                        fontSize: "24px",
+                        color: theme.palette.primary.dark,
+                      }}
+                    />
+                  }
+                  onClick={() => null}
+                  containerVariant="outlined"
+                  withoutAnimation
+                  containerStyle={{
+                    border: `1px solid ${theme.palette.primary.dark}`,
+                    marginTop: "24px",
+                    alignSelf: "center",
+                  }}
+                />
+              </Box>
+            ) : null}
+          </Stack>
         </Stack>
-      </Stack>
+      ) : (
+        <Stack sx={{ alignItems: "stretch", padding: "24px" }}>
+          {/* <CustomMultiImagePreviewSlider images={roomPhotos} /> */}
+          <FeatureDetails features_id={roomCategory.feature_id} />
+        </Stack>
+      )}
 
       <SpecialWishesSelector roomCategory={roomCategory} />
     </Stack>

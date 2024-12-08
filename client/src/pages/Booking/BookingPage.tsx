@@ -1,4 +1,10 @@
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
   BookingType,
@@ -30,6 +36,7 @@ import { findLastIndex } from "lodash";
 import { SelectRoomSection } from "./components/SelectRoomSection";
 import { BookingProgressIndicatorBaner } from "./components/BookingProgressIndicatorBaner";
 import { SelectTariffSection } from "./components/SelectTariffSection/SelectTariffSection";
+import { OrderServicesSection } from "./components/OrderServicesSection/OrderServicesSection";
 
 // Типы
 export type RoomCategoryPriceType = {
@@ -98,6 +105,27 @@ export type BookingProgressType = {
   prevStep: BookingProgressStepType;
   nextStep: BookingProgressStepType;
 };
+
+export const BookingContext = createContext<{
+  updateNewBookingDraft: ({
+    tempBookingId,
+    currentStep,
+    roomCategory,
+    tariffId,
+  }: {
+    tempBookingId: string;
+    currentStep: BookingStepType;
+    roomCategory: RoomCategoryType;
+    tariffId?: string;
+  }) => void;
+  bookingProgressCurrentStep: BookingProgressStepType;
+}>({
+  updateNewBookingDraft: () => null,
+  bookingProgressCurrentStep: {
+    step: null,
+    label: "",
+  },
+});
 
 interface Props {}
 
@@ -287,10 +315,12 @@ export const BookingPage = () => {
       tempBookingId,
       currentStep,
       roomCategory,
+      tariffId,
     }: {
       tempBookingId: string;
       currentStep: BookingStepType;
       roomCategory: RoomCategoryType;
+      tariffId?: string;
     }) => {
       // Проверяем правильно ли переданы данные и соответствуют ли они друг другу
       if (
@@ -345,10 +375,34 @@ export const BookingPage = () => {
             );
             toNextStep();
           }
+        } else if (currentStep.name === "Select a tariff") {
+          if (tariffId) {
+            setNewBookings((prev) => ({
+              ...prev,
+              bookings: prev.bookings.map((i) => {
+                if (i.tempId === tempBookingId) {
+                  return {
+                    ...i,
+                    tariff_id: tariffId,
+                  };
+                }
+                return i;
+              }),
+            }));
+            // Установить флаг complete для текущего шага
+            setBookingSteps((prev) =>
+              prev.map((i) =>
+                i.roomId === tempBookingId && i.isCurrent
+                  ? { ...i, isComplete: true }
+                  : i
+              )
+            );
+            toNextStep();
+          }
         }
       }
     },
-    [bookings, roomsCategories]
+    [bookingSteps, bookings, roomsCategories]
   );
 
   const createNewBookingDraft = ({
@@ -608,10 +662,6 @@ export const BookingPage = () => {
   useEffect(() => {
     updateBookingSteps();
   }, [updateBookingSteps]);
-
-  console.log("filterParams ", JSON.stringify(filterParams));
-  console.log("bookingsSteps ", JSON.stringify(bookingSteps));
-  console.log("newBookings ", JSON.stringify(newBookings));
 
   // Сформировать список букингов в зависимости от установленного фильтра "Гости"
   const updateNewBookings = useCallback(() => {
@@ -909,6 +959,7 @@ export const BookingPage = () => {
 
     if (curIdx >= 0) {
       const nextCurIdx = curIdx < bookingSteps.length - 1 ? curIdx + 1 : null;
+
       if (nextCurIdx && nextCurIdx !== curIdx) {
         setBookingSteps((prev) =>
           prev.map((item, idx) => ({
@@ -919,8 +970,6 @@ export const BookingPage = () => {
       }
     }
   };
-
-  console.log(JSON.stringify(bookingProgress));
 
   const currentRoomQuests = useMemo((): RoomQuestsCountType => {
     const a = filterParams.rooms.find(
@@ -994,8 +1043,6 @@ export const BookingPage = () => {
                     filterParams.rooms[0].adults +
                     filterParams.rooms[0].children
                   }
-                  updateNewBookingDraft={updateNewBookingDraft}
-                  bookingProgress={bookingProgress}
                   nextStepHandler={toNextStep}
                   prevStepHandler={toPrevStep}
                 />
@@ -1021,6 +1068,9 @@ export const BookingPage = () => {
                   }}
                   roomQuestsCount={currentRoomQuests}
                 />
+              ) : bookingProgress.currentStep.step?.name ===
+                "Order services" ? (
+                <OrderServicesSection />
               ) : null
             ) : null}
           </Stack>
@@ -1030,11 +1080,23 @@ export const BookingPage = () => {
     return null;
   };
 
+  console.log("filterParams ", JSON.stringify(filterParams));
+  console.log("bookingsSteps ", JSON.stringify(bookingSteps));
+  console.log("newBookings ", JSON.stringify(newBookings));
+  console.log("bookingProgress ", JSON.stringify(bookingProgress));
+
   return (
     <BasePageLayout isShowPageTitleBanner>
       <FiltersBar />
 
-      <StepContent />
+      <BookingContext.Provider
+        value={{
+          updateNewBookingDraft,
+          bookingProgressCurrentStep: bookingProgress.currentStep,
+        }}
+      >
+        <StepContent />
+      </BookingContext.Provider>
     </BasePageLayout>
   );
 };

@@ -9,23 +9,18 @@ import {
   useAppSelector,
 } from "../../../../../../../../hooks/redux";
 import { GetPaymentMethods } from "../../../../../../../../redux/slices/PaymentMethods/paymentMethodsSlice";
+import { UndoTermsPopup } from "./UndoTermsPopup";
 
 interface Props {
   included_breakfast: boolean;
   terms_сancellation: string;
   payment_method_id: string[];
   included_services?: string[];
-  paymentAndCancellationTerms?: string[];
+  payment_and_cancellation_terms?: string[];
 }
 
 export const Features = (props: Props) => {
-  const {
-    included_breakfast,
-    terms_сancellation,
-    payment_method_id,
-    included_services,
-    paymentAndCancellationTerms,
-  } = props;
+  const { included_breakfast, terms_сancellation, payment_method_id } = props;
   const dispatch = useAppDispatch();
   const { paymentMethods } = useAppSelector((state) => state.paymentMethods);
   const { isLoading: paymentsMethodsIsLoading } = useAppSelector(
@@ -58,15 +53,8 @@ export const Features = (props: Props) => {
         }
       />
 
-      <CustomIconLabel
-        icon={<UndoIcon sx={{ fontSize: "24px" }} />}
-        labelComponent={
-          <Typography variant="label" sx={{ textDecoration: "underline" }}>
-            Условия отмены
-          </Typography>
-        }
-        onClick={() => null}
-      />
+      <UndoTermsPopup description={terms_сancellation} />
+
       <CustomIconLabel
         icon={<PaymentCardIcon sx={{ fontSize: "24px" }} />}
         labelComponent={

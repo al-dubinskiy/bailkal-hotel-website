@@ -9,6 +9,7 @@ import {
 } from "./types";
 import {
   createRoomFeature,
+  deleteRoomFeature,
   getRoomFeatures,
   updateRoomFeature,
 } from "./httpRequests";
@@ -121,10 +122,10 @@ export const DeleteRoomFeature = createAsyncThunk(
     try {
       const { id } = payload;
 
-      const res = await fetch(`${updateRoomFeature.url}/${id}`, {
-        method: updateRoomFeature.method,
+      const res = await fetch(`${deleteRoomFeature.url}/${id}`, {
+        method: deleteRoomFeature.method,
         headers: {
-          ...updateRoomFeature.headers,
+          ...deleteRoomFeature.headers,
         },
       });
 
@@ -253,7 +254,7 @@ export const roomFeaturesSlice = createSlice({
           });
 
         if (DEBUG)
-          console.log("CreateRoomFeature (API): roomFeature was updated.");
+          console.log("UpdateRoomFeature (API): roomFeature was updated.");
       }
     );
     builder.addCase(UpdateRoomFeature.pending, (state, { payload }) => {

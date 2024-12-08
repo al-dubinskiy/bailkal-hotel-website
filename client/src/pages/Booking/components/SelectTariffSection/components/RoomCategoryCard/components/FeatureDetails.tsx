@@ -1,0 +1,97 @@
+import { Stack, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid2";
+import React, { useCallback, useEffect, useMemo } from "react";
+import { theme } from "../../../../../../../theme";
+import { GetRoomFeaturesCategories } from "../../../../../../../redux/slices/RoomFeaturesCategories/roomFeaturesSlice";
+import {
+  useAppDispatch,
+  useAppSelector,
+} from "../../../../../../../hooks/redux";
+import { RoomFeatureType } from "../../../../../../../redux/slices/RoomFeatures/types";
+import { CustomIconLabel } from "../../../../../../components/shared/CustomIconLabel";
+import { OneQuestIcon } from "../../../../../../../assets/icons/OneQuestIcon";
+import { GetRoomFeatures } from "../../../../../../../redux/slices/RoomFeatures/roomFeaturesSlice";
+
+interface Props {
+  features_id: string[];
+}
+
+export const FeatureDetails = (props: Props) => {
+  const { features_id } = props;
+
+  const dispatch = useAppDispatch();
+  const { roomFeaturesCategories } = useAppSelector(
+    (state) => state.roomFeaturesCategories
+  );
+  const { roomFeatures } = useAppSelector((state) => state.roomFeatures);
+
+  const GetFeaturesCategoriesList = useCallback(() => {
+    if (!roomFeaturesCategories) {
+      dispatch(GetRoomFeaturesCategories());
+    }
+  }, [roomFeaturesCategories]);
+
+  useEffect(() => {
+    GetFeaturesCategoriesList();
+  }, [GetFeaturesCategoriesList]);
+
+  const GetFeaturesList = useCallback(() => {
+    if (!roomFeatures) {
+      dispatch(GetRoomFeatures());
+    }
+  }, [roomFeatures]);
+
+  useEffect(() => {
+    GetFeaturesList();
+  }, [GetFeaturesList]);
+
+  const roomFeaturesList = useMemo(() => {
+    if (!roomFeatures) return [];
+    return roomFeatures.filter((i) => features_id.includes(i._id));
+  }, [roomFeatures]);
+
+  if (!roomFeaturesCategories || !roomFeatures) return null;
+
+  console.log(roomFeatures[0]);
+  return (
+    <Stack
+      sx={{
+        background: theme.palette.primary.extraLight,
+        borderRadius: "16px",
+        padding: "24px",
+      }}
+    >
+      <Grid container spacing={2}>
+        {roomFeaturesCategories.map((featureCategory) => {
+          const a = roomFeaturesList.filter(
+            (feature) => feature.category_id === featureCategory._id
+          );
+          if (a.length) {
+            return (
+              <Grid size={{ xs: 12, md: 6, lg: 4, xl: 3 }}>
+                <Typography variant="label" sx={{ fontWeight: "600" }}>
+                  {featureCategory.title}
+                </Typography>
+
+                <Stack sx={{ gap: "5px", marginTop: "10px" }}>
+                  {a.map((feature, idx) => {
+                    return (
+                      <CustomIconLabel
+                        icon={<OneQuestIcon sx={{ fontSize: "16px" }} />}
+                        labelComponent={
+                          <Typography variant="label">
+                            {feature.title}
+                          </Typography>
+                        }
+                      />
+                    );
+                  })}
+                </Stack>
+              </Grid>
+            );
+          }
+        })}
+      </Grid>
+    </Stack>
+  );
+};

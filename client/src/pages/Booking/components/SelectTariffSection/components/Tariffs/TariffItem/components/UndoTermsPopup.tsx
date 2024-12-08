@@ -16,13 +16,14 @@ import { theme } from "../../../../../../../../theme";
 import { useButtonDropdownCardStyles } from "../../../../../../../components/shared/styles";
 import { BookingDateType } from "../../../../SelectTariffSection";
 import moment from "moment";
+import { UndoIcon } from "../../../../../../../../assets/icons/UndoIcon";
 
 interface Props {
-  bookingDate: BookingDateType;
+  description: string;
 }
 
-export const PriceDetailsPopup = (props: Props) => {
-  const { bookingDate } = props;
+export const UndoTermsPopup = (props: Props) => {
+  const { description } = props;
 
   const classes = useButtonDropdownCardStyles();
 
@@ -42,28 +43,42 @@ export const PriceDetailsPopup = (props: Props) => {
     }
   };
 
-  const nightTotal = useMemo(
-    () => moment(bookingDate.departure.diff(bookingDate.arrival, "days")),
-    [bookingDate]
-  );
-
   return (
-    <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
+    <Box
+      sx={{
+        display: "flex",
+        flexDirection: "column",
+        gap: "10px",
+        width: "max-content",
+        // alignSelf: "flex-start",
+      }}
+    >
       <Button
+        startIcon={<UndoIcon sx={{ fontSize: "24px" }} />}
         sx={{
           width: "auto",
           minWidth: "auto",
           height: "auto",
           padding: 0,
           background: "transparent",
+          marginLeft: "3px",
+
+          "& .MuiButton-startIcon": {
+            marginRight: "11px",
+            fontSize: "24px",
+
+            "&>*:nth-of-type(1)": {
+              fontSize: "24px",
+            },
+          },
         }}
         aria-describedby={id}
         type="button"
         onClick={handleClick}
       >
-        <InfoOutlined
-          sx={{ fontSize: "24px", color: theme.palette.gray.dark }}
-        />
+        <Typography variant="label" sx={{ textDecoration: "underline" }}>
+          Условия отмены
+        </Typography>
       </Button>
 
       <Popper
@@ -72,7 +87,6 @@ export const PriceDetailsPopup = (props: Props) => {
         anchorEl={anchorEl}
         transition
         className={classes.popper}
-        // placement="top"
         modifiers={[
           {
             name: "arrow",
@@ -86,12 +100,13 @@ export const PriceDetailsPopup = (props: Props) => {
         {({ TransitionProps }) => (
           <ClickAwayListener onClickAway={handleClose}>
             <Fade {...TransitionProps} timeout={350}>
-              <Paper elevation={1} className={classes.popoverRoot}>
+              <Paper
+                elevation={1}
+                className={classes.popoverRoot}
+                sx={{ width: "450px", marginLeft: "10px" }}
+              >
                 <span className={classes.arrow} />
-                <Box
-                  className={`${classes.content} content`}
-                  sx={{ minWidth: "400px !important" }}
-                >
+                <Box className={`${classes.content}`}>
                   <Stack
                     sx={{
                       flexDirection: "column",
@@ -100,16 +115,10 @@ export const PriceDetailsPopup = (props: Props) => {
                     }}
                   >
                     <Typography variant={"label"} sx={{ fontWeight: 600 }}>
-                      Детализация цены
+                      Условия отмены
                     </Typography>
 
-                    <Typography variant={"label"}>
-                      {bookingDate.arrival.format("DD MMMM")} —
-                      {bookingDate.departure.format("DD MMMM")}
-                      <span style={{ fontWeight: 600 }}>, 1 ночь</span>
-                      <br></br>2 взрослых — 
-                      <span style={{ fontWeight: 600 }}>8220 ₽ за ночь</span>
-                    </Typography>
+                    <Typography variant={"body"}>{description}</Typography>
                   </Stack>
                 </Box>
               </Paper>

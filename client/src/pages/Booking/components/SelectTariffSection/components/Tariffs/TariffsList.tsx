@@ -52,6 +52,7 @@ export const TariffsList = (props: Props) => {
                       ? roomCategory.price_per_night_for_two_quest
                       : roomCategory.price_per_night_for_one_quest
                   }
+                  roomCategory={roomCategory}
                   roomQuestsCount={roomQuestsCount}
                   bookingDate={bookingDate}
                 />

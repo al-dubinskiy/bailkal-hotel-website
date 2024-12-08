@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material";
-import React from "react";
+import React, { useContext, useState } from "react";
 import { CustomCircleIconButton } from "../../../../../../components/shared/CustomCircleIconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -13,16 +13,33 @@ import { PersonIcon } from "../../../../../../../assets/icons/PersonIconIcon";
 import { RoomQuestsCountType } from "../../../../FiltersBar/SelectQuestsDropdown";
 import { PriceDetailsPopup } from "./components/PriceDetailsPopup";
 import { BookingDateType } from "../../../SelectTariffSection";
+import { TariffDetails } from "./components/TariffDetails";
+import { RoomCategoryType } from "../../../../../../../redux/slices/RoomsCategories/types";
+import {
+  BookingContext,
+  BookingProgressStepType,
+} from "../../../../../BookingPage";
 
 interface Props {
   tariff: BookingTariffType;
   roomCategoryPrice: number;
+  roomCategory: RoomCategoryType;
   roomQuestsCount: RoomQuestsCountType;
   bookingDate: BookingDateType;
 }
 
 export const TariffItem = (props: Props) => {
-  const { tariff, roomCategoryPrice, roomQuestsCount, bookingDate } = props;
+  const {
+    tariff,
+    roomCategoryPrice,
+    roomCategory,
+    roomQuestsCount,
+    bookingDate,
+  } = props;
+  const [tariffDetailsOpen, setTariffDetailsOpen] = useState<boolean>(false);
+
+  const { updateNewBookingDraft, bookingProgressCurrentStep } =
+    useContext(BookingContext);
 
   const isSelected = false;
 
@@ -33,149 +50,182 @@ export const TariffItem = (props: Props) => {
         borderRadius: "16px",
         padding: "24px",
         position: "relative",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        alignItems: "flex-end",
       }}
     >
-      <CustomCircleIconButton
-        icon={<KeyboardArrowDownIcon sx={{ fontSize: "16px" }} />}
-        onClick={() => null}
+      <Box
         sx={{
           position: "absolute",
           top: "24px",
           right: "24px",
-          minWidth: "40px",
-          width: "40px",
-          height: "40px",
+          "&:after": {
+            content: "''",
+            width: "40px",
+            height: "100px",
+            display: tariffDetailsOpen ? "inline-block" : "none",
+            position: "absolute",
+            top: 0,
+            left: 0,
+            background: theme.palette.background.paper,
+            zIndex: 0,
+            borderTopLeftRadius: "40px",
+            borderTopRightRadius: "40px",
+          },
         }}
-      />
+      >
+        <CustomCircleIconButton
+          icon={<KeyboardArrowDownIcon sx={{ fontSize: "16px" }} />}
+          onClick={() => setTariffDetailsOpen((prev) => !prev)}
+          sx={{
+            minWidth: "40px",
+            width: "40px",
+            height: "40px",
+            zIndex: 1,
+            transform: `rotate(${tariffDetailsOpen ? 180 : 0}deg)`,
+          }}
+        />
+      </Box>
+
+      <Typography
+        variant="label"
+        sx={{ fontWeight: 600, marginBottom: "24px" }}
+      >
+        {tariff.title}
+      </Typography>
+
+      {tariffDetailsOpen ? (
+        <TariffDetails
+          included_services={tariff.included_services}
+          payment_and_cancellation_terms={tariff.payment_and_cancellation_terms}
+          note={tariff.note}
+        />
+      ) : null}
 
       <Stack
         sx={{
-          alignItems: "stretch",
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "flex-end",
         }}
       >
-        <Typography
-          variant="label"
-          sx={{ fontWeight: 600, marginBottom: "24px" }}
-        >
-          {tariff.title}
-        </Typography>
-
         <Features
           included_breakfast={tariff.included_breakfast}
           terms_сancellation={tariff.terms_сancellation}
           payment_method_id={tariff.payment_method_id}
-          included_services={tariff.included_services}
-          paymentAndCancellationTerms={tariff.paymentAndCancellationTerms}
         />
-      </Stack>
 
-      <Stack sx={{ flexDirection: "row", alignItems: "flex-end", gap: "24px" }}>
         <Stack
-          sx={{
-            paddingTop: "24px",
-            gap: 0,
-            alignItems: "flex-end",
-          }}
+          sx={{ flexDirection: "row", alignItems: "flex-end", gap: "24px" }}
         >
-          {tariff.discount ? (
+          <Stack
+            sx={{
+              paddingTop: "24px",
+              gap: 0,
+              alignItems: "flex-end",
+            }}
+          >
+            {tariff.discount ? (
+              <Box
+                sx={{
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: "10px",
+                }}
+              >
+                <Box
+                  sx={{
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: theme.palette.secondary.main,
+                  }}
+                >
+                  <Typography variant="body">-{tariff.discount}%</Typography>
+                </Box>
+
+                <Typography
+                  variant="body"
+                  sx={{
+                    color: theme.palette.gray.light,
+                    textDecoration: "line-through",
+                  }}
+                >
+                  {(
+                    roomCategoryPrice +
+                    (tariff.cost * 100) / (100 - tariff.discount)
+                  ).toFixed()}
+                  ₽
+                </Typography>
+              </Box>
+            ) : null}
+
             <Box
               sx={{
                 display: "flex",
                 flexDirection: "row",
                 alignItems: "center",
-                gap: "10px",
+                columnGap: "10px",
               }}
             >
               <Box
                 sx={{
                   display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: theme.palette.secondary.main,
+                  flexDirection: "row",
+                  alignItems: "flex-end",
                 }}
               >
-                <Typography variant="body">-{tariff.discount}%</Typography>
+                {roomQuestsCount.children > 0 ? (
+                  <PersonIcon sx={{ fontSize: "16px", marginRight: "-5px" }} />
+                ) : null}
+                {roomQuestsCount.adults > 1 ? (
+                  <>
+                    <PersonIcon
+                      sx={{ fontSize: "24px", marginRight: "-8px" }}
+                    />
+                    <PersonIcon sx={{ fontSize: "24px" }} />
+                  </>
+                ) : (
+                  <>
+                    <PersonIcon sx={{ fontSize: "24px" }} />
+                  </>
+                )}
               </Box>
 
               <Typography
                 variant="body"
                 sx={{
-                  color: theme.palette.gray.light,
-                  textDecoration: "line-through",
+                  color: theme.palette.primary.dark,
+                  fontSize: "20.8px",
                 }}
               >
-                {roomCategoryPrice +
-                  (tariff.cost * 100) / (100 - tariff.discount)}
-                ₽
+                {roomCategoryPrice + tariff.cost}₽
               </Typography>
+
+              <PriceDetailsPopup bookingDate={bookingDate} />
             </Box>
-          ) : null}
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              columnGap: "10px",
+            <Typography variant="body">стоимость за 1 ночь</Typography>
+          </Stack>
+
+          <CustomButton
+            label={!isSelected ? "Выбрать" : "Выбрано"}
+            onClick={() => {
+              const { step: currentStep } = bookingProgressCurrentStep;
+              if (currentStep) {
+                updateNewBookingDraft({
+                  currentStep,
+                  roomCategory,
+                  tempBookingId: currentStep.roomId,
+                  tariffId: tariff._id,
+                });
+              }
             }}
-          >
-            <Box
-              sx={{
-                display: "flex",
-                flexDirection: "row",
-                alignItems: "flex-end",
-              }}
-            >
-              {roomQuestsCount.children > 0 ? (
-                <PersonIcon sx={{ fontSize: "16px", marginRight: "-5px" }} />
-              ) : null}
-              {roomQuestsCount.adults > 1 ? (
-                <>
-                  <PersonIcon sx={{ fontSize: "24px", marginRight: "-8px" }} />
-                  <PersonIcon sx={{ fontSize: "24px" }} />
-                </>
-              ) : (
-                <>
-                  <PersonIcon sx={{ fontSize: "24px" }} />
-                </>
-              )}
-            </Box>
-
-            <Typography
-              variant="body"
-              sx={{
-                color: theme.palette.primary.dark,
-                fontSize: "20.8px",
-              }}
-            >
-              {roomCategoryPrice + tariff.cost}₽
-            </Typography>
-
-            <PriceDetailsPopup bookingDate={bookingDate} />
-          </Box>
-          <Typography variant="body">стоимость за 1 ночь</Typography>
+            containerVariant={!isSelected ? "contained" : "outlined"}
+            disabled={Boolean(isSelected)}
+            containerBackgroundColor={"buttonDark"}
+            containerStyle={{ padding: "0 40px" }}
+            withoutAnimation
+          />
         </Stack>
-
-        <CustomButton
-          label={!isSelected ? "Выбрать" : "Выбрано"}
-          onClick={() => {
-            // const currentStep = bookingProgress.currentStep.step;
-            // if (currentStep) {
-            //   updateNewBookingDraft({
-            //     currentStep,
-            //     roomCategory,
-            //     tempBookingId: currentStep.roomId,
-            //   });
-            // }
-          }}
-          containerVariant={!isSelected ? "contained" : "outlined"}
-          disabled={Boolean(isSelected)}
-          containerBackgroundColor={"buttonDark"}
-          containerStyle={{ padding: "0 40px" }}
-          withoutAnimation
-        />
       </Stack>
     </Stack>
   );

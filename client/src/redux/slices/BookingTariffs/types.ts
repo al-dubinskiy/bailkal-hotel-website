@@ -6,7 +6,7 @@ export type CreateBookingTariffType = {
   terms_сancellation: string;
   payment_method_id: string[];
   included_services?: string[];
-  paymentAndCancellationTerms?: string[];
+  payment_and_cancellation_terms?: string[];
   note?: string;
   byPromoCode: boolean;
   cost: number;

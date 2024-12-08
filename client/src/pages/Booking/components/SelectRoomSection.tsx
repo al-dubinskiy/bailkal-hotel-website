@@ -1,8 +1,10 @@
-import React, { memo, useMemo } from "react";
+import React, { memo, useContext, useMemo } from "react";
 import { BookingProgressIndicatorBaner } from "./BookingProgressIndicatorBaner";
 import { Box, Stack, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import {
+  BookingContext,
+  BookingProgressStepType,
   BookingProgressType,
   BookingStepType,
   RoomCategoryPriceType,
@@ -30,34 +32,25 @@ import { CustomButton } from "../../components/shared/CustomButton";
 import { RoomCategoryType } from "../../../redux/slices/RoomsCategories/types";
 
 interface Props {
-  bookingProgress: BookingProgressType;
   prevStepHandler: () => void;
   nextStepHandler: () => void;
   availableRoomCategories: RoomCategoryPriceType[] | null;
   roomQuestsCount: number;
-  updateNewBookingDraft: ({
-    tempBookingId,
-    currentStep,
-    roomCategory,
-  }: {
-    tempBookingId: string;
-    currentStep: BookingStepType;
-    roomCategory: RoomCategoryType;
-  }) => void;
   selectedRoomCategoryId: string | null;
 }
 
 export const SelectRoomSection = memo((props: Props) => {
   const {
-    bookingProgress,
     prevStepHandler,
     nextStepHandler,
     availableRoomCategories,
     roomQuestsCount,
-    updateNewBookingDraft,
     selectedRoomCategoryId,
   } = props;
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
+
+  const { updateNewBookingDraft, bookingProgressCurrentStep } =
+    useContext(BookingContext);
 
   return (
     <Box
@@ -315,8 +308,8 @@ export const SelectRoomSection = memo((props: Props) => {
                           <CustomButton
                             label={!isSelected ? "Выбрать" : "Выбрано"}
                             onClick={() => {
-                              const currentStep =
-                                bookingProgress.currentStep.step;
+                              const { step: currentStep } =
+                                bookingProgressCurrentStep;
                               if (currentStep) {
                                 updateNewBookingDraft({
                                   currentStep,
