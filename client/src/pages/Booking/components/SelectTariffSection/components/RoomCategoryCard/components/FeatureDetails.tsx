@@ -45,14 +45,23 @@ export const FeatureDetails = (props: Props) => {
     GetFeaturesList();
   }, [GetFeaturesList]);
 
-  const roomFeaturesList = useMemo(() => {
-    if (!roomFeatures) return [];
-    return roomFeatures.filter((i) => features_id.includes(i._id));
-  }, [roomFeatures]);
+  const roomFeaturesByCategories = useMemo(() => {
+    if (!roomFeatures || !roomFeaturesCategories) return [];
+    const a = roomFeatures.filter((i) => features_id.includes(i._id));
+    const b = roomFeaturesCategories.map((featureCategory) => {
+      return {
+        title: featureCategory.title,
+        items: a.filter(
+          (feature) => feature.category_id === featureCategory._id
+        ),
+      };
+    });
+    return b.sort((k, l) => k.items.length - l.items.length);
+  }, [roomFeatures, roomFeaturesCategories]);
 
   if (!roomFeaturesCategories || !roomFeatures) return null;
 
-  console.log(roomFeatures[0]);
+  console.log(roomFeaturesByCategories);
   return (
     <Stack
       sx={{
@@ -62,21 +71,19 @@ export const FeatureDetails = (props: Props) => {
       }}
     >
       <Grid container spacing={2}>
-        {roomFeaturesCategories.map((featureCategory) => {
-          const a = roomFeaturesList.filter(
-            (feature) => feature.category_id === featureCategory._id
-          );
-          if (a.length) {
+        {roomFeaturesByCategories.map((featuresByCategory, idx_i) => {
+          if (featuresByCategory.items.length) {
             return (
-              <Grid size={{ xs: 12, md: 6, lg: 4, xl: 3 }}>
+              <Grid key={idx_i} size={{ xs: 12, md: 6, lg: 4, xl: 3 }}>
                 <Typography variant="label" sx={{ fontWeight: "600" }}>
-                  {featureCategory.title}
+                  {featuresByCategory.title}
                 </Typography>
 
                 <Stack sx={{ gap: "5px", marginTop: "10px" }}>
-                  {a.map((feature, idx) => {
+                  {featuresByCategory.items.map((feature, idx_j) => {
                     return (
                       <CustomIconLabel
+                        key={idx_j}
                         icon={<OneQuestIcon sx={{ fontSize: "16px" }} />}
                         labelComponent={
                           <Typography variant="label">

@@ -37,6 +37,7 @@ import { SelectRoomSection } from "./components/SelectRoomSection";
 import { BookingProgressIndicatorBaner } from "./components/BookingProgressIndicatorBaner";
 import { SelectTariffSection } from "./components/SelectTariffSection/SelectTariffSection";
 import { OrderServicesSection } from "./components/OrderServicesSection/OrderServicesSection";
+import { BookingTariffType } from "../../redux/slices/BookingTariffs/types";
 
 // Типы
 export type RoomCategoryPriceType = {
@@ -107,20 +108,26 @@ export type BookingProgressType = {
 };
 
 export const BookingContext = createContext<{
-  updateNewBookingDraft: ({
+  roomQuests: RoomQuestsCountType | null;
+  booking: CreateBookingLocalType | null;
+  roomCategory: RoomCategoryType | null;
+  updateBookingDraft: ({
     tempBookingId,
     currentStep,
     roomCategory,
-    tariffId,
+    tariff,
   }: {
     tempBookingId: string;
     currentStep: BookingStepType;
     roomCategory: RoomCategoryType;
-    tariffId?: string;
+    tariff?: BookingTariffType;
   }) => void;
   bookingProgressCurrentStep: BookingProgressStepType;
 }>({
-  updateNewBookingDraft: () => null,
+  roomQuests: null,
+  booking: null,
+  roomCategory: null,
+  updateBookingDraft: () => null,
   bookingProgressCurrentStep: {
     step: null,
     label: "",
@@ -310,17 +317,17 @@ export const BookingPage = () => {
     return null;
   };
 
-  const updateNewBookingDraft = useCallback(
+  const updateBookingDraft = useCallback(
     ({
       tempBookingId,
       currentStep,
       roomCategory,
-      tariffId,
+      tariff,
     }: {
       tempBookingId: string;
       currentStep: BookingStepType;
       roomCategory: RoomCategoryType;
-      tariffId?: string;
+      tariff?: BookingTariffType;
     }) => {
       // Проверяем правильно ли переданы данные и соответствуют ли они друг другу
       if (
@@ -376,14 +383,15 @@ export const BookingPage = () => {
             toNextStep();
           }
         } else if (currentStep.name === "Select a tariff") {
-          if (tariffId) {
+          if (tariff) {
             setNewBookings((prev) => ({
               ...prev,
               bookings: prev.bookings.map((i) => {
                 if (i.tempId === tempBookingId) {
                   return {
                     ...i,
-                    tariff_id: tariffId,
+                    tariff_id: tariff._id,
+                    price: i.price + tariff.cost,
                   };
                 }
                 return i;
@@ -1039,29 +1047,12 @@ export const BookingPage = () => {
                     )?.room_category_id || null
                   }
                   availableRoomCategories={availableRoomCategories}
-                  roomQuestsCount={
-                    filterParams.rooms[0].adults +
-                    filterParams.rooms[0].children
-                  }
                   nextStepHandler={toNextStep}
                   prevStepHandler={toPrevStep}
                 />
               ) : bookingProgress.currentStep.step?.name ===
                 "Select a tariff" ? (
                 <SelectTariffSection
-                  roomCategory={
-                    (roomsCategories &&
-                      roomsCategories.find(
-                        (i) =>
-                          i._id ===
-                          newBookings.bookings.find(
-                            (i) =>
-                              i.tempId ===
-                              bookingProgress.currentStep.step?.roomId
-                          )?.room_category_id
-                      )) ||
-                    null
-                  }
                   bookingDate={{
                     arrival: filterParams.arrival_datetime,
                     departure: filterParams.departure_datetime,
@@ -1091,7 +1082,22 @@ export const BookingPage = () => {
 
       <BookingContext.Provider
         value={{
-          updateNewBookingDraft,
+          roomQuests: currentRoomQuests,
+          booking:
+            newBookings.bookings.find(
+              (i) => i.tempId === bookingProgress.currentStep.step?.roomId
+            ) || null,
+          roomCategory:
+            (roomsCategories &&
+              roomsCategories.find(
+                (i) =>
+                  i._id ===
+                  newBookings.bookings.find(
+                    (i) => i.tempId === bookingProgress.currentStep.step?.roomId
+                  )?.room_category_id
+              )) ||
+            null,
+          updateBookingDraft,
           bookingProgressCurrentStep: bookingProgress.currentStep,
         }}
       >

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Stack } from "@mui/material";
 import { RoomCategoryType } from "../../../../redux/slices/RoomsCategories/types";
 import { useAppDispatch } from "../../../../hooks/redux";
@@ -7,6 +7,7 @@ import { SpecialWishesSelector } from "./components/RoomCategoryCard/components/
 import { TariffsList } from "./components/Tariffs/TariffsList";
 import { RoomQuestsCountType } from "../FiltersBar/SelectQuestsDropdown";
 import { Moment } from "moment";
+import { BookingContext } from "../../BookingPage";
 
 export type BookingDateType = {
   arrival: Moment;
@@ -14,23 +15,19 @@ export type BookingDateType = {
 };
 
 interface Props {
-  roomCategory: RoomCategoryType | null;
   roomQuestsCount: RoomQuestsCountType;
   bookingDate: BookingDateType;
 }
 
 export const SelectTariffSection = (props: Props) => {
-  const { roomCategory, roomQuestsCount, bookingDate } = props;
+  const { roomQuestsCount, bookingDate } = props;
   const dispatch = useAppDispatch();
-
-  if (!roomCategory) return null;
 
   return (
     <Stack sx={{ alignItems: "stretch", gap: "24px" }}>
-      <RoomCategoryCard roomCategory={roomCategory} />
+      <RoomCategoryCard />
 
       <TariffsList
-        roomCategory={roomCategory}
         roomQuestsCount={roomQuestsCount}
         bookingDate={bookingDate}
       />

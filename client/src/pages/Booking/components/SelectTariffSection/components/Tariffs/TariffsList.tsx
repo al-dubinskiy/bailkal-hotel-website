@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useMemo } from "react";
+import React, { useCallback, useContext, useEffect, useMemo } from "react";
 import { TariffItem } from "./TariffItem/TariffItem";
 import { useAppDispatch, useAppSelector } from "../../../../../../hooks/redux";
 import { GetBookingTariffs } from "../../../../../../redux/slices/BookingTariffs/bookingTariffsSlice";
@@ -6,17 +6,19 @@ import { RoomCategoryType } from "../../../../../../redux/slices/RoomsCategories
 import { Stack } from "@mui/material";
 import { RoomQuestsCountType } from "../../../FiltersBar/SelectQuestsDropdown";
 import { BookingDateType } from "../../SelectTariffSection";
+import { BookingContext } from "../../../../BookingPage";
 
 interface Props {
-  roomCategory: RoomCategoryType;
   roomQuestsCount: RoomQuestsCountType;
   bookingDate: BookingDateType;
 }
 
 export const TariffsList = (props: Props) => {
-  const { roomCategory, roomQuestsCount, bookingDate } = props;
+  const { roomQuestsCount, bookingDate } = props;
   const dispatch = useAppDispatch();
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
+
+  const { roomCategory } = useContext(BookingContext);
 
   const GetUnavailableBookingDatesList = useCallback(() => {
     if (!bookingTariffs) {
@@ -33,7 +35,7 @@ export const TariffsList = (props: Props) => {
     return a > 0 ? a : -1;
   }, [roomQuestsCount]);
 
-  if (!bookingTariffs) return <></>;
+  if (!bookingTariffs || !roomCategory) return null;
 
   return (
     <Stack sx={{ alignItems: "stretch", gap: "24px" }}>

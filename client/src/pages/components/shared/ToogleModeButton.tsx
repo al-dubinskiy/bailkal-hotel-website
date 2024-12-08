@@ -40,7 +40,15 @@ export const ToogleModeButton = (props: Props) => {
   };
 
   return (
-    <Stack sx={{ flexDirection: "row", alignItems: "center", gap: "24px" }}>
+    <Stack
+      sx={{
+        flexDirection: { xs: "column", md: "row" },
+        alignItems: "center",
+        columnGap: "24px",
+        rowGap: "10px",
+        width: { xs: "100%", md: "max-content" },
+      }}
+    >
       <Typography variant="label">{label}</Typography>
       <Stack sx={{ flexDirection: "row" }}>
         {modes.map((i, idx) => {

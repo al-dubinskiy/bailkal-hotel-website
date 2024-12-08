@@ -126,7 +126,10 @@ export const SpecialWishesSelector = (props: Props) => {
         sx={{
           flexDirection: "row",
           justifyContent: "space-between",
-          width: "90%",
+          width: { xs: "100%", md: "90%" },
+          flexWrap: "wrap",
+          columnGap: "24px",
+          rowGap: "15px",
         }}
       >
         <ToogleModeButton
@@ -141,8 +144,17 @@ export const SpecialWishesSelector = (props: Props) => {
         />
       </Stack>
 
-      <Typography variant="small">
-        <span style={{ fontSize: "16px", marginTop: "10px" }}>*</span>{" "}
+      <Typography
+        variant="small"
+        sx={{ margin: { xs: "10px auto 0", md: "10px 0 0" } }}
+      >
+        <span
+          style={{
+            fontSize: "16px",
+          }}
+        >
+          *
+        </span>
         Выполнение особых пожеланий не гарантируется
       </Typography>
     </Stack>

@@ -35,7 +35,6 @@ interface Props {
   prevStepHandler: () => void;
   nextStepHandler: () => void;
   availableRoomCategories: RoomCategoryPriceType[] | null;
-  roomQuestsCount: number;
   selectedRoomCategoryId: string | null;
 }
 
@@ -44,13 +43,16 @@ export const SelectRoomSection = memo((props: Props) => {
     prevStepHandler,
     nextStepHandler,
     availableRoomCategories,
-    roomQuestsCount,
     selectedRoomCategoryId,
   } = props;
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
 
-  const { updateNewBookingDraft, bookingProgressCurrentStep } =
+  const { roomQuests, updateBookingDraft, bookingProgressCurrentStep } =
     useContext(BookingContext);
+
+  if (!roomQuests) return null;
+
+  const roomQuestsCount = roomQuests.adults + roomQuests.children;
 
   return (
     <Box
@@ -248,7 +250,7 @@ export const SelectRoomSection = memo((props: Props) => {
                                 display: "flex",
                                 flexDirection: "row",
                                 alignItems: "center",
-                                gap: "10px",
+                                gap: "5px",
                               }}
                             >
                               <Typography
@@ -259,7 +261,7 @@ export const SelectRoomSection = memo((props: Props) => {
                               </Typography>
 
                               <Typography
-                                variant="body"
+                                variant="label"
                                 sx={{
                                   color: theme.palette.primary.dark,
                                   fontSize: "20.8px",
@@ -268,6 +270,7 @@ export const SelectRoomSection = memo((props: Props) => {
                                 {roomPrice} ₽
                               </Typography>
                             </Box>
+
                             <Typography variant="body">
                               1 ночь / {roomQuestsCount} гост
                               {roomQuestsCount > 1 ? "я" : "ь"}
@@ -311,7 +314,7 @@ export const SelectRoomSection = memo((props: Props) => {
                               const { step: currentStep } =
                                 bookingProgressCurrentStep;
                               if (currentStep) {
-                                updateNewBookingDraft({
+                                updateBookingDraft({
                                   currentStep,
                                   roomCategory,
                                   tempBookingId: currentStep.roomId,

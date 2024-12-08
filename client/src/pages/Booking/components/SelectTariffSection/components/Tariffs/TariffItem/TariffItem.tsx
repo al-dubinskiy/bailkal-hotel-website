@@ -38,7 +38,7 @@ export const TariffItem = (props: Props) => {
   } = props;
   const [tariffDetailsOpen, setTariffDetailsOpen] = useState<boolean>(false);
 
-  const { updateNewBookingDraft, bookingProgressCurrentStep } =
+  const { updateBookingDraft, bookingProgressCurrentStep } =
     useContext(BookingContext);
 
   const isSelected = false;
@@ -150,11 +150,7 @@ export const TariffItem = (props: Props) => {
                     textDecoration: "line-through",
                   }}
                 >
-                  {(
-                    roomCategoryPrice +
-                    (tariff.cost * 100) / (100 - tariff.discount)
-                  ).toFixed()}
-                  ₽
+                  {((tariff.cost * 100) / (100 - tariff.discount)).toFixed()}₽
                 </Typography>
               </Box>
             ) : null}
@@ -198,7 +194,7 @@ export const TariffItem = (props: Props) => {
                   fontSize: "20.8px",
                 }}
               >
-                {roomCategoryPrice + tariff.cost}₽
+                + {tariff.cost}₽
               </Typography>
 
               <PriceDetailsPopup bookingDate={bookingDate} />
@@ -211,11 +207,11 @@ export const TariffItem = (props: Props) => {
             onClick={() => {
               const { step: currentStep } = bookingProgressCurrentStep;
               if (currentStep) {
-                updateNewBookingDraft({
+                updateBookingDraft({
                   currentStep,
                   roomCategory,
                   tempBookingId: currentStep.roomId,
-                  tariffId: tariff._id,
+                  tariff: tariff,
                 });
               }
             }}

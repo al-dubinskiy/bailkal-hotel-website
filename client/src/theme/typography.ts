@@ -61,6 +61,16 @@ export const typography: TypographyOptions = {
     textDecoration: "none",
     textTransform: "capitalize",
   },
+  h7: {
+    fontFamily: "CormorantInfant",
+    fontSize: "24px",
+    fontWeight: 600,
+    lineHeight: 1.08,
+    letterSpacing: "0",
+    color: "#1a1a1a",
+    textDecoration: "none",
+    textTransform: "unset",
+  },
   intro: {
     fontFamily: "CormorantInfant",
     fontSize: "40px",

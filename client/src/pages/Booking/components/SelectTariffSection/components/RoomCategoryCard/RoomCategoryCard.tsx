@@ -2,7 +2,13 @@ import { Box, Stack, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import Grid from "@mui/material/Grid2";
 import Add from "@mui/icons-material/Add";
-import React, { ReactNode, useCallback, useEffect, useState } from "react";
+import React, {
+  ReactNode,
+  useCallback,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
 import { CustomSimpleImageSlider } from "../../../../../components/shared/CustomSimpleSlider.ts/CustomSimpleImageSlider";
 import { RoomCategoryType } from "../../../../../../redux/slices/RoomsCategories/types";
 import {
@@ -27,13 +33,13 @@ import { WifiIcon } from "../../../../../../assets/icons/WifiIcon";
 import { SpecialWishesSelector } from "./components/SpecialWishesSelector";
 import { CustomMultiImagePreviewSlider } from "../../../../../components/shared/CustomMultiImagePreviewSlider/CustomMultiImagePreviewSlider";
 import { FeatureDetails } from "./components/FeatureDetails";
+import { BookingContext } from "../../../../BookingPage";
 
-interface Props {
-  roomCategory: RoomCategoryType;
-}
+interface Props {}
 
 export const RoomCategoryCard = (props: Props) => {
-  const { roomCategory } = props;
+  const {} = props;
+  const { roomCategory } = useContext(BookingContext);
 
   const dispatch = useAppDispatch();
 
@@ -247,7 +253,8 @@ export const RoomCategoryCard = (props: Props) => {
         </Stack>
       ) : (
         <Stack sx={{ alignItems: "stretch", padding: "24px" }}>
-          {/* <CustomMultiImagePreviewSlider images={roomPhotos} /> */}
+          <Title />
+          <CustomMultiImagePreviewSlider images={roomPhotos} />
           <FeatureDetails features_id={roomCategory.feature_id} />
         </Stack>
       )}

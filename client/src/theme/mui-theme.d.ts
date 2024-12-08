@@ -34,6 +34,7 @@ declare module "@mui/material/styles" {
     body: React.CSSProperties;
     someSmall: React.CSSProperties;
     small: React.CSSProperties;
+    h7: React.CSSProperties;
   }
   interface TypographyVariantsOptions {
     intro?: React.CSSProperties;
@@ -41,6 +42,7 @@ declare module "@mui/material/styles" {
     body?: React.CSSProperties;
     someSmall?: React.CSSProperties;
     small?: React.CSSProperties;
+    h7: React.CSSProperties;
   }
 
   interface BreakpointOverrides {
@@ -78,5 +80,6 @@ declare module "@mui/material/Typography" {
     caption: false;
     button: true;
     overline: false;
+    h7: true;
   }
 }
