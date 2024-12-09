@@ -18,6 +18,8 @@ export type CreateRoomCategoryType = {
   include_service_id: string[];
   available_bed_variant_id: string[];
   available_tariff_id: string[];
+  main_view_from_room_window_id: string;
+  additional_view_from_room_window_id: string[];
 };
 
 export type UpdateRoomCategoryType = CreateRoomCategoryType;

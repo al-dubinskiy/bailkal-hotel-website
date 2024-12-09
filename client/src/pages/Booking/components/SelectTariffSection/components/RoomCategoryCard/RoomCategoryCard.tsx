@@ -1,6 +1,6 @@
 import { Box, Stack, Typography } from "@mui/material";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import Grid from "@mui/material/Grid2";
+import Grid, { GridBaseProps, GridSize } from "@mui/material/Grid2";
 import Add from "@mui/icons-material/Add";
 import React, {
   ReactNode,
@@ -34,6 +34,66 @@ import { SpecialWishesSelector } from "./components/SpecialWishesSelector";
 import { CustomMultiImagePreviewSlider } from "../../../../../components/shared/CustomMultiImagePreviewSlider/CustomMultiImagePreviewSlider";
 import { FeatureDetails } from "./components/FeatureDetails";
 import { BookingContext } from "../../../../BookingPage";
+
+export const RoomMainFeatureGridItem = ({
+  icon,
+  label,
+  value,
+  size,
+}: {
+  icon: ReactNode;
+  label: string;
+  value: string | number;
+  size?: GridBaseProps["size"];
+}) => {
+  return (
+    <Grid size={size ? size : { xs: 12, md: 6, lg: 4 }}>
+      <CustomIconLabel
+        icon={
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              alignItems: "center",
+              minWidth: "52px",
+              width: "52px",
+              height: "52px",
+              borderRadius: "16px",
+              border: `1px solid ${theme.palette.primary.dark}`,
+            }}
+          >
+            {icon}
+          </Box>
+        }
+        labelComponent={
+          <Stack sx={{ flexDirection: "column" }}>
+            <Typography variant="label" sx={{ fontWeight: 600 }}>
+              {label}
+            </Typography>
+            <Typography variant="label">{value}</Typography>
+          </Stack>
+        }
+        sx={{ gap: "15px" }}
+      />
+    </Grid>
+  );
+};
+
+export const getFeatureIcon = (title: string): ReactNode => {
+  return title === "Душ" ? (
+    <ShowerIcon sx={{ fontSize: "16px" }} />
+  ) : title === "Сейф" ? (
+    <SafeIcon sx={{ fontSize: "16px" }} />
+  ) : title === "Балкон" ? (
+    <BalconyIcon sx={{ fontSize: "16px" }} />
+  ) : title === "Wi-Fi" ? (
+    <WifiIcon sx={{ fontSize: "16px" }} />
+  ) : title === "Кровать" ? (
+    <TwoPersonsBedIcon sx={{ fontSize: "16px" }} />
+  ) : (
+    <div></div>
+  );
+};
 
 interface Props {}
 
@@ -70,64 +130,6 @@ export const RoomCategoryCard = (props: Props) => {
       : roomCategory._id === "672cd65af65cf0e5caff9686"
       ? suiteRooms
       : [];
-
-  const GridItem = ({
-    icon,
-    label,
-    value,
-  }: {
-    icon: ReactNode;
-    label: string;
-    value: string | number;
-  }) => {
-    return (
-      <Grid size={{ xs: 12, md: 6, lg: 4 }}>
-        <CustomIconLabel
-          icon={
-            <Box
-              sx={{
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-                minWidth: "52px",
-                width: "52px",
-                height: "52px",
-                borderRadius: "16px",
-                border: `1px solid ${theme.palette.primary.dark}`,
-              }}
-            >
-              {icon}
-            </Box>
-          }
-          labelComponent={
-            <Stack sx={{ flexDirection: "column" }}>
-              <Typography variant="label" sx={{ fontWeight: 600 }}>
-                {label}
-              </Typography>
-              <Typography variant="label">{value}</Typography>
-            </Stack>
-          }
-          sx={{ gap: "15px" }}
-        />
-      </Grid>
-    );
-  };
-
-  const getFeatureIcon = (title: string): ReactNode => {
-    return title === "Душ" ? (
-      <ShowerIcon sx={{ fontSize: "16px" }} />
-    ) : title === "Сейф" ? (
-      <SafeIcon sx={{ fontSize: "16px" }} />
-    ) : title === "Балкон" ? (
-      <BalconyIcon sx={{ fontSize: "16px" }} />
-    ) : title === "Wi-Fi" ? (
-      <WifiIcon sx={{ fontSize: "16px" }} />
-    ) : title === "Кровать" ? (
-      <TwoPersonsBedIcon sx={{ fontSize: "16px" }} />
-    ) : (
-      <div></div>
-    );
-  };
 
   const Title = () => {
     return <Typography variant="h5">{roomCategory.title}</Typography>;
@@ -194,17 +196,17 @@ export const RoomCategoryCard = (props: Props) => {
                 }}
               >
                 <Grid container spacing={2}>
-                  <GridItem
+                  <RoomMainFeatureGridItem
                     icon={<OneQuestIcon sx={{ fontSize: "16px" }} />}
                     label="Вместимость"
                     value={`до ${roomCategory.guests_capacity}-х мест`}
                   />
-                  <GridItem
+                  <RoomMainFeatureGridItem
                     icon={<RoomSizeIcon sx={{ fontSize: "16px" }} />}
                     label="Размер"
                     value={`${roomCategory.square} м²`}
                   />
-                  <GridItem
+                  <RoomMainFeatureGridItem
                     icon={<RoomsCountIcon sx={{ fontSize: "16px" }} />}
                     label="Количество комнат"
                     value={roomCategory.room_id.length}
@@ -218,7 +220,7 @@ export const RoomCategoryCard = (props: Props) => {
                     )
                     .map((item, idx) => {
                       return (
-                        <GridItem
+                        <RoomMainFeatureGridItem
                           key={idx}
                           icon={getFeatureIcon(item.title)}
                           label={item.title}

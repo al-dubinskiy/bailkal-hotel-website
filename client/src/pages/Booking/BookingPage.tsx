@@ -108,6 +108,7 @@ export type BookingProgressType = {
 };
 
 export const BookingContext = createContext<{
+  availableRoomCategories: RoomCategoryPriceType[] | null;
   roomQuests: RoomQuestsCountType | null;
   booking: CreateBookingLocalType | null;
   roomCategory: RoomCategoryType | null;
@@ -124,6 +125,7 @@ export const BookingContext = createContext<{
   }) => void;
   bookingProgressCurrentStep: BookingProgressStepType;
 }>({
+  availableRoomCategories: null,
   roomQuests: null,
   booking: null,
   roomCategory: null,
@@ -1082,6 +1084,7 @@ export const BookingPage = () => {
 
       <BookingContext.Provider
         value={{
+          availableRoomCategories,
           roomQuests: currentRoomQuests,
           booking:
             newBookings.bookings.find(

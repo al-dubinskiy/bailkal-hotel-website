@@ -38,6 +38,18 @@ const schema = new Schema({
       ref: "BookingTariff",
     },
   ],
+  main_view_from_room_window_id: {
+    type: Schema.Types.ObjectId,
+    required: true,
+    ref: "ViewFromRoomWindow",
+  },
+  additional_view_from_room_window_id: [
+    {
+      type: Schema.Types.ObjectId,
+      required: true,
+      ref: "ViewFromRoomWindow",
+    },
+  ],
   guests_capacity: { type: Number, required: true },
   square: { type: Number, required: true },
   price_per_night_for_one_quest: { type: Number, required: true },

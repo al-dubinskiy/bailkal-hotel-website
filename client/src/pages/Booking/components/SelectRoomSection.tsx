@@ -80,7 +80,8 @@ export const SelectRoomSection = memo((props: Props) => {
                   : roomCategory._id === "672cd30090ef8a2d0cdfcac6" ||
                     roomCategory._id === "672cd34e90ef8a2d0cdfcac9"
                   ? deluxeTwinRooms
-                  : roomCategory._id === "672cd65af65cf0e5caff9686"
+                  : roomCategory._id === "672cd65af65cf0e5caff9686" ||
+                    roomCategory._id === "6757519407763b1fc5c07e72"
                   ? suiteRooms
                   : [];
 
@@ -255,7 +256,7 @@ export const SelectRoomSection = memo((props: Props) => {
                             >
                               <Typography
                                 variant="body"
-                                sx={{ color: theme.palette.gray.light }}
+                                sx={{ color: theme.palette.text.primary }}
                               >
                                 от
                               </Typography>

@@ -24,7 +24,7 @@ router.post("/", async (req, res) => {
   try {
     const data = req.body;
     const existingRecord = await ViewFromRoomWindow.findOne({
-      title: data.title,
+      value: data.value,
     });
     if (existingRecord) {
       return res.status(409).json({

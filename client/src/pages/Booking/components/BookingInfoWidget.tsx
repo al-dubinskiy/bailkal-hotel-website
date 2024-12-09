@@ -5,10 +5,12 @@ import { CustomButton } from "../../components/shared/CustomButton";
 import { BookingContext } from "../BookingPage";
 import { useAppSelector } from "../../../hooks/redux";
 
-interface Props {}
+interface Props {
+  roomCategoryPrice: number;
+}
 
 export const BookingInfoWidget = (props: Props) => {
-  const {} = props;
+  const { roomCategoryPrice } = props;
   const { roomQuests, booking, roomCategory } = useContext(BookingContext);
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
 
@@ -60,13 +62,6 @@ export const BookingInfoWidget = (props: Props) => {
       : booking.adults_count == 2
       ? "2 взрослых на одном месте"
       : null;
-
-  const roomQuestsCount = roomQuests.adults + roomQuests.children;
-
-  const roomCategoryPrice =
-    roomQuestsCount === 1
-      ? roomCategory.price_per_night_for_one_quest
-      : roomCategory.price_per_night_for_two_quest;
 
   return (
     <Stack
