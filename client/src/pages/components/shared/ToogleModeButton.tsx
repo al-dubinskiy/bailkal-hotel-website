@@ -5,6 +5,7 @@ import { theme } from "../../../theme";
 import { Stack, Typography } from "@mui/material";
 
 export type ToogleButtonModeType = {
+  id: string;
   label: string;
   value: string;
   icon: ReactNode;
@@ -22,6 +23,7 @@ export const ToogleModeButton = (props: Props) => {
 
   const changeModeHandler = (val: ToogleButtonModeType) => {
     const found = modes.find((i) => i.value === val.value);
+
     if (found && !found.isSelected) {
       setMode(
         modes.map((i) => ({
@@ -38,6 +40,7 @@ export const ToogleModeButton = (props: Props) => {
       );
     }
   };
+  // console.log(modes);
 
   return (
     <Stack

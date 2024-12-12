@@ -89,7 +89,10 @@ const locales: LocaleType[] = [
 
 type ActionType = "addRooms" | "removeRooms" | "";
 
-type CreateBookingLocalType = CreateBookingType & { tempId: string };
+type CreateBookingLocalType = CreateBookingType & {
+  tempId: string;
+  isRoomCategoryWasChanged: boolean;
+};
 
 type NewBookingsType = {
   bookings: CreateBookingLocalType[];
@@ -117,11 +120,15 @@ export const BookingContext = createContext<{
     currentStep,
     roomCategory,
     tariff,
+    newRoomCategory,
   }: {
     tempBookingId: string;
     currentStep: BookingStepType;
-    roomCategory: RoomCategoryType;
+    roomCategory?: RoomCategoryType;
     tariff?: BookingTariffType;
+    bedTypeId?: string;
+    viewFromWindowId?: string;
+    newRoomCategory?: RoomCategoryType & { additionalPayment: number };
   }) => void;
   bookingProgressCurrentStep: BookingProgressStepType;
 }>({
@@ -325,11 +332,17 @@ export const BookingPage = () => {
       currentStep,
       roomCategory,
       tariff,
+      newRoomCategory,
+      bedTypeId,
+      viewFromWindowId,
     }: {
       tempBookingId: string;
       currentStep: BookingStepType;
-      roomCategory: RoomCategoryType;
+      roomCategory?: RoomCategoryType;
       tariff?: BookingTariffType;
+      newRoomCategory?: RoomCategoryType & { additionalPayment: number };
+      bedTypeId?: string;
+      viewFromWindowId?: string;
     }) => {
       // Проверяем правильно ли переданы данные и соответствуют ли они друг другу
       if (
@@ -338,7 +351,76 @@ export const BookingPage = () => {
         bookings &&
         roomsCategories
       ) {
-        if (currentStep.name === "Select a room") {
+        // Специальные пожелания (кровать, вид из окна, смена категории комнаты)
+        if (
+          currentStep.name === "Select a tariff" ||
+          currentStep.name === "Order services"
+        ) {
+          if (newRoomCategory) {
+            setNewBookings((prev) => ({
+              ...prev,
+              bookings: prev.bookings.map((i) => {
+                if (i.tempId === tempBookingId) {
+                  return {
+                    ...i,
+                    price: i.price + newRoomCategory.additionalPayment,
+                    room_category_id: newRoomCategory._id,
+                    view_from_window_id: "",
+                    isRoomCategoryWasChanged: true,
+                  };
+                }
+                return i;
+              }),
+            }));
+          } else if (
+            bedTypeId !== undefined ||
+            viewFromWindowId !== undefined
+          ) {
+            const currentBooking =
+              newBookings.bookings.find(
+                (i) => i.tempId === bookingProgress.currentStep.step?.roomId
+              ) || null;
+
+            console.log(bedTypeId);
+            if (
+              bedTypeId !== undefined &&
+              currentBooking &&
+              currentBooking.bed_type_id !== bedTypeId
+            ) {
+              setNewBookings((prev) => ({
+                ...prev,
+                bookings: prev.bookings.map((i) => {
+                  if (i.tempId === tempBookingId) {
+                    return {
+                      ...i,
+                      bed_type_id: bedTypeId,
+                    };
+                  }
+                  return i;
+                }),
+              }));
+            } else if (
+              viewFromWindowId !== undefined &&
+              currentBooking &&
+              currentBooking.view_from_window_id !== viewFromWindowId
+            ) {
+              setNewBookings((prev) => ({
+                ...prev,
+                bookings: prev.bookings.map((i) => {
+                  if (i.tempId === tempBookingId) {
+                    return {
+                      ...i,
+                      view_from_window_id: viewFromWindowId,
+                    };
+                  }
+                  return i;
+                }),
+              }));
+            }
+          }
+        }
+
+        if (currentStep.name === "Select a room" && roomCategory) {
           const { rooms } = filterParams;
           const roomQuestsCount = rooms[0].adults + rooms[0].children;
           // Получить id всех комнат, которые забронированы на данную категорию
@@ -409,6 +491,7 @@ export const BookingPage = () => {
             );
             toNextStep();
           }
+        } else if (currentStep.name === "Order services") {
         }
       }
     },
@@ -443,6 +526,7 @@ export const BookingPage = () => {
       transfer_id: "",
       transfer_comment: "",
       price: 0,
+      isRoomCategoryWasChanged: false,
     };
   };
 

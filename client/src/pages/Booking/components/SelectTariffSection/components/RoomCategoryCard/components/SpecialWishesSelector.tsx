@@ -1,5 +1,5 @@
 import { Stack, Typography } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useContext, useEffect, useState } from "react";
 import {
   ToogleButtonModeType,
   ToogleModeButton,
@@ -15,14 +15,21 @@ import { CourtyardViewIcon } from "../../../../../../../assets/icons/CourtyardVi
 import { ForestViewIcon } from "../../../../../../../assets/icons/ForestViewIcon";
 import { TwoPersonsBedIcon } from "../../../../../../../assets/icons/TwoPersonsBedIcon";
 import { RoomCategoryType } from "../../../../../../../redux/slices/RoomsCategories/types";
+import {
+  LandscapeOutlined,
+  WaterOutlined,
+  WavesOutlined,
+} from "@mui/icons-material";
+import { theme } from "../../../../../../../theme";
+import { BookingContext } from "../../../../../BookingPage";
 
-interface Props {
-  roomCategory: RoomCategoryType | null;
-}
+interface Props {}
 
 export const SpecialWishesSelector = (props: Props) => {
-  const { roomCategory } = props;
+  const {} = props;
   const dispatch = useAppDispatch();
+  const { roomCategory, updateBookingDraft, bookingProgressCurrentStep } =
+    useContext(BookingContext);
   const { roomFeatures } = useAppSelector((state) => state.roomFeatures);
   const { roomBedVariants } = useAppSelector((state) => state.roomBedVariants);
   const { viewsFromRoomWindow } = useAppSelector(
@@ -68,11 +75,15 @@ export const SpecialWishesSelector = (props: Props) => {
 
   useEffect(() => {
     if (roomCategory && roomBedVariants) {
+      const a = roomBedVariants.filter((i) =>
+        roomCategory.available_bed_variant_id.includes(i._id)
+      );
       setBedSpecialWish(
-        roomCategory.available_bed_variant_id.map((id: string) => {
+        a.map((i) => {
           return {
-            label: roomBedVariants.find((i) => i._id === id)?.title || "",
-            value: id,
+            id: i._id,
+            label: i.title,
+            value: i._id,
             icon: <TwoPersonsBedIcon sx={{ fontSize: "16px" }} />,
             isSelected: false,
           };
@@ -83,16 +94,32 @@ export const SpecialWishesSelector = (props: Props) => {
 
   useEffect(() => {
     if (roomCategory && viewsFromRoomWindow) {
+      const a = viewsFromRoomWindow.filter((i) =>
+        roomCategory.additional_view_from_room_window_id.includes(i._id)
+      );
       setViewsFromWindowSpecialWish(
-        viewsFromRoomWindow.slice(0, 2).map((i) => {
+        a.map((i) => {
           return {
+            id: i._id,
             label: i.title,
             value: i._id,
             icon:
-              i.title === "Вид во двор" ? (
+              i.value === "courtyard" ? (
                 <CourtyardViewIcon sx={{ fontSize: "16px" }} />
-              ) : i.title === "Вид на лес" ? (
+              ) : i.value === "forest" ? (
                 <ForestViewIcon sx={{ fontSize: "16px" }} />
+              ) : i.value === "mountains" ? (
+                <LandscapeOutlined
+                  sx={{ color: theme.palette.primary.dark, fontSize: "16px" }}
+                />
+              ) : i.value === "lake" ? (
+                <WavesOutlined
+                  sx={{ color: theme.palette.primary.dark, fontSize: "16px" }}
+                />
+              ) : i.value === "river" ? (
+                <WaterOutlined
+                  sx={{ color: theme.palette.primary.dark, fontSize: "16px" }}
+                />
               ) : (
                 <div></div>
               ),
@@ -102,6 +129,30 @@ export const SpecialWishesSelector = (props: Props) => {
       );
     }
   }, [roomCategory, viewsFromRoomWindow]);
+
+  useEffect(() => {
+    const selected = bedSpecialWish.find((i) => i.isSelected);
+    const { step: currentStep } = bookingProgressCurrentStep;
+    if (currentStep) {
+      updateBookingDraft({
+        currentStep,
+        tempBookingId: currentStep.roomId,
+        bedTypeId: selected ? selected.id : "",
+      });
+    }
+  }, [bedSpecialWish]);
+
+  useEffect(() => {
+    const selected = viewsFromWindowSpecialWish.find((i) => i.isSelected);
+    const { step: currentStep } = bookingProgressCurrentStep;
+    if (currentStep) {
+      updateBookingDraft({
+        currentStep,
+        tempBookingId: currentStep.roomId,
+        viewFromWindowId: selected ? selected.id : "",
+      });
+    }
+  }, [viewsFromWindowSpecialWish]);
 
   return (
     <Stack

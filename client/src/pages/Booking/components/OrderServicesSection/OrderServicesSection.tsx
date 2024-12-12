@@ -12,7 +12,7 @@ interface Props {}
 export const OrderServicesSection = (props: Props) => {
   const {} = props;
 
-  const { roomQuests, roomCategory } = useContext(BookingContext);
+  const { roomQuests, roomCategory, booking } = useContext(BookingContext);
 
   if (!roomQuests || !roomCategory) return null;
 
@@ -41,14 +41,18 @@ export const OrderServicesSection = (props: Props) => {
             flex: 0.7,
           }}
         >
-          <Typography
-            variant="label"
-            sx={{ fontWeight: 600, alignSelf: "center" }}
-          >
-            Повысить комфорт
-          </Typography>
+          {booking && !booking.isRoomCategoryWasChanged ? (
+            <>
+              <Typography
+                variant="label"
+                sx={{ fontWeight: 600, alignSelf: "center" }}
+              >
+                Повысить комфорт
+              </Typography>
 
-          <MoreAdvantageousRoomCategoryCard />
+              <MoreAdvantageousRoomCategoryCard />
+            </>
+          ) : null}
         </Stack>
 
         <BookingInfoWidget roomCategoryPrice={roomCategoryPrice} />

@@ -30,6 +30,8 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
     roomCategory: prevRoomCategory,
     availableRoomCategories,
     roomQuests,
+    bookingProgressCurrentStep,
+    updateBookingDraft,
   } = useContext(BookingContext);
 
   const roomQuestsCount = roomQuests
@@ -83,13 +85,8 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
     return [];
   }, [moreAdvantageousRoomCategory]);
 
-  const additionaPayment = useMemo(() => {
+  const additionalPayment = useMemo(() => {
     if (roomPrice && roomQuestsCount && prevRoomCategory) {
-      console.log(
-        roomPrice,
-        prevRoomCategory.price_per_night_for_one_quest,
-        roomQuestsCount
-      );
       return (
         roomPrice -
         (roomQuestsCount > 1
@@ -100,7 +97,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
     return null;
   }, [roomPrice, roomQuestsCount, prevRoomCategory]);
 
-  if (!moreAdvantageousRoomCategory || !additionaPayment) return null;
+  if (!moreAdvantageousRoomCategory || !additionalPayment) return null;
 
   return (
     <Stack
@@ -216,7 +213,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
             fontSize: "20.8px",
           }}
         >
-          + {additionaPayment} ₽
+          + {additionalPayment} ₽
         </Typography>
 
         <Typography
@@ -228,7 +225,19 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
 
         <CustomButton
           label={"Да, поменять номер"}
-          onClick={() => null}
+          onClick={() => {
+            const { step: currentStep } = bookingProgressCurrentStep;
+            if (currentStep) {
+              updateBookingDraft({
+                currentStep,
+                tempBookingId: currentStep.roomId,
+                newRoomCategory: {
+                  ...moreAdvantageousRoomCategory,
+                  additionalPayment,
+                },
+              });
+            }
+          }}
           containerVariant={"contained"}
           containerStyle={{
             padding: "0 24px",

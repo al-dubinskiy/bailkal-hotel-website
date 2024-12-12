@@ -261,7 +261,7 @@ export const RoomCategoryCard = (props: Props) => {
         </Stack>
       )}
 
-      <SpecialWishesSelector roomCategory={roomCategory} />
+      <SpecialWishesSelector />
     </Stack>
   );
 };
