@@ -3,7 +3,7 @@ import React from "react";
 import { CustomCircleIconButton } from "../../../../../../components/shared/CustomCircleIconButton";
 import { Box, Stack, Typography } from "@mui/material";
 import { theme } from "../../../../../../../theme";
-import { TransferStepType } from "./Content";
+import { TransferStepType } from "./types";
 
 interface Props {
   step: TransferStepType;

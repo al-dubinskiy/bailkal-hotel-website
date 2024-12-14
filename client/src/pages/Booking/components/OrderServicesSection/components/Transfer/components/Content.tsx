@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { theme } from "../../../../../../../theme";
 import {
   CheckOutlined,
@@ -24,22 +24,14 @@ import {
 import { TransportStepContent } from "./TransportStepContent";
 import { DirectionStepContent } from "./DirectionStepContent";
 import { StepsHeader } from "./StepsHeader";
-
-export type TransferVariantType = ToogleButtonModeType & {
-  time_from: string;
-  time_to: string;
-};
-export type TransferDirectionType = ToogleButtonModeType & {
-  variants: TransferVariantType[];
-};
-
-export type TransferStepType = {
-  id: number;
-  label: string;
-  value: string;
-  isCurrent: boolean;
-  isComplete: boolean;
-};
+import {
+  TransferDirectionType,
+  TransferStepType,
+  TransferVariantType,
+} from "./types";
+import { stepsData, transferDirectionData } from "./default";
+import { ArrivalStepContent } from "./ArrivalStepContent";
+import { GetTransferVariants } from "../../../../../../../redux/slices/TransferVariants/transferVariantsSlice";
 
 interface Props {}
 
@@ -48,6 +40,10 @@ export const Content = (props: Props) => {
 
   const dispatch = useAppDispatch();
   const { transferCars } = useAppSelector((state) => state.transfersCars);
+  const { transferVariants } = useAppSelector(
+    (state) => state.transfersVariants
+  );
+
   const [transferParams, setTransferParams] =
     useState<CreateTransferVariantType>({
       from_hotel: false,
@@ -59,82 +55,11 @@ export const Content = (props: Props) => {
       comment: "",
     });
 
-  const [steps, setSteps] = useState<TransferStepType[]>([
-    {
-      id: 1,
-      label: "Направление",
-      value: "direction",
-      isCurrent: true,
-      isComplete: false,
-    },
-    {
-      id: 2,
-      label: "Транспорт",
-      value: "transport",
-      isCurrent: false,
-      isComplete: false,
-    },
-    {
-      id: 3,
-      label: "Прибытие",
-      value: "arrival",
-      isCurrent: false,
-      isComplete: false,
-    },
-  ]);
+  const [steps, setSteps] = useState<TransferStepType[]>(stepsData);
 
   const [transferDirection, setTransferDirection] = useState<
     TransferDirectionType[]
-  >([
-    {
-      id: "1",
-      label: "В отель",
-      value: "to_hotel",
-      variants: [
-        {
-          id: "1.1",
-          label: 'Трансфер из Аэропорта в Отель "Байкал" с 06:00 до 22:00',
-          value: "from_airport_in_hotel_variant_1",
-          time_from: "06:00",
-          time_to: "22:00",
-          isSelected: false,
-        },
-        {
-          id: "1.2",
-          label: 'Трансфер из Аэропорта в Отель "Байкал" с 22:00 до 06:00',
-          value: "from_airport_in_hotel_variant_2",
-          time_from: "22:00",
-          time_to: "06:00",
-          isSelected: false,
-        },
-      ],
-      isSelected: true,
-    },
-    {
-      id: "2",
-      label: "Из отеля",
-      value: "from_hotel",
-      variants: [
-        {
-          id: "1.1",
-          label: 'Трансфер из Аэропорта из Отеля "Байкал" с 06:00 до 22:00',
-          value: "to_airport_from_hotel_variant_1",
-          time_from: "06:00",
-          time_to: "22:00",
-          isSelected: false,
-        },
-        {
-          id: "1.2",
-          label: 'Трансфер из Аэропорта из Отеля "Байкал" с 22:00 до 06:00',
-          value: "to_airport_from_hotel_variant_2",
-          time_from: "22:00",
-          time_to: "06:00",
-          isSelected: false,
-        },
-      ],
-      isSelected: false,
-    },
-  ]);
+  >(transferDirectionData);
 
   const GetTransferCarsList = useCallback(() => {
     if (!transferCars) {
@@ -146,13 +71,27 @@ export const Content = (props: Props) => {
     GetTransferCarsList();
   }, [GetTransferCarsList]);
 
+  const GetTransferVariantsList = useCallback(() => {
+    if (!transferVariants) {
+      dispatch(GetTransferVariants());
+    }
+  }, [transferVariants]);
+
+  useEffect(() => {
+    GetTransferVariantsList();
+  }, [GetTransferVariantsList]);
+
   const toStep = (step: TransferStepType) => {
     const stepIdx = steps.findIndex((i) => i.id === step.id);
+    const currentStepIdx = steps.findIndex((i) => i.isCurrent);
     const lastCompleteIdx = findLastIndex(steps, (i) => i.isComplete);
 
-    if (step.isComplete || (stepIdx !== -1 && lastCompleteIdx !== -1)) {
+    if (stepIdx !== -1 && currentStepIdx !== -1) {
       // Если произошло нажатие на предыдущие (пройденные) шаги или на первый шаг, следующий после последнего пройденного
-      if (step.isComplete || lastCompleteIdx + 1 === stepIdx) {
+      if (
+        stepIdx < currentStepIdx ||
+        (lastCompleteIdx !== -1 && lastCompleteIdx + 1 === stepIdx)
+      ) {
         setSteps((prev) =>
           prev.map((i) => ({
             ...i,
@@ -177,9 +116,11 @@ export const Content = (props: Props) => {
     if (currentIdx !== -1) {
       // Если на сейчас на первом шаге (когда он еще не isComplete), но уже выбрано одно из "направлений трансфера", то переходим на второй шаг
       if (
-        currentIdx === 0 &&
+        (transferParams.from_hotel || transferParams.to_hotel) &&
+        transferParams.time_from &&
+        transferParams.time_to &&
         !steps[0].isComplete &&
-        transferDirection.find((i) => i.variants.find((j) => j.isSelected))
+        currentIdx === 0
       ) {
         const nextIdx = currentIdx + 1;
         setSteps((prev) =>
@@ -189,16 +130,28 @@ export const Content = (props: Props) => {
             isComplete: idx === currentIdx ? true : i.isComplete,
           }))
         );
+      } else if (
+        (!transferParams.from_hotel && !transferParams.to_hotel) ||
+        (!transferParams.time_from &&
+          !transferParams.time_to &&
+          steps[0].isComplete &&
+          currentIdx === 0)
+      ) {
+        setSteps((prev) =>
+          prev.map((i, idx) => ({
+            ...i,
+            isComplete: idx === 0 ? false : i.isComplete,
+          }))
+        );
       }
     }
-  }, [transferDirection]);
+  }, [transferParams]);
 
   useEffect(() => {
     if (transferDirection) {
       setTransferDirection((prev) =>
         prev.map((i) => {
           // Установка выбранного типа направления маршрута для переключателя
-
           const updated = {
             ...i,
             isSelected:
@@ -230,6 +183,30 @@ export const Content = (props: Props) => {
     transferParams.time_to,
   ]);
 
+  useEffect(() => {
+    if (
+      transferVariants &&
+      (transferParams.from_hotel || transferParams.to_hotel) &&
+      transferParams.time_from &&
+      transferParams.time_to &&
+      transferParams.car_id
+    ) {
+      const price = transferVariants.find(
+        (i) =>
+          i.from_hotel === transferParams.from_hotel &&
+          i.to_hotel === transferParams.to_hotel &&
+          i.time_from === transferParams.time_from &&
+          i.time_to === transferParams.time_to
+      )?.price;
+      if (price) {
+        setTransferParams((prev) => ({
+          ...prev,
+          price: price,
+        }));
+      }
+    }
+  }, [transferVariants, transferParams]);
+
   const StepContent = ({ step }: { step: TransferStepType }) => {
     return (
       <Stack
@@ -245,10 +222,12 @@ export const Content = (props: Props) => {
           <DirectionStepContent
             transferDirection={transferDirection}
             setTransferDirection={(val) => {
-              // console.log(val);
               const selectedType = val.find((i) => i.isSelected);
               const selectedVariant =
-                selectedType && selectedType.variants.find((i) => i.isSelected);
+                selectedType &&
+                selectedType.variants.find(
+                  (i: TransferVariantType) => i.isSelected
+                );
 
               if (selectedType) {
                 setTransferParams((prev) => ({
@@ -277,6 +256,19 @@ export const Content = (props: Props) => {
             }
             containerStyles={{
               display: step.isCurrent && step.id === 2 ? "flex" : "none",
+            }}
+          />
+
+          <ArrivalStepContent
+            setComment={(val) => {
+              setTransferParams((prev) => ({
+                ...prev,
+                comment: val,
+              }));
+            }}
+            transferPrice={transferParams.price}
+            containerStyles={{
+              display: step.isCurrent && step.id === 3 ? "flex" : "none",
             }}
           />
         </Stack>

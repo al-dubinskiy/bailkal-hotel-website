@@ -6,6 +6,10 @@ const router = Router();
 // Get transfer variants
 router.get("/", async (req, res) => {
   try {
+    const transferVariants = await TransferVariant.find();
+    res.status(200).json({
+      data: transferVariants,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get transfer variants: статус 500. Ошибка сервера.",

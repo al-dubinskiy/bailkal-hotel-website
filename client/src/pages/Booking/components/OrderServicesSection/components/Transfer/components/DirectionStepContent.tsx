@@ -4,7 +4,7 @@ import {
   ToogleButtonModeType,
   ToogleModeButton,
 } from "../../../../../../components/shared/ToogleModeButton";
-import { TransferDirectionType, TransferVariantType } from "./Content";
+import { TransferDirectionType, TransferVariantType } from "./types";
 
 interface Props {
   transferDirection: TransferDirectionType[];

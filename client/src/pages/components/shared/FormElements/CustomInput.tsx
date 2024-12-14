@@ -5,16 +5,27 @@ import { theme } from "../../../../theme";
 interface Props {
   id: string;
   name: string;
-  label: string;
+  label?: string;
   value: string;
+  placeholder?: string;
   onChange: (event: React.ChangeEvent<HTMLInputElement>) => void;
-  onBlur: (event: React.FocusEvent<HTMLInputElement>) => void;
-  error: boolean | undefined;
-  helperText: string | false | undefined;
+  onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
+  error?: boolean | undefined;
+  helperText?: string | false | undefined;
 }
 
 export const CustomInput = (props: Props) => {
-  const { id, name, label, value, onChange, onBlur, error, helperText } = props;
+  const {
+    id,
+    name,
+    label,
+    value,
+    placeholder,
+    onChange,
+    onBlur,
+    error,
+    helperText,
+  } = props;
 
   return (
     <TextField
@@ -23,6 +34,7 @@ export const CustomInput = (props: Props) => {
       name={name}
       label={label}
       value={value}
+      placeholder={placeholder}
       onChange={onChange}
       onBlur={onBlur}
       error={error}

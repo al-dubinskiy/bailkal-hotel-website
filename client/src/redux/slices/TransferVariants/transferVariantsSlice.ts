@@ -19,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetTransferVariants = createAsyncThunk(
   "transferVariants/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getTransferVariants.url}`, {
         method: getTransferVariants.method,
