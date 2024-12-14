@@ -195,7 +195,6 @@ export const Content = (props: Props) => {
 
   useEffect(() => {
     if (transferDirection) {
-      console.log(123);
       setTransferDirection((prev) =>
         prev.map((i) => {
           // Установка выбранного типа направления маршрута для переключателя
@@ -231,7 +230,6 @@ export const Content = (props: Props) => {
     transferParams.time_to,
   ]);
 
-  console.log(transferDirection);
   const StepContent = ({ step }: { step: TransferStepType }) => {
     return (
       <Stack
