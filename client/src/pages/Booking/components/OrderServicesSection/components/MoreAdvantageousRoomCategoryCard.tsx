@@ -26,13 +26,10 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
   const {} = props;
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
   const { roomFeatures } = useAppSelector((state) => state.roomFeatures);
-  const {
-    roomCategory: prevRoomCategory,
-    availableRoomCategories,
-    roomQuests,
-    bookingProgressCurrentStep,
-    updateBookingDraft,
-  } = useContext(BookingContext);
+  const { currentRoomCategory: prevRoomCategory } = useAppSelector(
+    (state) => state.bookings
+  );
+  const { availableRoomCategories, roomQuests } = useContext(BookingContext);
 
   const roomQuestsCount = roomQuests
     ? roomQuests.adults + roomQuests.children
@@ -40,19 +37,26 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
 
   const moreAdvantageousRoomCategory = useMemo(() => {
     if (availableRoomCategories && roomsCategories && prevRoomCategory) {
+      // Получаем id доступных категорий комнат
       const ids = Array.from(availableRoomCategories, (i) => i.id);
+      // Получаем перечень доступных категорий категорий
       const list = roomsCategories
         .filter((i) => ids.includes(i._id))
+        // Выбираем те которые имеют тот же вид из окна, что и у предыдущей категории
         .filter(
           (i) =>
             i.main_view_from_room_window_id ===
             prevRoomCategory.main_view_from_room_window_id
         )
+        // Сортируем по цене в порядке возрастания
         .sort(
           (a, b) =>
             a.price_per_night_for_one_quest - b.price_per_night_for_one_quest
         );
+      console.log(list.forEach((i) => console.log(JSON.stringify(i))));
+
       const idx = list.findIndex((i) => i._id === prevRoomCategory?._id);
+      // Определяем следующую по списку, категорию
       if (idx !== -1) {
         const item = list.find((_, index) => index === idx + 1);
         if (item) return item;
@@ -78,15 +82,21 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
         : moreAdvantageousRoomCategory._id === "672cd30090ef8a2d0cdfcac6" ||
           moreAdvantageousRoomCategory._id === "672cd34e90ef8a2d0cdfcac9"
         ? deluxeTwinRooms
-        : moreAdvantageousRoomCategory._id === "672cd65af65cf0e5caff9686"
+        : moreAdvantageousRoomCategory._id === "672cd65af65cf0e5caff9686" ||
+          moreAdvantageousRoomCategory._id === "6757519407763b1fc5c07e72"
         ? suiteRooms
         : [];
     }
     return [];
   }, [moreAdvantageousRoomCategory]);
 
-  const additionalPayment = useMemo(() => {
+  const additionaPayment = useMemo(() => {
     if (roomPrice && roomQuestsCount && prevRoomCategory) {
+      console.log(
+        roomPrice,
+        prevRoomCategory.price_per_night_for_one_quest,
+        roomQuestsCount
+      );
       return (
         roomPrice -
         (roomQuestsCount > 1
@@ -97,7 +107,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
     return null;
   }, [roomPrice, roomQuestsCount, prevRoomCategory]);
 
-  if (!moreAdvantageousRoomCategory || !additionalPayment) return null;
+  if (!moreAdvantageousRoomCategory || !additionaPayment) return null;
 
   return (
     <Stack
@@ -108,7 +118,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
         flexDirection: "column",
         alignItems: "stretch",
         gap: "24px",
-        paddingBottom: "0",
+        paddingBottom: "24px",
         border: "1px solid #DAE8FF",
         position: "relative",
       }}
@@ -213,7 +223,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
             fontSize: "20.8px",
           }}
         >
-          + {additionalPayment} ₽
+          + {additionaPayment} ₽
         </Typography>
 
         <Typography
@@ -225,19 +235,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
 
         <CustomButton
           label={"Да, поменять номер"}
-          onClick={() => {
-            const { step: currentStep } = bookingProgressCurrentStep;
-            if (currentStep) {
-              updateBookingDraft({
-                currentStep,
-                tempBookingId: currentStep.roomId,
-                newRoomCategory: {
-                  ...moreAdvantageousRoomCategory,
-                  additionalPayment,
-                },
-              });
-            }
-          }}
+          onClick={() => null}
           containerVariant={"contained"}
           containerStyle={{
             padding: "0 24px",

@@ -17,18 +17,19 @@ export const TariffsList = (props: Props) => {
   const { roomQuestsCount, bookingDate } = props;
   const dispatch = useAppDispatch();
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
+  const { currentRoomCategory: roomCategory } = useAppSelector(
+    (state) => state.bookings
+  );
 
-  const { roomCategory } = useContext(BookingContext);
-
-  const GetUnavailableBookingDatesList = useCallback(() => {
+  const GetBookingsTariffsList = useCallback(() => {
     if (!bookingTariffs) {
       dispatch(GetBookingTariffs());
     }
   }, [bookingTariffs]);
 
   useEffect(() => {
-    GetUnavailableBookingDatesList();
-  }, [GetUnavailableBookingDatesList]);
+    GetBookingsTariffsList();
+  }, [GetBookingsTariffsList]);
 
   const questsCountTotal = useMemo(() => {
     const a = roomQuestsCount.adults + roomQuestsCount.children;

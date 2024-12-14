@@ -2,10 +2,11 @@
 export type CreateTransferVariantType = {
   from_hotel: boolean;
   to_hotel: boolean;
-  time_from: number;
-  time_to: number;
+  time_from: string;
+  time_to: string;
   price: number;
   car_id: string;
+  comment: string;
 };
 
 export type UpdateTransferVariantType = CreateTransferVariantType;

@@ -33,6 +33,19 @@ export type BookingType = CreateBookingType & {
 
 export type UpdateBookingType = BookingType;
 
+/* --- Booking page --- */
+export type CreateBookingLocalType = CreateBookingType & {
+  tempId: string;
+  isRoomCategoryWasChanged: boolean;
+};
+
+type ActionType = "addRooms" | "removeRooms" | "";
+
+export type NewBookingsType = {
+  bookings: CreateBookingLocalType[];
+  actionType: ActionType;
+};
+
 // API
 export type GetBookingsApiResponseType = {
   success: boolean;

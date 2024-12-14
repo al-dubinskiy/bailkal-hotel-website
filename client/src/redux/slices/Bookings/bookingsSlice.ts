@@ -2,8 +2,10 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   BookingType,
   CreateBookingApiResponseType,
+  CreateBookingLocalType,
   CreateBookingType,
   GetBookingsApiResponseType,
+  NewBookingsType,
   UpdateBookingApiResponseType,
   UpdateBookingType,
 } from "./types";
@@ -13,6 +15,7 @@ import {
   getBookings,
   updateBooking,
 } from "./httpRequests";
+import { RoomCategoryType } from "../RoomsCategories/types";
 
 const DEBUG = true;
 
@@ -167,6 +170,11 @@ interface IBookingState {
     error: any;
     isLoading: boolean;
   };
+  /* --- Booking page --- */
+  // ... add/remove new bookings drafts
+  newBookings: NewBookingsType;
+  currentBooking: CreateBookingLocalType | null;
+  currentRoomCategory: RoomCategoryType | null;
 }
 
 const initialState: IBookingState = {
@@ -193,13 +201,37 @@ const initialState: IBookingState = {
     error: null,
     isLoading: false,
   },
+  /* --- Booking page --- */
+  // ... add/remove new bookings drafts
+  newBookings: {
+    bookings: [],
+    actionType: "",
+  },
+  currentBooking: null,
+  currentRoomCategory: null,
 };
 
 export const bookingsSlice = createSlice({
   name: "bookings",
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
-  reducers: {},
+  reducers: {
+    setNewBookings: (state, { payload }: { payload: NewBookingsType }) => {
+      state.newBookings = payload;
+    },
+    setCurrentBooking: (
+      state,
+      { payload }: { payload: CreateBookingLocalType | null }
+    ) => {
+      state.currentBooking = payload;
+    },
+    setCurrentRoomCategory: (
+      state,
+      { payload }: { payload: RoomCategoryType | null }
+    ) => {
+      state.currentRoomCategory = payload;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(
       GetBookings.fulfilled,
@@ -290,4 +322,5 @@ export const bookingsSlice = createSlice({
   },
 });
 
-export const {} = bookingsSlice.actions;
+export const { setNewBookings, setCurrentBooking, setCurrentRoomCategory } =
+  bookingsSlice.actions;

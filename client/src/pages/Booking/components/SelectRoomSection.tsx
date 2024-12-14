@@ -1,6 +1,6 @@
 import React, { memo, useContext, useMemo } from "react";
 import { BookingProgressIndicatorBaner } from "./BookingProgressIndicatorBaner";
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, Stack, SxProps, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import {
   BookingContext,
@@ -36,6 +36,7 @@ interface Props {
   nextStepHandler: () => void;
   availableRoomCategories: RoomCategoryPriceType[] | null;
   selectedRoomCategoryId: string | null;
+  containerStyles: SxProps;
 }
 
 export const SelectRoomSection = memo((props: Props) => {
@@ -44,6 +45,7 @@ export const SelectRoomSection = memo((props: Props) => {
     nextStepHandler,
     availableRoomCategories,
     selectedRoomCategoryId,
+    containerStyles,
   } = props;
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
 
@@ -63,6 +65,7 @@ export const SelectRoomSection = memo((props: Props) => {
         gap: "24px",
         margin: "24px 0",
         flex: 1,
+        ...containerStyles,
       }}
     >
       <Grid container spacing={2}>

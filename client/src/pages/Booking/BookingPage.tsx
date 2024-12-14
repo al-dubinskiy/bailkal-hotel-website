@@ -19,7 +19,12 @@ import { dateTimeFormat } from "../../constants";
 import { BookingInfoWidget } from "./components/BookingInfoWidget";
 import { GroupObjectByKey } from "./utils";
 import { GetRoomsCategories } from "../../redux/slices/RoomsCategories/roomsCategoriesSlice";
-import { GetBookings } from "../../redux/slices/Bookings/bookingsSlice";
+import {
+  GetBookings,
+  setCurrentBooking,
+  setCurrentRoomCategory,
+  setNewBookings,
+} from "../../redux/slices/Bookings/bookingsSlice";
 import BasePageLayout from "../components/BasePageLayout";
 import { GetUnavailableBookingDates } from "../../redux/slices/UnavailableBookingDates/unavailableBookingDates";
 import { theme } from "../../theme";
@@ -113,8 +118,6 @@ export type BookingProgressType = {
 export const BookingContext = createContext<{
   availableRoomCategories: RoomCategoryPriceType[] | null;
   roomQuests: RoomQuestsCountType | null;
-  booking: CreateBookingLocalType | null;
-  roomCategory: RoomCategoryType | null;
   updateBookingDraft: ({
     tempBookingId,
     currentStep,
@@ -134,8 +137,6 @@ export const BookingContext = createContext<{
 }>({
   availableRoomCategories: null,
   roomQuests: null,
-  booking: null,
-  roomCategory: null,
   updateBookingDraft: () => null,
   bookingProgressCurrentStep: {
     step: null,
@@ -151,7 +152,7 @@ export const BookingPage = () => {
     (state) => state.unavailableBookingDates
   );
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
-  const { bookings } = useAppSelector((state) => state.bookings);
+  const { bookings, newBookings } = useAppSelector((state) => state.bookings);
   const [filterParams, setFilterParams] = useState<{
     arrival_datetime: Moment;
     departure_datetime: Moment;
@@ -170,10 +171,10 @@ export const BookingPage = () => {
     phone: "",
     email: "",
   });
-  const [newBookings, setNewBookings] = useState<NewBookingsType>({
-    bookings: [],
-    actionType: "",
-  });
+  // const [newBookings, setNewBookings] = useState<NewBookingsType>({
+  //   bookings: [],
+  //   actionType: "",
+  // });
   const [bookingSteps, setBookingSteps] = useState<BookingStepType[]>([]);
 
   // Get data from API
@@ -357,39 +358,28 @@ export const BookingPage = () => {
           currentStep.name === "Order services"
         ) {
           if (newRoomCategory) {
-            setNewBookings((prev) => ({
-              ...prev,
-              bookings: prev.bookings.map((i) => {
-                if (i.tempId === tempBookingId) {
-                  return {
-                    ...i,
-                    price: i.price + newRoomCategory.additionalPayment,
-                    room_category_id: newRoomCategory._id,
-                    view_from_window_id: "",
-                    isRoomCategoryWasChanged: true,
-                  };
-                }
-                return i;
-              }),
-            }));
-          } else if (
-            bedTypeId !== undefined ||
-            viewFromWindowId !== undefined
-          ) {
-            const currentBooking =
-              newBookings.bookings.find(
-                (i) => i.tempId === bookingProgress.currentStep.step?.roomId
-              ) || null;
-
-            console.log(bedTypeId);
-            if (
-              bedTypeId !== undefined &&
-              currentBooking &&
-              currentBooking.bed_type_id !== bedTypeId
-            ) {
-              setNewBookings((prev) => ({
-                ...prev,
-                bookings: prev.bookings.map((i) => {
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i) => {
+                  if (i.tempId === tempBookingId) {
+                    return {
+                      ...i,
+                      price: i.price + newRoomCategory.additionalPayment,
+                      room_category_id: newRoomCategory._id,
+                      view_from_window_id: "",
+                      isRoomCategoryWasChanged: true,
+                    };
+                  }
+                  return i;
+                }),
+              })
+            );
+          } else if (bedTypeId !== undefined) {
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i) => {
                   if (i.tempId === tempBookingId) {
                     return {
                       ...i,
@@ -398,15 +388,13 @@ export const BookingPage = () => {
                   }
                   return i;
                 }),
-              }));
-            } else if (
-              viewFromWindowId !== undefined &&
-              currentBooking &&
-              currentBooking.view_from_window_id !== viewFromWindowId
-            ) {
-              setNewBookings((prev) => ({
-                ...prev,
-                bookings: prev.bookings.map((i) => {
+              })
+            );
+          } else if (viewFromWindowId !== undefined) {
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i) => {
                   if (i.tempId === tempBookingId) {
                     return {
                       ...i,
@@ -415,8 +403,8 @@ export const BookingPage = () => {
                   }
                   return i;
                 }),
-              }));
-            }
+              })
+            );
           }
         }
 
@@ -425,7 +413,9 @@ export const BookingPage = () => {
           const roomQuestsCount = rooms[0].adults + rooms[0].children;
           // Получить id всех комнат, которые забронированы на данную категорию
           const bookedRoomsOnCategory = Array.from(
-            bookings.filter((i) => i.room_category_id === roomCategory._id),
+            newBookings.bookings.filter(
+              (i) => i.room_category_id === roomCategory._id
+            ),
             (i) => i.room_id
           );
           // Найти id доступной комнаты для бронирования
@@ -434,28 +424,30 @@ export const BookingPage = () => {
           );
 
           if (freeRoomId) {
-            setNewBookings((prev) => ({
-              ...prev,
-              bookings: prev.bookings.map((i) => {
-                if (i.tempId === tempBookingId) {
-                  return {
-                    ...i,
-                    room_category_id: roomCategory._id,
-                    room_id: freeRoomId,
-                    price:
-                      roomQuestsCount > 1
-                        ? roomCategory.price_per_night_for_two_quest
-                        : roomCategory.price_per_night_for_one_quest,
-                    // Сбросить все остальные данные
-                    service_id: [],
-                    tariff_id: "",
-                    bed_type_id: "",
-                    view_from_window_id: "",
-                  };
-                }
-                return i;
-              }),
-            }));
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i) => {
+                  if (i.tempId === tempBookingId) {
+                    return {
+                      ...i,
+                      room_category_id: roomCategory._id,
+                      room_id: freeRoomId,
+                      price:
+                        roomQuestsCount > 1
+                          ? roomCategory.price_per_night_for_two_quest
+                          : roomCategory.price_per_night_for_one_quest,
+                      // Сбросить все остальные данные
+                      service_id: [],
+                      tariff_id: "",
+                      bed_type_id: "",
+                      view_from_window_id: "",
+                    };
+                  }
+                  return i;
+                }),
+              })
+            );
             // Установить флаг complete для текущего шага
             setBookingSteps((prev) =>
               prev.map((i) =>
@@ -468,19 +460,21 @@ export const BookingPage = () => {
           }
         } else if (currentStep.name === "Select a tariff") {
           if (tariff) {
-            setNewBookings((prev) => ({
-              ...prev,
-              bookings: prev.bookings.map((i) => {
-                if (i.tempId === tempBookingId) {
-                  return {
-                    ...i,
-                    tariff_id: tariff._id,
-                    price: i.price + tariff.cost,
-                  };
-                }
-                return i;
-              }),
-            }));
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i) => {
+                  if (i.tempId === tempBookingId) {
+                    return {
+                      ...i,
+                      tariff_id: tariff._id,
+                      price: i.price + tariff.cost,
+                    };
+                  }
+                  return i;
+                }),
+              })
+            );
             // Установить флаг complete для текущего шага
             setBookingSteps((prev) =>
               prev.map((i) =>
@@ -772,36 +766,40 @@ export const BookingPage = () => {
         });
       });
       // Обновить перечень букингов и установить тип действия для формирования списка шагов
-      setNewBookings({ bookings: data, actionType: "addRooms" });
+      dispatch(setNewBookings({ bookings: data, actionType: "addRooms" }));
     }
     // 2. Если в фильтре "Гости" добавили одну или несколько комнат
     else if (rooms.length > bookings.length) {
       const newRooms = rooms.slice(bookings.length);
       // Обновить перечень букингов и установить тип действия для формирования списка шагов
-      setNewBookings((prev) => {
-        const data = newRooms.map((i) => {
-          return createNewBookingDraft({
-            tempId: i.id,
-            adultsCount: i.adults,
-            childrenCount: i.children,
-          });
-        });
-        return {
-          bookings: [...prev.bookings, ...data],
+      dispatch(
+        setNewBookings({
+          bookings: [
+            ...newBookings.bookings,
+            ...newRooms.map((i) => {
+              return createNewBookingDraft({
+                tempId: i.id,
+                adultsCount: i.adults,
+                childrenCount: i.children,
+              });
+            }),
+          ],
           actionType: "addRooms",
-        };
-      });
+        })
+      );
     }
     // 3. Если в фильтре "Гости" удалили одну комнату
     else if (rooms.length < bookings.length) {
       const roomsIds = Array.from(rooms, (i) => i.id);
       // Обновить перечень букингов и установить тип действия для формирования списка шагов
-      setNewBookings((prev) => {
-        return {
-          bookings: prev.bookings.filter((i) => roomsIds.includes(i.tempId)),
+      dispatch(
+        setNewBookings({
+          bookings: newBookings.bookings.filter((i) =>
+            roomsIds.includes(i.tempId)
+          ),
           actionType: "removeRooms",
-        };
-      });
+        })
+      );
     }
   }, [filterParams.rooms]);
 
@@ -816,9 +814,9 @@ export const BookingPage = () => {
 
     if (arrival_datetime && departure_datetime) {
       if (bookings.length) {
-        setNewBookings((prev) => {
-          return {
-            bookings: prev.bookings.map((i) => {
+        dispatch(
+          setNewBookings({
+            bookings: newBookings.bookings.map((i) => {
               return {
                 ...i,
                 arrival_datetime: arrival_datetime.format(dateTimeFormat),
@@ -826,8 +824,8 @@ export const BookingPage = () => {
               };
             }),
             actionType: "",
-          };
-        });
+          })
+        );
       }
     }
   }, [filterParams.arrival_datetime, filterParams.departure_datetime]);
@@ -842,9 +840,9 @@ export const BookingPage = () => {
     const { bookings } = newBookings;
 
     if (rooms.length === bookings.length) {
-      setNewBookings((prev) => {
-        return {
-          bookings: prev.bookings.map((item, i) => {
+      dispatch(
+        setNewBookings({
+          bookings: newBookings.bookings.map((item, i) => {
             return {
               ...item,
               adults_count: rooms[i].adults,
@@ -852,8 +850,8 @@ export const BookingPage = () => {
             };
           }),
           actionType: "",
-        };
-      });
+        })
+      );
     }
   }, [filterParams.rooms]);
 
@@ -1135,6 +1133,7 @@ export const BookingPage = () => {
                   availableRoomCategories={availableRoomCategories}
                   nextStepHandler={toNextStep}
                   prevStepHandler={toPrevStep}
+                  containerStyles={{}}
                 />
               ) : bookingProgress.currentStep.step?.name ===
                 "Select a tariff" ? (
@@ -1144,10 +1143,11 @@ export const BookingPage = () => {
                     departure: filterParams.departure_datetime,
                   }}
                   roomQuestsCount={currentRoomQuests}
+                  containerStyles={{}}
                 />
               ) : bookingProgress.currentStep.step?.name ===
                 "Order services" ? (
-                <OrderServicesSection />
+                <OrderServicesSection containerStyles={{}} />
               ) : null
             ) : null}
           </Stack>
@@ -1156,6 +1156,36 @@ export const BookingPage = () => {
     }
     return null;
   };
+
+  useEffect(() => {
+    if (bookingProgress.currentStep) {
+      const a = newBookings.bookings.find(
+        (i) => i.tempId === bookingProgress.currentStep.step?.roomId
+      );
+      if (a) {
+        dispatch(setCurrentBooking(a));
+      }
+    }
+  }, [bookingProgress.currentStep]);
+
+  useEffect(() => {
+    if (bookingProgress.currentStep) {
+      const a =
+        (roomsCategories &&
+          roomsCategories.find(
+            (i) =>
+              i._id ===
+              newBookings.bookings.find(
+                (i) => i.tempId === bookingProgress.currentStep.step?.roomId
+              )?.room_category_id
+          )) ||
+        null;
+
+      if (a) {
+        dispatch(setCurrentRoomCategory(a));
+      }
+    }
+  }, [bookingProgress.currentStep]);
 
   console.log("filterParams ", JSON.stringify(filterParams));
   console.log("bookingsSteps ", JSON.stringify(bookingSteps));
@@ -1170,20 +1200,6 @@ export const BookingPage = () => {
         value={{
           availableRoomCategories,
           roomQuests: currentRoomQuests,
-          booking:
-            newBookings.bookings.find(
-              (i) => i.tempId === bookingProgress.currentStep.step?.roomId
-            ) || null,
-          roomCategory:
-            (roomsCategories &&
-              roomsCategories.find(
-                (i) =>
-                  i._id ===
-                  newBookings.bookings.find(
-                    (i) => i.tempId === bookingProgress.currentStep.step?.roomId
-                  )?.room_category_id
-              )) ||
-            null,
           updateBookingDraft,
           bookingProgressCurrentStep: bookingProgress.currentStep,
         }}

@@ -2,28 +2,37 @@ import React, { ReactNode } from "react";
 import { CustomButton } from "./CustomButton";
 import { TwoPersonsBedIcon } from "../../../assets/icons/TwoPersonsBedIcon";
 import { theme } from "../../../theme";
-import { Stack, Typography } from "@mui/material";
+import { Stack, SxProps, Typography } from "@mui/material";
 
 export type ToogleButtonModeType = {
   id: string;
-  label: string;
+  label?: string;
   value: string;
-  icon: ReactNode;
+  icon?: ReactNode;
   isSelected: boolean;
 };
 
 interface Props {
-  label: string;
+  label?: string;
   modes: ToogleButtonModeType[];
   setMode: Function;
+  contentStyle?: SxProps;
+  buttonsDirection?: "row" | "column";
+  isCanUnchecked?: boolean;
 }
 
 export const ToogleModeButton = (props: Props) => {
-  const { label, modes, setMode } = props;
+  const {
+    label,
+    modes,
+    setMode,
+    contentStyle,
+    buttonsDirection = "row",
+    isCanUnchecked = true,
+  } = props;
 
   const changeModeHandler = (val: ToogleButtonModeType) => {
     const found = modes.find((i) => i.value === val.value);
-
     if (found && !found.isSelected) {
       setMode(
         modes.map((i) => ({
@@ -31,7 +40,7 @@ export const ToogleModeButton = (props: Props) => {
           isSelected: i.value === found.value ? true : false,
         }))
       );
-    } else if (found && found.isSelected) {
+    } else if (found && found.isSelected && isCanUnchecked) {
       setMode(
         modes.map((i) => ({
           ...i,
@@ -40,7 +49,6 @@ export const ToogleModeButton = (props: Props) => {
       );
     }
   };
-  // console.log(modes);
 
   return (
     <Stack
@@ -52,8 +60,15 @@ export const ToogleModeButton = (props: Props) => {
         width: { xs: "100%", md: "max-content" },
       }}
     >
-      <Typography variant="label">{label}</Typography>
-      <Stack sx={{ flexDirection: "row" }}>
+      {label ? <Typography variant="label">{label}</Typography> : null}
+      <Stack
+        sx={{
+          flexDirection: buttonsDirection === "row" ? "row" : "column",
+          borderRadius: "10px",
+          overflow: "hidden",
+          border: `1px solid ${theme.palette.primary.light}`,
+        }}
+      >
         {modes.map((i, idx) => {
           return (
             <CustomButton
@@ -64,14 +79,20 @@ export const ToogleModeButton = (props: Props) => {
               containerVariant={i.isSelected ? "contained" : "outlined"}
               containerBackgroundColor={"buttonLight"}
               containerStyle={{
-                border: `1px solid ${theme.palette.primary.light}`,
+                border: "unset",
+                borderRight:
+                  idx === 0 && buttonsDirection === "row"
+                    ? `1px solid ${theme.palette.primary.light}`
+                    : "unset",
+
+                borderBottom:
+                  idx === 0 && buttonsDirection === "column"
+                    ? `1px solid ${theme.palette.primary.light}`
+                    : "unset",
+
                 "& .MuiButton-startIcon": {
                   marginRight: "10px",
                 },
-                borderTopRightRadius: idx === 0 ? 0 : "10px",
-                borderBottomRightRadius: idx === 0 ? 0 : "10px",
-                borderTopLeftRadius: idx > 0 ? 0 : "10px",
-                borderBottomLeftRadius: idx > 0 ? 0 : "10px",
               }}
               withoutAnimation
             />

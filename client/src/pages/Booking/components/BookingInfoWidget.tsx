@@ -11,8 +11,11 @@ interface Props {
 
 export const BookingInfoWidget = (props: Props) => {
   const { roomCategoryPrice } = props;
-  const { roomQuests, booking, roomCategory } = useContext(BookingContext);
+  const { roomQuests } = useContext(BookingContext);
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
+  const { currentBooking, currentRoomCategory: roomCategory } = useAppSelector(
+    (state) => state.bookings
+  );
 
   const BookingDateInfo = ({
     dayNumber,
@@ -33,6 +36,7 @@ export const BookingInfoWidget = (props: Props) => {
           display: "flex",
           flexDirection: "column",
           alignItems: dateType === "arrival" ? "flex-end" : "flex-start",
+          height: "max-content",
         }}
       >
         <Typography variant="body">
@@ -46,20 +50,20 @@ export const BookingInfoWidget = (props: Props) => {
     );
   };
 
-  if (!roomCategory || !booking || !roomQuests) return null;
+  if (!roomCategory || !currentBooking || !roomQuests) return null;
 
   const bookingTariff =
-    (booking &&
+    (currentBooking &&
       bookingTariffs &&
-      bookingTariffs.find((i) => i._id === booking.tariff_id)) ||
+      bookingTariffs.find((i) => i._id === currentBooking.tariff_id)) ||
     null;
 
   const bookingQuests =
-    booking.children_count == 1
+    currentBooking.children_count == 1
       ? "1 взрослый и 1 ребенок"
-      : booking.adults_count == 1
+      : currentBooking.adults_count == 1
       ? "1 взрослый на одном месте"
-      : booking.adults_count == 2
+      : currentBooking.adults_count == 2
       ? "2 взрослых на одном месте"
       : null;
 
@@ -182,7 +186,7 @@ export const BookingInfoWidget = (props: Props) => {
               fontSize: "20.8px",
             }}
           >
-            {booking.price} ₽
+            {currentBooking.price} ₽
           </Typography>
         </Box>
 

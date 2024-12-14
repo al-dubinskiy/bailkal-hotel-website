@@ -9,7 +9,7 @@ import { Features } from "./components/Features";
 import { theme } from "../../../../../../../theme";
 import { CustomButton } from "../../../../../../components/shared/CustomButton";
 import { InfoOutlined } from "@mui/icons-material";
-import { PersonIcon } from "../../../../../../../assets/icons/PersonIconIcon";
+import { PersonIcon } from "../../../../../../../assets/icons/PersonIcon";
 import { RoomQuestsCountType } from "../../../../FiltersBar/SelectQuestsDropdown";
 import { PriceDetailsPopup } from "./components/PriceDetailsPopup";
 import { BookingDateType } from "../../../SelectTariffSection";
@@ -19,6 +19,7 @@ import {
   BookingContext,
   BookingProgressStepType,
 } from "../../../../../BookingPage";
+import { useAppSelector } from "../../../../../../../hooks/redux";
 
 interface Props {
   tariff: BookingTariffType;
@@ -36,12 +37,14 @@ export const TariffItem = (props: Props) => {
     roomQuestsCount,
     bookingDate,
   } = props;
+  const { currentBooking } = useAppSelector((state) => state.bookings);
+
   const [tariffDetailsOpen, setTariffDetailsOpen] = useState<boolean>(false);
 
   const { updateBookingDraft, bookingProgressCurrentStep } =
     useContext(BookingContext);
 
-  const isSelected = false;
+  const isSelected = currentBooking?.tariff_id === tariff._id ? true : false;
 
   return (
     <Stack
