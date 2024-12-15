@@ -12,6 +12,7 @@ interface Props {
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
   error?: boolean | undefined;
   helperText?: string | false | undefined;
+  multiline?: boolean;
 }
 
 export const CustomInput = (props: Props) => {
@@ -25,6 +26,7 @@ export const CustomInput = (props: Props) => {
     onBlur,
     error,
     helperText,
+    multiline = false,
   } = props;
 
   return (
@@ -39,12 +41,14 @@ export const CustomInput = (props: Props) => {
       onBlur={onBlur}
       error={error}
       helperText={helperText}
+      multiline={multiline}
       sx={{
         marginTop: 0,
         marginBottom: 0,
 
         "& .MuiInputBase-input": {
           height: "33px",
+          minHeight: !multiline ? "33px" : "100px",
         },
 
         "& .MuiOutlinedInput-notchedOutline": {

@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material";
-import React, { useContext, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import { CustomCircleIconButton } from "../../../../../../components/shared/CustomCircleIconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
 import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
@@ -10,7 +10,6 @@ import { theme } from "../../../../../../../theme";
 import { CustomButton } from "../../../../../../components/shared/CustomButton";
 import { InfoOutlined } from "@mui/icons-material";
 import { PersonIcon } from "../../../../../../../assets/icons/PersonIcon";
-import { RoomQuestsCountType } from "../../../../FiltersBar/SelectQuestsDropdown";
 import { PriceDetailsPopup } from "./components/PriceDetailsPopup";
 import { BookingDateType } from "../../../SelectTariffSection";
 import { TariffDetails } from "./components/TariffDetails";
@@ -23,21 +22,15 @@ import { useAppSelector } from "../../../../../../../hooks/redux";
 
 interface Props {
   tariff: BookingTariffType;
-  roomCategoryPrice: number;
   roomCategory: RoomCategoryType;
-  roomQuestsCount: RoomQuestsCountType;
   bookingDate: BookingDateType;
 }
 
 export const TariffItem = (props: Props) => {
-  const {
-    tariff,
-    roomCategoryPrice,
-    roomCategory,
-    roomQuestsCount,
-    bookingDate,
-  } = props;
-  const { currentBooking } = useAppSelector((state) => state.bookings);
+  const { tariff, roomCategory, bookingDate } = props;
+  const { currentBooking, filterParams } = useAppSelector(
+    (state) => state.bookings
+  );
 
   const [tariffDetailsOpen, setTariffDetailsOpen] = useState<boolean>(false);
 
@@ -45,6 +38,15 @@ export const TariffItem = (props: Props) => {
     useContext(BookingContext);
 
   const isSelected = currentBooking?.tariff_id === tariff._id ? true : false;
+
+  const bookingGuests = useMemo(() => {
+    if (currentBooking) {
+      return filterParams.rooms.find((i) => i.id === currentBooking.tempId);
+    }
+    return false;
+  }, [filterParams, currentBooking]);
+
+  if (!bookingGuests) return null;
 
   return (
     <Stack
@@ -173,10 +175,10 @@ export const TariffItem = (props: Props) => {
                   alignItems: "flex-end",
                 }}
               >
-                {roomQuestsCount.children > 0 ? (
+                {bookingGuests.children > 0 ? (
                   <PersonIcon sx={{ fontSize: "16px", marginRight: "-5px" }} />
                 ) : null}
-                {roomQuestsCount.adults > 1 ? (
+                {bookingGuests.adults > 1 ? (
                   <>
                     <PersonIcon
                       sx={{ fontSize: "24px", marginRight: "-8px" }}
@@ -212,7 +214,6 @@ export const TariffItem = (props: Props) => {
               if (currentStep) {
                 updateBookingDraft({
                   currentStep,
-                  roomCategory,
                   tempBookingId: currentStep.roomId,
                   tariff: tariff,
                 });

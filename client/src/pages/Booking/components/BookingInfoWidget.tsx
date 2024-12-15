@@ -1,21 +1,21 @@
-import React, { useContext } from "react";
+import React, { useContext, useMemo } from "react";
 import { Box, Button, Stack, Typography } from "@mui/material";
 import { theme } from "../../../theme";
 import { CustomButton } from "../../components/shared/CustomButton";
 import { BookingContext } from "../BookingPage";
 import { useAppSelector } from "../../../hooks/redux";
 
-interface Props {
-  roomCategoryPrice: number;
-}
+interface Props {}
 
 export const BookingInfoWidget = (props: Props) => {
-  const { roomCategoryPrice } = props;
-  const { roomQuests } = useContext(BookingContext);
+  const {} = props;
+  const { bookingProgressCurrentStep, toNextStep } = useContext(BookingContext);
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
-  const { currentBooking, currentRoomCategory: roomCategory } = useAppSelector(
-    (state) => state.bookings
-  );
+  const {
+    currentBooking,
+    currentRoomCategory: roomCategory,
+    filterParams,
+  } = useAppSelector((state) => state.bookings);
 
   const BookingDateInfo = ({
     dayNumber,
@@ -50,7 +50,27 @@ export const BookingInfoWidget = (props: Props) => {
     );
   };
 
-  if (!roomCategory || !currentBooking || !roomQuests) return null;
+  const bookingGuests = useMemo(() => {
+    if (currentBooking) {
+      return filterParams.rooms.find((i) => i.id === currentBooking.tempId);
+    }
+    return false;
+  }, [filterParams, currentBooking]);
+
+  const roomCategoryPrice = useMemo(() => {
+    if (bookingGuests && roomCategory) {
+      const questsTotal = bookingGuests.adults + bookingGuests.children;
+
+      return questsTotal > 1
+        ? roomCategory.price_per_night_for_two_quest
+        : roomCategory.price_per_night_for_one_quest;
+    }
+    return 0;
+  }, [bookingGuests, roomCategory]);
+
+  if (!bookingGuests) return null;
+
+  if (!roomCategory || !currentBooking) return null;
 
   const bookingTariff =
     (currentBooking &&
@@ -58,7 +78,7 @@ export const BookingInfoWidget = (props: Props) => {
       bookingTariffs.find((i) => i._id === currentBooking.tariff_id)) ||
     null;
 
-  const bookingQuests =
+  const bookingGuestsCount =
     currentBooking.children_count == 1
       ? "1 взрослый и 1 ребенок"
       : currentBooking.adults_count == 1
@@ -150,8 +170,8 @@ export const BookingInfoWidget = (props: Props) => {
           marginTop: "10px",
         }}
       >
-        {bookingQuests ? (
-          <Typography variant="label">{bookingQuests}</Typography>
+        {bookingGuests ? (
+          <Typography variant="label">{bookingGuestsCount}</Typography>
         ) : null}
 
         {bookingTariff ? (
@@ -186,13 +206,23 @@ export const BookingInfoWidget = (props: Props) => {
               fontSize: "20.8px",
             }}
           >
-            {currentBooking.price} ₽
+            {currentBooking.roomPrice +
+              currentBooking.tariffPrice +
+              currentBooking.servicePriceTotal}{" "}
+            ₽
           </Typography>
         </Box>
 
         <CustomButton
           label={"Продолжить"}
-          onClick={() => null}
+          onClick={() => {
+            if (
+              bookingProgressCurrentStep.step?.name === "Order services" ||
+              bookingProgressCurrentStep.step?.isComplete
+            ) {
+              toNextStep();
+            }
+          }}
           containerVariant={"contained"}
           disabled={false}
           containerBackgroundColor={"buttonDark"}

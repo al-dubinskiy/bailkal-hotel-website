@@ -26,14 +26,24 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
   const {} = props;
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
   const { roomFeatures } = useAppSelector((state) => state.roomFeatures);
-  const { currentRoomCategory: prevRoomCategory } = useAppSelector(
-    (state) => state.bookings
-  );
-  const { availableRoomCategories, roomQuests } = useContext(BookingContext);
+  const {
+    currentRoomCategory: prevRoomCategory,
+    currentBooking,
+    filterParams,
+  } = useAppSelector((state) => state.bookings);
+  const { availableRoomCategories } = useContext(BookingContext);
 
-  const roomQuestsCount = roomQuests
-    ? roomQuests.adults + roomQuests.children
-    : null;
+  const bookingGuestsTotal = useMemo(() => {
+    if (currentBooking) {
+      const room = filterParams.rooms.find(
+        (i) => i.id === currentBooking.tempId
+      );
+      if (room) {
+        return room.adults + room.children;
+      }
+    }
+    return false;
+  }, [filterParams, currentBooking]);
 
   const moreAdvantageousRoomCategory = useMemo(() => {
     if (availableRoomCategories && roomsCategories && prevRoomCategory) {
@@ -53,7 +63,6 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
           (a, b) =>
             a.price_per_night_for_one_quest - b.price_per_night_for_one_quest
         );
-      console.log(list.forEach((i) => console.log(JSON.stringify(i))));
 
       const idx = list.findIndex((i) => i._id === prevRoomCategory?._id);
       // Определяем следующую по списку, категорию
@@ -63,16 +72,16 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
       }
     }
     return null;
-  }, [availableRoomCategories, prevRoomCategory, roomQuestsCount]);
+  }, [availableRoomCategories, prevRoomCategory, bookingGuestsTotal]);
 
   const roomPrice = useMemo(() => {
-    if (moreAdvantageousRoomCategory && roomQuestsCount) {
-      return roomQuestsCount > 1
+    if (moreAdvantageousRoomCategory && bookingGuestsTotal) {
+      return bookingGuestsTotal > 1
         ? moreAdvantageousRoomCategory.price_per_night_for_two_quest
         : moreAdvantageousRoomCategory.price_per_night_for_one_quest;
     }
     return null;
-  }, [roomQuestsCount, moreAdvantageousRoomCategory]);
+  }, [bookingGuestsTotal, moreAdvantageousRoomCategory]);
 
   const roomPhotos = useMemo(() => {
     if (moreAdvantageousRoomCategory) {
@@ -91,21 +100,16 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
   }, [moreAdvantageousRoomCategory]);
 
   const additionaPayment = useMemo(() => {
-    if (roomPrice && roomQuestsCount && prevRoomCategory) {
-      console.log(
-        roomPrice,
-        prevRoomCategory.price_per_night_for_one_quest,
-        roomQuestsCount
-      );
+    if (roomPrice && bookingGuestsTotal && prevRoomCategory) {
       return (
         roomPrice -
-        (roomQuestsCount > 1
+        (bookingGuestsTotal > 1
           ? prevRoomCategory.price_per_night_for_two_quest
           : prevRoomCategory.price_per_night_for_one_quest)
       );
     }
     return null;
-  }, [roomPrice, roomQuestsCount, prevRoomCategory]);
+  }, [roomPrice, bookingGuestsTotal, prevRoomCategory]);
 
   if (!moreAdvantageousRoomCategory || !additionaPayment) return null;
 

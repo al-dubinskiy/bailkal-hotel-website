@@ -1,12 +1,17 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { TransferCarType } from "../../../../../../../redux/slices/TransferCars/types";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
 import { PeoplesIcon } from "../../../../../../../assets/icons/PeoplesIcon";
 import { CustomIconLabel } from "../../../../../../components/shared/CustomIconLabel";
 import { theme } from "../../../../../../../theme";
 import { CustomButton } from "../../../../../../components/shared/CustomButton";
+import { t } from "i18next";
+import { TransferVariantType } from "../../../../../../../redux/slices/TransferVariants/types";
 
 interface Props {
+  time_from: string;
+  time_to: string;
+  transferVariants: TransferVariantType[] | null;
   transferCars: TransferCarType[] | null;
   selectedCarId: string;
   setSelectedCardId: (id: string) => void;
@@ -14,14 +19,40 @@ interface Props {
 }
 
 export const TransportStepContent = (props: Props) => {
-  const { transferCars, selectedCarId, setSelectedCardId, containerStyles } =
-    props;
+  const {
+    time_from,
+    time_to,
+    transferVariants,
+    transferCars,
+    selectedCarId,
+    setSelectedCardId,
+    containerStyles,
+  } = props;
 
-  if (!transferCars) return null;
+  const transferCarsList = useMemo(() => {
+    if (transferVariants && transferCars) {
+      return transferCars
+        .map((i) => {
+          const price =
+            transferVariants.find(
+              (j) =>
+                j.time_from === time_from &&
+                j.time_to === time_to &&
+                j.car_id === i._id
+            )?.price || 0;
+          return {
+            ...i,
+            price,
+          };
+        })
+        .sort((a, b) => a.price - b.price);
+    }
+    return [];
+  }, [transferVariants, transferCars]);
 
   return (
     <Stack sx={{ alignItems: "stretch", gap: "24px" }}>
-      {transferCars.map((item, index) => {
+      {transferCarsList.map((item, index) => {
         const isSelected = selectedCarId === item._id;
         return (
           <Stack
@@ -70,7 +101,7 @@ export const TransportStepContent = (props: Props) => {
                     fontSize: "20.8px",
                   }}
                 >
-                  {1500} ₽
+                  {item.price} ₽
                 </Typography>
 
                 <Typography

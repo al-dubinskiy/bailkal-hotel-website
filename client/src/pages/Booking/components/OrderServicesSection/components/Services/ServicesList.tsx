@@ -1,5 +1,4 @@
-import React, { useCallback, useEffect } from "react";
-import { BookingServiceType } from "../../../../../../redux/slices/BookingServices/types";
+import React, { useCallback, useContext, useEffect } from "react";
 import { Stack } from "@mui/material";
 import { useAppDispatch, useAppSelector } from "../../../../../../hooks/redux";
 import { GetBookingServices } from "../../../../../../redux/slices/BookingServices/bookingServicesSlice";
@@ -14,15 +13,15 @@ export const ServicesList = (props: Props) => {
   const { bookingServices } = useAppSelector((state) => state.bookingServices);
   const { currentRoomCategory } = useAppSelector((state) => state.bookings);
 
-  const GetBookingsTariffsList = useCallback(() => {
+  const GetBookingsServicesList = useCallback(() => {
     if (!bookingServices) {
       dispatch(GetBookingServices());
     }
   }, [bookingServices]);
 
   useEffect(() => {
-    GetBookingsTariffsList();
-  }, [GetBookingsTariffsList]);
+    GetBookingsServicesList();
+  }, [GetBookingsServicesList]);
 
   if (!bookingServices || !currentRoomCategory) return null;
 
@@ -34,9 +33,10 @@ export const ServicesList = (props: Props) => {
               <ServicesItem
                 key={index}
                 service={item}
-                isSelected={currentRoomCategory.include_service_id.includes(
+                isIncludes={currentRoomCategory.include_service_id.includes(
                   item._id
                 )}
+                allServices={bookingServices}
               />
             );
           })

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useContext } from "react";
 import { BookingServiceType } from "../../../../../../../redux/slices/BookingServices/types";
 import { Box, Stack, Typography } from "@mui/material";
 import { theme } from "../../../../../../../theme";
@@ -10,14 +10,26 @@ import { DigitsIcon } from "../../../../../../../assets/icons/DigitsIcon";
 import { PersonIcon } from "../../../../../../../assets/icons/PersonIcon";
 import { CustomButton } from "../../../../../../components/shared/CustomButton";
 import { CheckboxIcon } from "../../../../../../../assets/icons/CheckboxIcon";
+import { BookingContext } from "../../../../../BookingPage";
+import { useAppSelector } from "../../../../../../../hooks/redux";
 
 interface Props {
   service: BookingServiceType;
-  isSelected: boolean;
+  isIncludes: boolean;
+  allServices: BookingServiceType[];
 }
 
 export const ServicesItem = (props: Props) => {
-  const { service, isSelected } = props;
+  const { service, isIncludes, allServices } = props;
+
+  const { currentBooking } = useAppSelector((state) => state.bookings);
+
+  const { updateBookingDraft, bookingProgressCurrentStep } =
+    useContext(BookingContext);
+
+  if (!currentBooking) return null;
+
+  const isSelected = currentBooking.service_id.includes(service._id);
 
   return (
     <Stack
@@ -118,7 +130,7 @@ export const ServicesItem = (props: Props) => {
           }}
         />
 
-        {!isSelected ? (
+        {!isIncludes ? (
           <Stack
             sx={{
               flexDirection: "row",
@@ -147,14 +159,21 @@ export const ServicesItem = (props: Props) => {
             </Box>
 
             <CustomButton
-              label={"Выбрать"}
-              onClick={() => null}
-              containerVariant={"contained"}
-              disabled={false}
-              containerBackgroundColor={"buttonDark"}
-              containerStyle={{
-                padding: "0 24px",
+              label={!isSelected ? "Выбрать" : "Выбрано"}
+              onClick={() => {
+                const { step: currentStep } = bookingProgressCurrentStep;
+                if (currentStep) {
+                  updateBookingDraft({
+                    currentStep,
+                    tempBookingId: currentStep.roomId,
+                    serviceId: service._id,
+                    allServices,
+                  });
+                }
               }}
+              containerVariant={!isSelected ? "contained" : "outlined"}
+              containerBackgroundColor={"buttonDark"}
+              containerStyle={{ padding: "0 40px" }}
               withoutAnimation
             />
           </Stack>

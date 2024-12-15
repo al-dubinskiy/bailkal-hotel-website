@@ -4,7 +4,8 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { Typography } from "@mui/material";
+import { SxProps, Typography } from "@mui/material";
+import { theme } from "../../../../theme";
 
 type MenuItemType = {
   id: number;
@@ -24,6 +25,7 @@ interface Props {
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
   error?: boolean | undefined;
   helperText?: string | false | undefined;
+  customSelectStyle?: SxProps;
 }
 
 export const CustomSelect = (props: Props) => {
@@ -39,6 +41,7 @@ export const CustomSelect = (props: Props) => {
     onBlur,
     error,
     helperText,
+    customSelectStyle,
   } = props;
 
   const handleChange = (event: SelectChangeEvent | any) => {
@@ -70,9 +73,42 @@ export const CustomSelect = (props: Props) => {
           // labelId={`${id}-label`}
           id={id}
           value={value.value}
-          label={selectLabel}
+          // label={selectLabel}
           name={name}
           onChange={handleChange}
+          sx={{
+            "&.MuiOutlinedInput-root": {
+              height: "57px",
+              borderRadius: "8px",
+              backgroundColor: theme.palette.layoutBackground.light,
+
+              "&.Mui-focused": {
+                "& .MuiOutlinedInput-notchedOutline": {
+                  borderWidth: 1,
+                  borderColor: theme.palette.primary.dark,
+                },
+
+                "&.Mui-error": {
+                  "& .MuiOutlinedInput-notchedOutline": {
+                    borderWidth: 1,
+                    borderColor: theme.palette.error.main,
+                  },
+                },
+              },
+            },
+
+            "& .MuiFormHelperText-root": {
+              font: theme.typography.small,
+              color: theme.palette.error.main,
+            },
+
+            "& .MuiOutlinedInput-notchedOutline": {
+              borderRadius: "8px",
+              borderWidth: 1,
+              borderColor: theme.palette.gray.extraLight,
+            },
+            ...customSelectStyle,
+          }}
         >
           {data.map((item) => {
             return (

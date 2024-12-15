@@ -18,20 +18,9 @@ export const OrderServicesSection = memo(
   (props: Props) => {
     const { containerStyles } = props;
 
-    const { roomQuests } = useContext(BookingContext);
+    const { currentRoomCategory } = useAppSelector((state) => state.bookings);
 
-    const { currentRoomCategory: roomCategory } = useAppSelector(
-      (state) => state.bookings
-    );
-
-    if (!roomQuests || !roomCategory) return null;
-
-    const roomQuestsCount = roomQuests.adults + roomQuests.children;
-
-    const roomCategoryPrice =
-      roomQuestsCount === 1
-        ? roomCategory.price_per_night_for_one_quest
-        : roomCategory.price_per_night_for_two_quest;
+    if (!currentRoomCategory) return null;
 
     return (
       <Stack sx={{ alignItems: "stretch", gap: "24px", ...containerStyles }}>
@@ -61,12 +50,19 @@ export const OrderServicesSection = memo(
 
             <MoreAdvantageousRoomCategoryCard />
 
+            <Typography
+              variant="label"
+              sx={{ fontWeight: 600, alignSelf: "center" }}
+            >
+              Выберите дополнительные услуги
+            </Typography>
+
             <ServicesList />
 
             <Transfer />
           </Stack>
 
-          <BookingInfoWidget roomCategoryPrice={roomCategoryPrice} />
+          <BookingInfoWidget />
         </Stack>
       </Stack>
     );

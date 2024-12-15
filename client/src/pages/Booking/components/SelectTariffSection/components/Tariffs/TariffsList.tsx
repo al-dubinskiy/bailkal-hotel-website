@@ -2,24 +2,22 @@ import React, { useCallback, useContext, useEffect, useMemo } from "react";
 import { TariffItem } from "./TariffItem/TariffItem";
 import { useAppDispatch, useAppSelector } from "../../../../../../hooks/redux";
 import { GetBookingTariffs } from "../../../../../../redux/slices/BookingTariffs/bookingTariffsSlice";
-import { RoomCategoryType } from "../../../../../../redux/slices/RoomsCategories/types";
 import { Stack } from "@mui/material";
-import { RoomQuestsCountType } from "../../../FiltersBar/SelectQuestsDropdown";
 import { BookingDateType } from "../../SelectTariffSection";
-import { BookingContext } from "../../../../BookingPage";
 
 interface Props {
-  roomQuestsCount: RoomQuestsCountType;
   bookingDate: BookingDateType;
 }
 
 export const TariffsList = (props: Props) => {
-  const { roomQuestsCount, bookingDate } = props;
+  const { bookingDate } = props;
   const dispatch = useAppDispatch();
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
-  const { currentRoomCategory: roomCategory } = useAppSelector(
-    (state) => state.bookings
-  );
+  const {
+    currentRoomCategory: roomCategory,
+    currentBooking,
+    filterParams,
+  } = useAppSelector((state) => state.bookings);
 
   const GetBookingsTariffsList = useCallback(() => {
     if (!bookingTariffs) {
@@ -30,11 +28,6 @@ export const TariffsList = (props: Props) => {
   useEffect(() => {
     GetBookingsTariffsList();
   }, [GetBookingsTariffsList]);
-
-  const questsCountTotal = useMemo(() => {
-    const a = roomQuestsCount.adults + roomQuestsCount.children;
-    return a > 0 ? a : -1;
-  }, [roomQuestsCount]);
 
   if (!bookingTariffs || !roomCategory) return null;
 
@@ -48,15 +41,7 @@ export const TariffsList = (props: Props) => {
                 <TariffItem
                   key={index}
                   tariff={item}
-                  roomCategoryPrice={
-                    questsCountTotal === -1
-                      ? 0
-                      : questsCountTotal > 1
-                      ? roomCategory.price_per_night_for_two_quest
-                      : roomCategory.price_per_night_for_one_quest
-                  }
                   roomCategory={roomCategory}
-                  roomQuestsCount={roomQuestsCount}
                   bookingDate={bookingDate}
                 />
               );

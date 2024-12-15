@@ -1,34 +1,37 @@
 import { Box, Stack, SxProps, Typography } from "@mui/material";
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import { CustomInput } from "../../../../../../components/shared/FormElements/CustomInput";
 import { CustomIconLabel } from "../../../../../../components/shared/CustomIconLabel";
 import { PeoplesIcon } from "../../../../../../../assets/icons/PeoplesIcon";
 import { CustomButton } from "../../../../../../components/shared/CustomButton";
 import { theme } from "../../../../../../../theme";
+import { BookingContext } from "../../../../../BookingPage";
 
 interface Props {
   setComment: (val: string) => void;
+  setTransfer: (comment: string) => void;
   transferPrice: number;
   containerStyles: SxProps;
 }
 
 export const ArrivalStepContent = (props: Props) => {
-  const { setComment, transferPrice, containerStyles } = props;
+  const { setComment, setTransfer, transferPrice, containerStyles } = props;
   const [input, setInput] = useState<string>("");
 
   const orderTransfer = () => {
     setComment(input);
-    // ...
+    setTransfer(input);
   };
 
   return (
-    <Stack sx={{ alignItems: "stretch", ...containerStyles }}>
+    <Stack sx={{ alignItems: "stretch", gap: "24px", ...containerStyles }}>
       <CustomInput
         id="comment"
         name="comment"
         placeholder="Введите комментарий"
         value={input}
         onChange={(event) => setInput(event.target.value)}
+        multiline
       />
 
       <Stack

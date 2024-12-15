@@ -16,6 +16,10 @@ import SuiteRoom4 from "./suiteRoom/suite_4.webp";
 import SuiteRoom5 from "./suiteRoom/suite_5.webp";
 import SuiteRoom6 from "./suiteRoom/suite_6.webp";
 import SuiteRoom7 from "./suiteRoom/suite_7.webp";
+// Auth methods
+import VkLogo from "./authMethods/vkLogo.png";
+import SberBankLogo from "./authMethods/sberBankLogo.png";
+import TBankLogo from "./authMethods/tBankLogo.png";
 
 export const deluxeKingRooms = [
   DeluxeKingRoom1,
@@ -40,3 +44,5 @@ export const suiteRooms = [
   SuiteRoom6,
   SuiteRoom7,
 ];
+
+export const authMethods = { VkLogo, SberBankLogo, TBankLogo };

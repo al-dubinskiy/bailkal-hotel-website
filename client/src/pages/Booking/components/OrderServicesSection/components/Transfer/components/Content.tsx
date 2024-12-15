@@ -1,10 +1,18 @@
-import { Box, Stack, Typography } from "@mui/material";
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { Box, Button, Stack, Typography } from "@mui/material";
+import React, {
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { theme } from "../../../../../../../theme";
 import {
   CheckOutlined,
+  DeleteOutline,
   EditOffOutlined,
   EditOutlined,
+  RemoveCircleOutline,
 } from "@mui/icons-material";
 import { CustomCircleIconButton } from "../../../../../../components/shared/CustomCircleIconButton";
 import {
@@ -15,7 +23,10 @@ import { findLast, findLastIndex } from "lodash";
 import { PeoplesIcon } from "../../../../../../../assets/icons/PeoplesIcon";
 import { CustomIconLabel } from "../../../../../../components/shared/CustomIconLabel";
 import { CustomButton } from "../../../../../../components/shared/CustomButton";
-import { CreateTransferVariantType } from "../../../../../../../redux/slices/TransferVariants/types";
+import {
+  CreateTransferVariantType,
+  TransferVariantType,
+} from "../../../../../../../redux/slices/TransferVariants/types";
 import { GetTransferCars } from "../../../../../../../redux/slices/TransferCars/transferCarsSlice";
 import {
   useAppDispatch,
@@ -27,11 +38,12 @@ import { StepsHeader } from "./StepsHeader";
 import {
   TransferDirectionType,
   TransferStepType,
-  TransferVariantType,
+  TransferVariantType as TransferVariantLocalType,
 } from "./types";
 import { stepsData, transferDirectionData } from "./default";
 import { ArrivalStepContent } from "./ArrivalStepContent";
 import { GetTransferVariants } from "../../../../../../../redux/slices/TransferVariants/transferVariantsSlice";
+import { BookingContext } from "../../../../../BookingPage";
 
 interface Props {}
 
@@ -39,6 +51,8 @@ export const Content = (props: Props) => {
   const {} = props;
 
   const dispatch = useAppDispatch();
+  const { bookingProgressCurrentStep, updateBookingDraft } =
+    useContext(BookingContext);
   const { transferCars } = useAppSelector((state) => state.transfersCars);
   const { transferVariants } = useAppSelector(
     (state) => state.transfersVariants
@@ -140,7 +154,29 @@ export const Content = (props: Props) => {
         setSteps((prev) =>
           prev.map((i, idx) => ({
             ...i,
-            isComplete: idx === 0 ? false : i.isComplete,
+            isComplete: idx === currentIdx ? false : i.isComplete,
+          }))
+        );
+      }
+      // Если на сейчас на втором шаге (когда он еще не isComplete), но уже выбрано один из "видов транспорта", то переходим на третий шаг
+      if (transferParams.car_id && !steps[1].isComplete && currentIdx === 1) {
+        const nextIdx = currentIdx + 1;
+        setSteps((prev) =>
+          prev.map((i, idx) => ({
+            ...i,
+            isCurrent: idx === nextIdx ? true : false,
+            isComplete: idx === currentIdx ? true : i.isComplete,
+          }))
+        );
+      } else if (
+        !transferParams.car_id &&
+        steps[1].isComplete &&
+        currentIdx === 1
+      ) {
+        setSteps((prev) =>
+          prev.map((i, idx) => ({
+            ...i,
+            isComplete: idx === currentIdx ? false : i.isComplete,
           }))
         );
       }
@@ -183,29 +219,68 @@ export const Content = (props: Props) => {
     transferParams.time_to,
   ]);
 
-  useEffect(() => {
+  const getTransferVariant = (): TransferVariantType | null => {
     if (
       transferVariants &&
-      (transferParams.from_hotel || transferParams.to_hotel) &&
       transferParams.time_from &&
       transferParams.time_to &&
       transferParams.car_id
     ) {
-      const price = transferVariants.find(
+      const transfer = transferVariants.find(
         (i) =>
           i.from_hotel === transferParams.from_hotel &&
           i.to_hotel === transferParams.to_hotel &&
           i.time_from === transferParams.time_from &&
           i.time_to === transferParams.time_to
-      )?.price;
-      if (price) {
-        setTransferParams((prev) => ({
-          ...prev,
-          price: price,
-        }));
+      );
+
+      if (transfer) {
+        return transfer;
       }
     }
+    return null;
+  };
+
+  useEffect(() => {
+    const price = getTransferVariant()?.price;
+    if (price && price !== transferParams.price) {
+      setTransferParams((prev) => ({
+        ...prev,
+        price,
+      }));
+    }
   }, [transferVariants, transferParams]);
+
+  const removeTransferDraft = () => {
+    setTransferParams({
+      from_hotel: false,
+      to_hotel: false,
+      time_from: "",
+      time_to: "",
+      price: 0,
+      car_id: "",
+      comment: "",
+    });
+    setSteps((prev) =>
+      prev.map((i, idx) => ({
+        ...i,
+        isCurrent: idx === 0 ? true : false,
+      }))
+    );
+  };
+
+  const isExistTransferDraft = useMemo(() => {
+    if (
+      ((transferParams.from_hotel || transferParams.to_hotel) &&
+        transferParams.time_from &&
+        transferParams.time_to) ||
+      transferParams.car_id ||
+      transferParams.comment
+    ) {
+      return true;
+    }
+    return false;
+  }, [transferParams]);
 
   const StepContent = ({ step }: { step: TransferStepType }) => {
     return (
@@ -213,6 +288,7 @@ export const Content = (props: Props) => {
         sx={{
           gap: "30px",
           alignItems: "stretch",
+          position: "relative",
           zIndex: 1,
         }}
       >
@@ -226,7 +302,7 @@ export const Content = (props: Props) => {
               const selectedVariant =
                 selectedType &&
                 selectedType.variants.find(
-                  (i: TransferVariantType) => i.isSelected
+                  (i: TransferVariantLocalType) => i.isSelected
                 );
 
               if (selectedType) {
@@ -246,6 +322,9 @@ export const Content = (props: Props) => {
           />
 
           <TransportStepContent
+            time_from={transferParams.time_from}
+            time_to={transferParams.time_to}
+            transferVariants={transferVariants}
             transferCars={transferCars}
             selectedCarId={transferParams.car_id}
             setSelectedCardId={(id) =>
@@ -265,6 +344,18 @@ export const Content = (props: Props) => {
                 ...prev,
                 comment: val,
               }));
+            }}
+            setTransfer={(comment) => {
+              const transfer = getTransferVariant();
+              const { step: currentStep } = bookingProgressCurrentStep;
+              if (currentStep && transfer) {
+                updateBookingDraft({
+                  currentStep,
+                  tempBookingId: currentStep.roomId,
+                  transferId: transfer._id,
+                  transferComment: comment,
+                });
+              }
             }}
             transferPrice={transferParams.price}
             containerStyles={{
@@ -294,6 +385,15 @@ export const Content = (props: Props) => {
         },
       }}
     >
+      {isExistTransferDraft ? (
+        <Button
+          onClick={removeTransferDraft}
+          sx={{ position: "absolute", top: "-24px", right: 0, zIndex: 1 }}
+        >
+          <DeleteOutline sx={{ fontSize: "24px" }} />
+        </Button>
+      ) : null}
+
       {steps.map((item, idx) => {
         return <StepContent key={idx} step={item} />;
       })}

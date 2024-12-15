@@ -1,9 +1,11 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  BookingStepType,
   BookingType,
   CreateBookingApiResponseType,
   CreateBookingLocalType,
   CreateBookingType,
+  FiltersParamsType,
   GetBookingsApiResponseType,
   NewBookingsType,
   UpdateBookingApiResponseType,
@@ -16,6 +18,8 @@ import {
   updateBooking,
 } from "./httpRequests";
 import { RoomCategoryType } from "../RoomsCategories/types";
+import moment from "moment";
+import { v4 as uuidv4 } from "uuid";
 
 const DEBUG = true;
 
@@ -147,7 +151,7 @@ export const DeleteBooking = createAsyncThunk(
 );
 
 interface IBookingState {
-  roomQuestsMax: number;
+  roomGuestsMax: number;
   bookings: BookingType[] | null;
   getBookings: {
     successMessage: string | null;
@@ -175,10 +179,12 @@ interface IBookingState {
   newBookings: NewBookingsType;
   currentBooking: CreateBookingLocalType | null;
   currentRoomCategory: RoomCategoryType | null;
+  bookingSteps: BookingStepType[];
+  filterParams: FiltersParamsType;
 }
 
 const initialState: IBookingState = {
-  roomQuestsMax: 2,
+  roomGuestsMax: 2,
   bookings: null,
   getBookings: {
     successMessage: null,
@@ -209,6 +215,12 @@ const initialState: IBookingState = {
   },
   currentBooking: null,
   currentRoomCategory: null,
+  bookingSteps: [],
+  filterParams: {
+    arrival_datetime: moment(),
+    departure_datetime: moment().add(1, "days"),
+    rooms: [{ id: uuidv4(), adults: 1, children: 0 }],
+  },
 };
 
 export const bookingsSlice = createSlice({
@@ -230,6 +242,13 @@ export const bookingsSlice = createSlice({
       { payload }: { payload: RoomCategoryType | null }
     ) => {
       state.currentRoomCategory = payload;
+    },
+    setBookingSteps: (state, { payload }: { payload: BookingStepType[] }) => {
+      console.log("payload", payload);
+      state.bookingSteps = payload;
+    },
+    setFilterParams: (state, { payload }: { payload: FiltersParamsType }) => {
+      state.filterParams = payload;
     },
   },
   extraReducers: (builder) => {
@@ -322,5 +341,10 @@ export const bookingsSlice = createSlice({
   },
 });
 
-export const { setNewBookings, setCurrentBooking, setCurrentRoomCategory } =
-  bookingsSlice.actions;
+export const {
+  setNewBookings,
+  setCurrentBooking,
+  setCurrentRoomCategory,
+  setBookingSteps,
+  setFilterParams,
+} = bookingsSlice.actions;

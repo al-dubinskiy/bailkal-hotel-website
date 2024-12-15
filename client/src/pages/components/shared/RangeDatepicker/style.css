@@ -1,5 +1,5 @@
 .react-datepicker-popper {
-    z-index: 2;
+    z-index: 100;
 }
 
 .react-datepicker {
@@ -218,4 +218,8 @@ input.range-date-picker.focused {
 
 .react-datepicker__day--outside-month.react-datepicker__day--in-range .react-datepicker__day-cost {
     color: #606060;
+}
+
+input.range-date-picker.focused {
+    border: 1px solid #2F70D9;
 }

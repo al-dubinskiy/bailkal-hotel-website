@@ -29,6 +29,10 @@ export const store = configureStore({
     transfersCars: transfersCarsSlice.reducer,
     unavailableBookingDates: unavailableBookingDatesSlice.reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

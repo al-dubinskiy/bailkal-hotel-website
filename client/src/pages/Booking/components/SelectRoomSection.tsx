@@ -1,14 +1,7 @@
 import React, { memo, useContext, useMemo } from "react";
-import { BookingProgressIndicatorBaner } from "./BookingProgressIndicatorBaner";
 import { Box, Stack, SxProps, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import {
-  BookingContext,
-  BookingProgressStepType,
-  BookingProgressType,
-  BookingStepType,
-  RoomCategoryPriceType,
-} from "../BookingPage";
+import { BookingContext, RoomCategoryPriceType } from "../BookingPage";
 import { useAppSelector } from "../../../hooks/redux";
 import {
   deluxeKingRooms,
@@ -47,14 +40,24 @@ export const SelectRoomSection = memo((props: Props) => {
     selectedRoomCategoryId,
     containerStyles,
   } = props;
+  const { currentBooking, filterParams } = useAppSelector(
+    (state) => state.bookings
+  );
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
 
-  const { roomQuests, updateBookingDraft, bookingProgressCurrentStep } =
+  const { updateBookingDraft, bookingProgressCurrentStep } =
     useContext(BookingContext);
 
-  if (!roomQuests) return null;
+  const bookingGuests = useMemo(() => {
+    if (currentBooking) {
+      return filterParams.rooms.find((i) => i.id === currentBooking.tempId);
+    }
+    return false;
+  }, [filterParams, currentBooking]);
 
-  const roomQuestsCount = roomQuests.adults + roomQuests.children;
+  if (!bookingGuests) return null;
+
+  const roomGuestsCount = bookingGuests.adults + bookingGuests.children;
 
   return (
     <Box
@@ -93,7 +96,7 @@ export const SelectRoomSection = memo((props: Props) => {
                 selectedRoomCategoryId === roomCategory._id;
 
               const roomPrice =
-                roomQuestsCount > 1
+                roomGuestsCount > 1
                   ? roomCategory.price_per_night_for_two_quest
                   : roomCategory.price_per_night_for_one_quest;
 
@@ -276,8 +279,8 @@ export const SelectRoomSection = memo((props: Props) => {
                             </Box>
 
                             <Typography variant="body">
-                              1 ночь / {roomQuestsCount} гост
-                              {roomQuestsCount > 1 ? "я" : "ь"}
+                              1 ночь / {roomGuestsCount} гост
+                              {roomGuestsCount > 1 ? "я" : "ь"}
                             </Typography>
                           </Stack>
                         ) : (

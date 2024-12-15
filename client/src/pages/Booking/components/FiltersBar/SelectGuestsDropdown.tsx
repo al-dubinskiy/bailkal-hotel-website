@@ -16,27 +16,25 @@ import { useButtonDropdownCardStyles } from "../../../components/shared/styles";
 import { CustomCounterButton } from "../../../components/shared/CustomCounterButton";
 import { CustomButton } from "../../../components/shared/CustomButton";
 import { isEqual } from "lodash";
-import { useAppSelector } from "../../../../hooks/redux";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import { RemoveCircleOutline } from "@mui/icons-material";
+import { RoomGuestsCountType } from "../../../../redux/slices/Bookings/types";
+import { setFilterParams } from "../../../../redux/slices/Bookings/bookingsSlice";
 
-export type RoomQuestsCountType = {
-  id: string;
-  adults: number;
-  children: number;
-};
+type Rooms = RoomGuestsCountType[];
 
-type Rooms = RoomQuestsCountType[];
+interface Props {}
 
-interface Props {
-  rooms: Rooms;
-  setRooms: (val: Rooms) => void;
-}
+export const SelectGuestsDropdown = (props: Props) => {
+  const {} = props;
+  const dispatch = useAppDispatch();
+  const { roomGuestsMax, filterParams } = useAppSelector(
+    (state) => state.bookings
+  );
 
-export const SelectQuestsDropdown = (props: Props) => {
-  const { rooms, setRooms } = props;
-  const { roomQuestsMax } = useAppSelector((state) => state.bookings);
+  const { rooms } = filterParams;
 
-  const [roomsQuestsCountLocal, setRoomsQuestsCountLocal] =
+  const [roomsGuestsCountLocal, setRoomsGuestsCountLocal] =
     useState<Rooms>(rooms);
   const classes = useButtonDropdownCardStyles();
 
@@ -65,7 +63,7 @@ export const SelectQuestsDropdown = (props: Props) => {
   };
 
   const addRoom = () => {
-    setRoomsQuestsCountLocal((prev) => [
+    setRoomsGuestsCountLocal((prev) => [
       ...prev,
       {
         id: uuidv4(),
@@ -76,8 +74,8 @@ export const SelectQuestsDropdown = (props: Props) => {
   };
 
   const removeRoom = (index: number) => {
-    if (roomsQuestsCountLocal.length > 1) {
-      setRoomsQuestsCountLocal((prev) =>
+    if (roomsGuestsCountLocal.length > 1) {
+      setRoomsGuestsCountLocal((prev) =>
         prev.filter((_, idx) => idx !== index)
       );
     }
@@ -85,16 +83,21 @@ export const SelectQuestsDropdown = (props: Props) => {
 
   const save = () => {
     if (isChanged) {
-      setRooms(roomsQuestsCountLocal);
+      dispatch(
+        setFilterParams({
+          ...filterParams,
+          rooms: roomsGuestsCountLocal,
+        })
+      );
     }
   };
 
   const isChanged = useMemo(() => {
-    if (isEqual(roomsQuestsCountLocal, rooms)) {
+    if (isEqual(roomsGuestsCountLocal, rooms)) {
       return false;
     }
     return true;
-  }, [rooms, roomsQuestsCountLocal]);
+  }, [rooms, roomsGuestsCountLocal]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -115,7 +118,7 @@ export const SelectQuestsDropdown = (props: Props) => {
           display: "flex",
           flexDirection: "row",
           justifyContent: "space-between",
-          border: open ? "1px solid #1a1a1a" : "none",
+          border: open ? `1px solid ${theme.palette.primary.dark}` : "none",
           gap: "15px",
         }}
         aria-describedby={id}
@@ -180,7 +183,7 @@ export const SelectQuestsDropdown = (props: Props) => {
                       gap: "24px",
                     }}
                   >
-                    {roomsQuestsCountLocal.map((item, index) => {
+                    {roomsGuestsCountLocal.map((item, index) => {
                       return (
                         <Stack
                           key={index}
@@ -201,7 +204,7 @@ export const SelectQuestsDropdown = (props: Props) => {
                               Номер {index + 1}
                             </Typography>
 
-                            {roomsQuestsCountLocal.length > 1 ? (
+                            {roomsGuestsCountLocal.length > 1 ? (
                               <Button onClick={() => removeRoom(index)}>
                                 <RemoveCircleOutline />
                               </Button>
@@ -218,11 +221,11 @@ export const SelectQuestsDropdown = (props: Props) => {
                             <CustomCounterButton
                               label={"Взрослые"}
                               minValue={1}
-                              maxValue={roomQuestsMax - item.children}
+                              maxValue={roomGuestsMax - item.children}
                               value={item.adults}
                               setValue={(val) =>
-                                setRoomsQuestsCountLocal(
-                                  roomsQuestsCountLocal.map(
+                                setRoomsGuestsCountLocal(
+                                  roomsGuestsCountLocal.map(
                                     (room, room_index) =>
                                       room_index === index
                                         ? { ...room, adults: val }
@@ -235,11 +238,11 @@ export const SelectQuestsDropdown = (props: Props) => {
                             <CustomCounterButton
                               label={"Дети (до 12 лет)"}
                               minValue={0}
-                              maxValue={roomQuestsMax - item.adults}
+                              maxValue={roomGuestsMax - item.adults}
                               value={item.children}
                               setValue={(val) =>
-                                setRoomsQuestsCountLocal(
-                                  roomsQuestsCountLocal.map(
+                                setRoomsGuestsCountLocal(
+                                  roomsGuestsCountLocal.map(
                                     (room, room_index) =>
                                       room_index === index
                                         ? { ...room, children: val }

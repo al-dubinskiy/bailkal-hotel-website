@@ -1,3 +1,5 @@
+import { Moment } from "moment";
+
 // Local
 export type BookingUserInfoType = {
   name: string;
@@ -36,6 +38,9 @@ export type UpdateBookingType = BookingType;
 /* --- Booking page --- */
 export type CreateBookingLocalType = CreateBookingType & {
   tempId: string;
+  roomPrice: number;
+  tariffPrice: number;
+  servicePriceTotal: number;
   isRoomCategoryWasChanged: boolean;
 };
 
@@ -44,6 +49,33 @@ type ActionType = "addRooms" | "removeRooms" | "";
 export type NewBookingsType = {
   bookings: CreateBookingLocalType[];
   actionType: ActionType;
+};
+
+export type BookingStepNameType =
+  | "Select a room"
+  | "Select a tariff"
+  | "Order services"
+  | "Enter guest details"
+  | "";
+
+// Filters bar
+export type RoomGuestsCountType = {
+  id: string;
+  adults: number;
+  children: number;
+};
+
+export type FiltersParamsType = {
+  arrival_datetime: Moment;
+  departure_datetime: Moment;
+  rooms: RoomGuestsCountType[];
+};
+
+export type BookingStepType = {
+  roomId: string;
+  name: BookingStepNameType;
+  isCurrent: boolean;
+  isComplete: boolean;
 };
 
 // API
