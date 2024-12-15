@@ -43,7 +43,13 @@ export const UserDataForm = (props: Props) => {
         style={{ display: "flex", flexDirection: "column", gap: "15px" }}
       >
         <Stack sx={{ alignItems: "stretch", gap: "24px" }}>
-          <Stack sx={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Stack
+            sx={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: "24px",
+            }}
+          >
             <CustomInput
               id="name"
               name="name"
@@ -66,7 +72,13 @@ export const UserDataForm = (props: Props) => {
             />
           </Stack>
 
-          <Stack sx={{ flexDirection: "row", justifyContent: "space-between" }}>
+          <Stack
+            sx={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: "24px",
+            }}
+          >
             <CustomInput
               id="surname"
               name="surname"
@@ -89,11 +101,18 @@ export const UserDataForm = (props: Props) => {
               helperText={formik.touched.phone && formik.errors.phone}
             />
           </Stack>
-          <Stack sx={{ flexDirection: "row", justifyContent: "space-between" }}>
+
+          <Stack
+            sx={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: "24px",
+            }}
+          >
             <CustomInput
               id="email"
               name="email"
-              label="Email"
+              label="Электронная почта"
               value={formik.values.email}
               onChange={formik.handleChange}
               onBlur={formik.handleBlur}
