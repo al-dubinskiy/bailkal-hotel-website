@@ -1,4 +1,4 @@
-import { SxProps, TextField } from "@mui/material";
+import { IconButton, InputAdornment, SxProps, TextField } from "@mui/material";
 import React from "react";
 import { theme } from "../../../../theme";
 
@@ -14,6 +14,7 @@ interface Props {
   helperText?: string | false | undefined;
   multiline?: boolean;
   containerStyles?: SxProps;
+  startIcon?: JSX.Element;
 }
 
 export const CustomInput = (props: Props) => {
@@ -29,6 +30,7 @@ export const CustomInput = (props: Props) => {
     helperText,
     multiline = false,
     containerStyles,
+    startIcon,
   } = props;
 
   return (
@@ -44,6 +46,17 @@ export const CustomInput = (props: Props) => {
       error={error}
       helperText={helperText}
       multiline={multiline}
+      slotProps={{
+        input: {
+          startAdornment: startIcon ? (
+            <InputAdornment position="start">
+              <IconButton aria-label="description for action">
+                {startIcon}
+              </IconButton>
+            </InputAdornment>
+          ) : null,
+        },
+      }}
       sx={{
         marginTop: 0,
         marginBottom: 0,

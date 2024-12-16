@@ -86,7 +86,6 @@ export const SpecialWishesSelector = memo(
 
     useEffect(() => {
       if (roomCategory && roomBedVariants) {
-        console.log(1234);
         const a = roomBedVariants.filter((i) =>
           roomCategory.available_bed_variant_id.includes(i._id)
         );

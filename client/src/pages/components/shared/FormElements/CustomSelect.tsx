@@ -11,6 +11,7 @@ export type SelectItemType = {
   id: number;
   label: string;
   value: string;
+  icon?: React.ReactNode;
 };
 
 interface Props {
@@ -129,6 +130,10 @@ export const CustomSelect = (props: Props) => {
             );
           })}
         </Select>
+
+        {helperText ? (
+          <Typography variant="label">{helperText}</Typography>
+        ) : null}
       </FormControl>
     </Box>
   );

@@ -9,6 +9,9 @@ import {
 } from "../../../../components/shared/FormElements/CustomSelect";
 import { countries } from "./constants";
 import { CustomLabelCheckbox } from "../../../../components/shared/FormElements/CustomLabelCheckbox";
+import { EmailIcon } from "../../../../../assets/icons/EmailIcon";
+import { theme } from "../../../../../theme";
+import { Phone, PhoneOutlined } from "@mui/icons-material";
 
 const validationSchema = yup.object({
   name: yup.string().required("Поле обязательно для заполнения"),
@@ -118,6 +121,16 @@ export const UserDataForm = (props: Props) => {
               onBlur={formik.handleBlur}
               error={formik.touched.phone && Boolean(formik.errors.phone)}
               helperText={formik.touched.phone && formik.errors.phone}
+              startIcon={
+                <PhoneOutlined
+                  sx={{
+                    "& path": {
+                      fill: theme.palette.gray.dark,
+                    },
+                    fontSize: "24px",
+                  }}
+                />
+              }
             />
           </Stack>
 
@@ -138,6 +151,16 @@ export const UserDataForm = (props: Props) => {
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
               containerStyles={{ flex: 0.5 }}
+              startIcon={
+                <EmailIcon
+                  sx={{
+                    "& path": {
+                      fill: theme.palette.gray.dark,
+                    },
+                    fontSize: "24px",
+                  }}
+                />
+              }
             />
 
             <CustomSelect

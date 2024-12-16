@@ -7,6 +7,7 @@ import {
 import { authMethods } from "../../../../../assets/images";
 import { UserDataForm } from "./UserDataForm";
 import { AuthMethodButtons } from "./AuthMethodButtons";
+import { AdditionalInfoForm } from "./AdditionalInfoForm";
 
 interface Props {}
 
@@ -47,6 +48,12 @@ export const Content = (props: Props) => {
       <AuthMethodButtons />
 
       <UserDataForm />
+
+      <Typography variant="label" sx={{ fontWeight: 600, alignSelf: "center" }}>
+        Дополнительная информация
+      </Typography>
+
+      <AdditionalInfoForm />
     </Stack>
   );
 };
