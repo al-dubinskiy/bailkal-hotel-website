@@ -1,8 +1,14 @@
-import { Stack } from "@mui/material";
+import { FormGroup, Stack } from "@mui/material";
 import { useFormik } from "formik";
-import React from "react";
+import React, { useMemo } from "react";
 import * as yup from "yup";
 import { CustomInput } from "../../../../components/shared/FormElements/CustomInput";
+import {
+  CustomSelect,
+  SelectItemType,
+} from "../../../../components/shared/FormElements/CustomSelect";
+import { countries } from "./constants";
+import { CustomLabelCheckbox } from "../../../../components/shared/FormElements/CustomLabelCheckbox";
 
 const validationSchema = yup.object({
   name: yup.string().required("Поле обязательно для заполнения"),
@@ -16,6 +22,15 @@ const validationSchema = yup.object({
     .string()
     .email("Введите Вашу електронную почту")
     .required("Поле обязательно для заполнения"),
+  nationality: yup
+    .object({
+      id: yup.number(),
+      label: yup.string(),
+      value: yup.string(),
+    })
+    .required("Поле обязательно для заполнения"),
+  sendConfirmOnPhone: yup.boolean(),
+  wantToKnowAboutSpecialOffersAndNews: yup.boolean(),
 });
 
 interface Props {}
@@ -30,12 +45,16 @@ export const UserDataForm = (props: Props) => {
       surname: "",
       phone: "",
       email: "",
+      nationality: countries[0],
+      sendConfirmOnPhone: false,
+      wantToKnowAboutSpecialOffersAndNews: true,
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
       alert(JSON.stringify(values, null, 2));
     },
   });
+
   return (
     <div>
       <form
@@ -118,8 +137,42 @@ export const UserDataForm = (props: Props) => {
               onBlur={formik.handleBlur}
               error={formik.touched.email && Boolean(formik.errors.email)}
               helperText={formik.touched.email && formik.errors.email}
+              containerStyles={{ flex: 0.5 }}
+            />
+
+            <CustomSelect
+              id="nationality"
+              name="nationality"
+              inputLabel="Гражданство"
+              data={countries}
+              value={formik.values.nationality}
+              setValue={(val) => formik.setFieldValue("nationality", val)}
+              labelPosition={"left"}
+              containerStyles={{ flex: 0.5 }}
+              onBlur={formik.handleBlur}
+              error={formik.touched.email && Boolean(formik.errors.email)}
+              helperText={formik.touched.email && formik.errors.email}
             />
           </Stack>
+
+          <FormGroup sx={{ display: "flex", flexDirection: "column" }}>
+            <CustomLabelCheckbox
+              label="Пришлите мне подтверждение на телефон"
+              checked={formik.values.sendConfirmOnPhone}
+              handleChange={(val) =>
+                formik.setFieldValue("sendConfirmOnPhone", val)
+              }
+              defaultChecked
+            />
+            <CustomLabelCheckbox
+              label="Я хочу узнавать о специальных предложениях и новостях"
+              checked={formik.values.wantToKnowAboutSpecialOffersAndNews}
+              handleChange={(val) =>
+                formik.setFieldValue("wantToKnowAboutSpecialOffersAndNews", val)
+              }
+              defaultChecked
+            />
+          </FormGroup>
         </Stack>
       </form>
     </div>

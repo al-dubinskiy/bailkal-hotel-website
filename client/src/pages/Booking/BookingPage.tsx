@@ -899,7 +899,6 @@ export const BookingPage = () => {
 
         <CustomSelect
           inputLabel="Язык"
-          selectLabel="Язык 1"
           data={locales.map(({ id, label, value }) => ({
             id,
             label,

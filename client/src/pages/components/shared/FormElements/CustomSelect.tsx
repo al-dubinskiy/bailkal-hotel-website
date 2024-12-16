@@ -7,7 +7,7 @@ import Select, { SelectChangeEvent } from "@mui/material/Select";
 import { SxProps, Typography } from "@mui/material";
 import { theme } from "../../../../theme";
 
-type MenuItemType = {
+export type SelectItemType = {
   id: number;
   label: string;
   value: string;
@@ -17,15 +17,17 @@ interface Props {
   id?: string;
   name?: string;
   inputLabel: string;
-  selectLabel: string;
-  value: MenuItemType;
-  setValue?: (val: MenuItemType) => void;
-  data: MenuItemType[];
+  value: SelectItemType;
+  setValue?: (val: SelectItemType) => void;
+  data: SelectItemType[];
   onChange?: (event: React.ChangeEvent<HTMLInputElement>) => void;
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;
   error?: boolean | undefined;
   helperText?: string | false | undefined;
   customSelectStyle?: SxProps;
+  contentStyles?: SxProps;
+  containerStyles?: SxProps;
+  labelPosition?: "left" | "top";
 }
 
 export const CustomSelect = (props: Props) => {
@@ -33,15 +35,16 @@ export const CustomSelect = (props: Props) => {
     id = "simple-select",
     name,
     inputLabel,
-    selectLabel,
     value,
     setValue,
     data,
-    onChange,
     onBlur,
     error,
     helperText,
     customSelectStyle,
+    contentStyles,
+    containerStyles,
+    labelPosition = "top",
   } = props;
 
   const handleChange = (event: SelectChangeEvent | any) => {
@@ -54,15 +57,23 @@ export const CustomSelect = (props: Props) => {
   };
 
   return (
-    <Box sx={{ minWidth: 120 }}>
-      <FormControl fullWidth>
+    <Box sx={{ minWidth: 120, ...containerStyles }}>
+      <FormControl
+        fullWidth
+        sx={{
+          display: "flex",
+          flexDirection: labelPosition === "top" ? "column" : "row",
+          alignItems: labelPosition === "top" ? "flex-start" : "center",
+          gap: labelPosition === "top" ? 0 : "10px",
+        }}
+      >
         {inputLabel ? (
           <Typography
             variant="label"
             sx={{
-              textTransform: "uppercase",
+              textTransform: labelPosition === "top" ? "uppercase" : "normal",
               fontWeight: 400,
-              marginBottom: "10px",
+              marginBottom: labelPosition === "top" ? "10px" : "0",
             }}
           >
             {inputLabel}

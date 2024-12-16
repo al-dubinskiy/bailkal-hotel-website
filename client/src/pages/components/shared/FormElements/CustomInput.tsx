@@ -1,4 +1,4 @@
-import { TextField } from "@mui/material";
+import { SxProps, TextField } from "@mui/material";
 import React from "react";
 import { theme } from "../../../../theme";
 
@@ -13,6 +13,7 @@ interface Props {
   error?: boolean | undefined;
   helperText?: string | false | undefined;
   multiline?: boolean;
+  containerStyles?: SxProps;
 }
 
 export const CustomInput = (props: Props) => {
@@ -27,6 +28,7 @@ export const CustomInput = (props: Props) => {
     error,
     helperText,
     multiline = false,
+    containerStyles,
   } = props;
 
   return (
@@ -95,6 +97,8 @@ export const CustomInput = (props: Props) => {
           font: theme.typography.small,
           color: theme.palette.error.main,
         },
+
+        ...containerStyles,
       }}
     />
   );
