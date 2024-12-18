@@ -23,7 +23,9 @@ export const PaymentMethods = (props: Props) => {
   const {} = props;
   const dispatch = useAppDispatch();
   const { paymentMethods } = useAppSelector((state) => state.paymentMethods);
-  const { currentBooking } = useAppSelector((state) => state.bookings);
+  const { currentBooking, currentRoomCategory } = useAppSelector(
+    (state) => state.bookings
+  );
   const { updateBookingDraft, bookingProgressCurrentStep } =
     useContext(BookingContext);
 
@@ -142,10 +144,14 @@ export const PaymentMethods = (props: Props) => {
                 label={!isSelected ? "Выбрать" : "Выбрано"}
                 onClick={() => {
                   const { step: currentStep } = bookingProgressCurrentStep;
-                  if (currentStep) {
+                  if (currentStep && currentRoomCategory && currentBooking) {
                     updateBookingDraft({
-                      currentStep,
-                      tempBookingId: currentStep.roomId,
+                      currentStep: {
+                        ...currentStep,
+                        roomId: currentBooking.tempId,
+                      },
+                      tempBookingId: currentBooking.tempId,
+                      roomCategory: currentRoomCategory,
                       paymentMethodId: item._id,
                     });
                   }

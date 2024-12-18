@@ -41,6 +41,7 @@ export type CreateBookingLocalType = CreateBookingType & {
   roomPrice: number;
   tariffPrice: number;
   servicePriceTotal: number;
+  transferPrice: number;
   isRoomCategoryWasChanged: boolean;
 };
 

@@ -22,7 +22,9 @@ interface Props {
 export const ServicesItem = (props: Props) => {
   const { service, isIncludes, allServices } = props;
 
-  const { currentBooking } = useAppSelector((state) => state.bookings);
+  const { currentBooking, currentRoomCategory } = useAppSelector(
+    (state) => state.bookings
+  );
 
   const { updateBookingDraft, bookingProgressCurrentStep } =
     useContext(BookingContext);
@@ -162,10 +164,11 @@ export const ServicesItem = (props: Props) => {
               label={!isSelected ? "Выбрать" : "Выбрано"}
               onClick={() => {
                 const { step: currentStep } = bookingProgressCurrentStep;
-                if (currentStep) {
+                if (currentStep && currentRoomCategory) {
                   updateBookingDraft({
                     currentStep,
                     tempBookingId: currentStep.roomId,
+                    roomCategory: currentRoomCategory,
                     serviceId: service._id,
                     allServices,
                   });

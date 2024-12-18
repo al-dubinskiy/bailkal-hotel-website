@@ -211,9 +211,10 @@ export const TariffItem = (props: Props) => {
             label={!isSelected ? "Выбрать" : "Выбрано"}
             onClick={() => {
               const { step: currentStep } = bookingProgressCurrentStep;
-              if (currentStep) {
+              if (currentStep && roomCategory) {
                 updateBookingDraft({
                   currentStep,
+                  roomCategory,
                   tempBookingId: currentStep.roomId,
                   tariff: tariff,
                 });

@@ -245,9 +245,14 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
           label={"Да, поменять номер"}
           onClick={() => {
             const { step: currentStep } = bookingProgressCurrentStep;
-            if (currentStep && moreAdvantageousRoomCategory) {
+            if (
+              currentStep &&
+              moreAdvantageousRoomCategory &&
+              prevRoomCategory
+            ) {
               updateBookingDraft({
                 currentStep,
+                roomCategory: prevRoomCategory,
                 tempBookingId: currentStep.roomId,
                 newRoomCategory: {
                   ...moreAdvantageousRoomCategory,

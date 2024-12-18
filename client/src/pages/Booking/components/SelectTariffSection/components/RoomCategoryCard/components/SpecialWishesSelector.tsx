@@ -185,10 +185,11 @@ export const SpecialWishesSelector = memo((props: Props) => {
             );
             const { step: currentStep } = bookingProgressCurrentStep;
 
-            if (currentStep) {
+            if (currentStep && roomCategory) {
               updateBookingDraft({
                 currentStep,
                 tempBookingId: currentStep.roomId,
+                roomCategory,
                 bedTypeId:
                   selected && selected.id !== currentBooking?.bed_type_id
                     ? selected.id
@@ -206,10 +207,11 @@ export const SpecialWishesSelector = memo((props: Props) => {
             );
             const { step: currentStep } = bookingProgressCurrentStep;
 
-            if (currentStep) {
+            if (currentStep && roomCategory) {
               updateBookingDraft({
                 currentStep,
                 tempBookingId: currentStep.roomId,
+                roomCategory,
                 viewFromWindowId:
                   selected &&
                   selected.id !== currentBooking?.view_from_window_id

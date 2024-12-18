@@ -57,6 +57,9 @@ export const Content = (props: Props) => {
   const { transferVariants } = useAppSelector(
     (state) => state.transfersVariants
   );
+  const { currentRoomCategory: roomCategory } = useAppSelector(
+    (state) => state.bookings
+  );
 
   const [transferParams, setTransferParams] =
     useState<CreateTransferVariantType>({
@@ -348,9 +351,10 @@ export const Content = (props: Props) => {
             setTransfer={(comment) => {
               const transfer = getTransferVariant();
               const { step: currentStep } = bookingProgressCurrentStep;
-              if (currentStep && transfer) {
+              if (currentStep && transfer && roomCategory) {
                 updateBookingDraft({
                   currentStep,
+                  roomCategory,
                   tempBookingId: currentStep.roomId,
                   transferId: transfer._id,
                   transferComment: comment,

@@ -4,6 +4,7 @@ import { theme } from "../../../theme";
 import { CustomButton } from "../../components/shared/CustomButton";
 import { BookingContext } from "../BookingPage";
 import { useAppSelector } from "../../../hooks/redux";
+import { getBookingServicesInfo } from "../utils";
 
 interface Props {}
 
@@ -52,23 +53,23 @@ export const BookingInfoWidget = (props: Props) => {
     );
   };
 
-  const bookingGuests = useMemo(() => {
-    if (currentBooking) {
-      return filterParams.rooms.find((i) => i.id === currentBooking.tempId);
-    }
-    return false;
-  }, [filterParams, currentBooking]);
+  // const bookingGuests = useMemo(() => {
+  //   if (currentBooking) {
+  //     return filterParams.rooms.find((i) => i.id === currentBooking.tempId);
+  //   }
+  //   return false;
+  // }, [filterParams, currentBooking]);
 
-  const roomCategoryPrice = useMemo(() => {
-    if (bookingGuests && roomCategory) {
-      const questsTotal = bookingGuests.adults + bookingGuests.children;
+  // const roomCategoryPrice = useMemo(() => {
+  //   if (bookingGuests && roomCategory) {
+  //     const questsTotal = bookingGuests.adults + bookingGuests.children;
 
-      return questsTotal > 1
-        ? roomCategory.price_per_night_for_two_quest
-        : roomCategory.price_per_night_for_one_quest;
-    }
-    return 0;
-  }, [bookingGuests, roomCategory]);
+  //     return questsTotal > 1
+  //       ? roomCategory.price_per_night_for_two_quest
+  //       : roomCategory.price_per_night_for_one_quest;
+  //   }
+  //   return 0;
+  // }, [bookingGuests, roomCategory]);
 
   const bookingTariff = useMemo(
     () =>
@@ -79,16 +80,13 @@ export const BookingInfoWidget = (props: Props) => {
     [currentBooking, bookingTariffs]
   );
 
-  const bookingServicesList = useMemo(
-    () =>
-      (currentBooking &&
-        bookingServices &&
-        bookingServices.filter((i) =>
-          currentBooking.service_id.includes(i._id)
-        )) ||
-      null,
-    [currentBooking, bookingServices]
-  );
+  const bookingServicesList = useMemo(() => {
+    return getBookingServicesInfo({
+      bookingServices,
+      roomCategory,
+      currentBooking,
+    });
+  }, [currentBooking, bookingServices, roomCategory]);
 
   const paymentMethod = useMemo(
     () =>
@@ -101,7 +99,7 @@ export const BookingInfoWidget = (props: Props) => {
     [currentBooking, paymentMethods]
   );
 
-  if (!bookingGuests) return null;
+  // if (!bookingGuests) return null;
 
   if (!roomCategory || !currentBooking) return null;
 
@@ -114,6 +112,7 @@ export const BookingInfoWidget = (props: Props) => {
       ? "2 взрослых на одном месте"
       : null;
 
+  console.log(bookingServicesList);
   return (
     <Stack
       sx={{
@@ -175,7 +174,8 @@ export const BookingInfoWidget = (props: Props) => {
       </Box>
 
       <Typography variant="body" sx={{ margin: "10px auto" }}>
-        Номер: <span style={{ fontWeight: 600 }}>{roomCategoryPrice} ₽</span>
+        Номер:{" "}
+        <span style={{ fontWeight: 600 }}>{currentBooking.roomPrice} ₽</span>
       </Typography>
 
       <Typography
@@ -197,7 +197,7 @@ export const BookingInfoWidget = (props: Props) => {
           marginTop: "10px",
         }}
       >
-        {bookingGuests ? (
+        {currentBooking.adults_count + currentBooking.children_count ? (
           <Typography variant="label">{bookingGuestsCount}</Typography>
         ) : null}
 
@@ -214,7 +214,7 @@ export const BookingInfoWidget = (props: Props) => {
               variant="label"
               sx={{ textAlign: "center", fontWeight: 600, marginTop: "10px" }}
             >
-              Сервисы
+              Услуги
             </Typography>
 
             <Stack sx={{ alignItems: "stretch", gap: "5px" }}>
@@ -226,7 +226,9 @@ export const BookingInfoWidget = (props: Props) => {
                     sx={{ textAlign: "center" }}
                   >
                     {item.title}:{" "}
-                    <span style={{ fontWeight: 600 }}>{item.price} ₽</span>
+                    <span style={{ fontWeight: 600 }}>
+                      {item.price > 0 ? item.price + "₽" : "Вкл"}
+                    </span>
                   </Typography>
                 );
               })}
