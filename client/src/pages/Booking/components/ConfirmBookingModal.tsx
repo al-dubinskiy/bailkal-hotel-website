@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useMemo } from "react";
 import { CustomModal } from "../../components/shared/CustomModal/CustomModal";
 import { Stack, Typography } from "@mui/material";
 import { theme } from "../../../theme";
@@ -20,6 +20,10 @@ export const ConfirmBookingModal = (props: Props) => {
   );
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
   const { bookingServices } = useAppSelector((state) => state.bookingServices);
+  const { roomBedVariants } = useAppSelector((state) => state.roomBedVariants);
+  const { viewsFromRoomWindow } = useAppSelector(
+    (state) => state.viewsFromRoomWindow
+  );
 
   if (!currentBooking || !currentRoomCategory) return null;
 
@@ -50,6 +54,26 @@ export const ConfirmBookingModal = (props: Props) => {
       roomCategory,
       currentBooking,
     });
+
+    const bedTypeSpecialWish = useMemo(
+      () =>
+        (currentBooking &&
+          roomBedVariants &&
+          roomBedVariants.find((i) => i._id === currentBooking.bed_type_id)) ||
+        null,
+      [currentBooking, roomBedVariants]
+    );
+
+    const viewsFromRoomWindowSpecialWish = useMemo(
+      () =>
+        (currentBooking &&
+          viewsFromRoomWindow &&
+          viewsFromRoomWindow.find(
+            (i) => i._id === currentBooking.view_from_window_id
+          )) ||
+        null,
+      [currentBooking, viewsFromRoomWindow]
+    );
 
     return (
       <Stack

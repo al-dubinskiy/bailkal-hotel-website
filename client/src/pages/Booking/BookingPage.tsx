@@ -334,6 +334,21 @@ export const BookingPage = () => {
       viewFromWindowId?: string;
       paymentMethodId?: string;
     }) => {
+      const getRoomCategoryPrice = ({
+        room,
+        roomCategory,
+      }: {
+        room: RoomGuestsCountType;
+        roomCategory: RoomCategoryType;
+      }) => {
+        // Подсчитываем количество гостей комнаты
+        const roomGuestsCount = room.adults + room.children;
+        // Получаем стоимость категории комнаты
+        return roomGuestsCount > 1
+          ? roomCategory.price_per_night_for_two_quest
+          : roomCategory.price_per_night_for_one_quest;
+      };
+
       // Проверяем правильно ли переданы данные и соответствуют ли они друг другу
       if (
         tempBookingId &&
@@ -404,72 +419,75 @@ export const BookingPage = () => {
             );
           }
         }
-        // Подсчитываем количество гостей комнаты
-        const room = filterParams.rooms.find(
-          (i) => i.id === currentStep.roomId
-        );
+        // Для одиночного режима бронирования
+        if (currentStep.name === "Select a room") {
+          // Получить id всех комнат, которые забронированы на данную категорию
+          const bookedRoomsOnCategory = Array.from(
+            newBookings.bookings.filter(
+              (i) => i.room_category_id === roomCategory._id
+            ),
+            (i) => i.room_id
+          );
+          // Найти id доступной комнаты для бронирования
+          const freeRoomId = roomCategory.room_id.find(
+            (i) => !bookedRoomsOnCategory.includes(i)
+          );
 
-        if (room) {
-          const roomGuestsCount = room.adults + room.children;
-          // Получаем стоимость категории комнаты
-          const roomPrice =
-            roomGuestsCount > 1
-              ? roomCategory.price_per_night_for_two_quest
-              : roomCategory.price_per_night_for_one_quest;
+          if (freeRoomId) {
+            const roomPrice = getRoomCategoryPrice({
+              room: filterParams.rooms[0], // при одиночном бронирования только одна комната в списке
+              roomCategory,
+            });
 
-          if (currentStep.name === "Select a room") {
-            // Получить id всех комнат, которые забронированы на данную категорию
-            const bookedRoomsOnCategory = Array.from(
-              newBookings.bookings.filter(
-                (i) => i.room_category_id === roomCategory._id
-              ),
-              (i) => i.room_id
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i, index) => {
+                  if (index === 0) {
+                    return {
+                      ...i,
+                      room_category_id: roomCategory._id,
+                      room_id: freeRoomId,
+                      tariffPrice: 0,
+                      servicePriceTotal: 0,
+                      roomPrice,
+                      price: roomPrice + i.transferPrice, // добавить цену трансфера, если он ранее был выбран, а после была заменена категория комнаты
+                      service_id: [],
+                      tariff_id: "",
+                      bed_type_id: "",
+                      view_from_window_id: "",
+                    };
+                  }
+                  return i;
+                }),
+              })
             );
-            // Найти id доступной комнаты для бронирования
-            const freeRoomId = roomCategory.room_id.find(
-              (i) => !bookedRoomsOnCategory.includes(i)
-            );
 
-            if (freeRoomId) {
-              dispatch(
-                setNewBookings({
-                  ...newBookings,
-                  bookings: newBookings.bookings.map((i) => {
-                    if (i.tempId === tempBookingId) {
-                      return {
-                        ...i,
-                        room_category_id: roomCategory._id,
-                        room_id: freeRoomId,
-                        tariffPrice: 0,
-                        servicePriceTotal: 0,
-                        roomPrice,
-                        price: roomPrice + i.transferPrice,
-                        // Сбросить все остальные данные
-                        service_id: [],
-                        tariff_id: "",
-                        bed_type_id: "",
-                        view_from_window_id: "",
-                      };
-                    }
-                    return i;
-                  }),
-                })
-              );
+            // Установить флаг complete для текущего шага и перейти к следующему шагу
+            toNextStep(true);
+          }
+        } else if (currentStep.name === "Select a tariff") {
+          if (tariff) {
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i) => {
+                  if (i.tempId === tempBookingId) {
+                    const room = filterParams.rooms.find(
+                      (j) => j.id === i.tempId
+                    );
 
-              // Установить флаг complete для текущего шага и перейти к следующему шану
-              toNextStep(true);
-            }
-          } else if (currentStep.name === "Select a tariff") {
-            if (tariff) {
-              dispatch(
-                setNewBookings({
-                  ...newBookings,
-                  bookings: newBookings.bookings.map((i) => {
-                    if (i.tempId === tempBookingId) {
+                    if (room) {
+                      const roomPrice = getRoomCategoryPrice({
+                        room,
+                        roomCategory,
+                      });
+
                       return {
                         ...i,
                         tariff_id: tariff._id,
                         tariffPrice: tariff.cost,
+                        roomPrice,
                         price:
                           roomPrice +
                           tariff.cost +
@@ -477,99 +495,94 @@ export const BookingPage = () => {
                           i.transferPrice,
                       };
                     }
-                    return i;
-                  }),
-                })
-              );
+                  }
 
-              // Установить флаг complete для текущего шага и перейти к следующему шану
-              toNextStep(true);
-            }
-          } else if (currentStep.name === "Order services") {
-            if (allServices && serviceId) {
-              // console.log(allServices);
-              // console.log(serviceId);
-              // console.log(tempBookingId);
-              dispatch(
-                setNewBookings({
-                  ...newBookings,
-                  bookings: newBookings.bookings.map((i) => {
-                    if (i.tempId === tempBookingId) {
-                      // Если сервис еще не добавлен, то добавить, если есть - исключить
-                      const servicesIds = !i.service_id.includes(serviceId)
-                        ? [...i.service_id, serviceId]
-                        : i.service_id.filter((j) => j !== serviceId);
-                      const priceTotal = allServices
-                        .filter((j) => servicesIds.includes(j._id))
-                        .reduce((acc, cur) => {
-                          return (acc += cur.price);
-                        }, 0);
+                  return i;
+                }),
+              })
+            );
 
-                      return {
-                        ...i,
-                        service_id: servicesIds,
-                        servicePriceTotal: priceTotal,
-                        price:
-                          roomPrice +
-                          i.tariffPrice +
-                          priceTotal +
-                          i.transferPrice,
-                      };
-                    }
-                    return i;
-                  }),
-                })
-              );
-            } else if (transferId) {
-              dispatch(
-                setNewBookings({
-                  ...newBookings,
-                  bookings: newBookings.bookings.map((i) => {
-                    if (i.tempId === tempBookingId) {
-                      const transferPrice =
-                        (transferVariants &&
-                          transferVariants.find((j) => j._id === transferId)
-                            ?.price) ||
-                        0;
-                      return {
-                        ...i,
-                        transfer_id: transferId,
-                        transfer_comment: transferComment
-                          ? transferComment
-                          : "",
-                        transferPrice,
-                        price:
-                          roomPrice +
-                          i.tariffPrice +
-                          i.servicePriceTotal +
-                          transferPrice,
-                      };
-                    }
-                    return i;
-                  }),
-                })
-              );
-            }
-          } else if (currentStep.name === "Enter guest details") {
-            console.log("fsfs", paymentMethodId);
-            if (paymentMethodId) {
-              dispatch(
-                setNewBookings({
-                  ...newBookings,
-                  bookings: newBookings.bookings.map((i) => {
+            // Установить флаг complete для текущего шага и перейти к следующему шану
+            toNextStep(true);
+          }
+        } else if (currentStep.name === "Order services") {
+          if (allServices && serviceId) {
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i) => {
+                  if (i.tempId === tempBookingId) {
+                    // Если сервис еще не добавлен, то добавить, если есть - исключить
+                    const servicesIds = !i.service_id.includes(serviceId)
+                      ? [...i.service_id, serviceId]
+                      : i.service_id.filter((j) => j !== serviceId);
+                    const servicePriceTotal = allServices
+                      .filter((j) => servicesIds.includes(j._id))
+                      .reduce((acc, cur) => {
+                        return (acc += cur.price);
+                      }, 0);
+
                     return {
                       ...i,
-                      payment_method_id: paymentMethodId,
+                      service_id: servicesIds,
+                      servicePriceTotal,
+                      price:
+                        i.roomPrice +
+                        i.tariffPrice +
+                        servicePriceTotal +
+                        i.transferPrice,
                     };
-                  }),
-                })
-              );
-            }
+                  }
+                  return i;
+                }),
+              })
+            );
+          } else if (transferId !== undefined) {
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i) => {
+                  const transferPrice =
+                    (transferVariants &&
+                      transferVariants.find((j) => j._id === transferId)
+                        ?.price) ||
+                    0;
+
+                  return {
+                    ...i,
+                    transfer_id: transferId,
+                    transfer_comment: transferComment ? transferComment : "",
+                    transferPrice,
+                    price:
+                      i.roomPrice +
+                      i.tariffPrice +
+                      i.servicePriceTotal +
+                      transferPrice,
+                  };
+
+                  return i;
+                }),
+              })
+            );
+          }
+        } else if (currentStep.name === "Enter guest details") {
+          if (paymentMethodId) {
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i) => {
+                  return {
+                    ...i,
+                    payment_method_id: paymentMethodId,
+                  };
+                }),
+              })
+            );
           }
         }
       }
     },
-    [bookingSteps, bookings, roomsCategories, newBookings]
+    [bookingSteps, bookings, roomsCategories, newBookings, transferVariants]
   );
 
   const createNewBookingDraft = ({
@@ -1235,6 +1248,7 @@ export const BookingPage = () => {
           (i) => i.tempId === bookingProgress.currentStep.step?.roomId
         );
       } else {
+        // Для шага "Enter a guests details", который попросту не привязывается к id бронирования
         if (currentBooking) {
           a = newBookings.bookings.find(
             (i) => i.tempId === currentBooking.tempId

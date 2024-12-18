@@ -1,5 +1,5 @@
 import { Box, Stack, SxProps, Typography } from "@mui/material";
-import React, { useContext, useState } from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { CustomInput } from "../../../../../../components/shared/FormElements/CustomInput";
 import { CustomIconLabel } from "../../../../../../components/shared/CustomIconLabel";
 import { PeoplesIcon } from "../../../../../../../assets/icons/PeoplesIcon";
@@ -8,6 +8,7 @@ import { theme } from "../../../../../../../theme";
 import { BookingContext } from "../../../../../BookingPage";
 
 interface Props {
+  comment: string;
   setComment: (val: string) => void;
   setTransfer: (comment: string) => void;
   transferPrice: number;
@@ -15,13 +16,18 @@ interface Props {
 }
 
 export const ArrivalStepContent = (props: Props) => {
-  const { setComment, setTransfer, transferPrice, containerStyles } = props;
+  const { comment, setComment, setTransfer, transferPrice, containerStyles } =
+    props;
   const [input, setInput] = useState<string>("");
 
   const orderTransfer = () => {
     setComment(input);
     setTransfer(input);
   };
+
+  useEffect(() => {
+    setInput(comment);
+  }, [comment]);
 
   return (
     <Stack sx={{ alignItems: "stretch", gap: "24px", ...containerStyles }}>

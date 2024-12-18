@@ -57,9 +57,10 @@ export const Content = (props: Props) => {
   const { transferVariants } = useAppSelector(
     (state) => state.transfersVariants
   );
-  const { currentRoomCategory: roomCategory } = useAppSelector(
-    (state) => state.bookings
-  );
+  const {
+    currentRoomCategory: roomCategory,
+    currentBooking: oneOfTheBookings,
+  } = useAppSelector((state) => state.bookings);
 
   const [transferParams, setTransferParams] =
     useState<CreateTransferVariantType>({
@@ -103,11 +104,17 @@ export const Content = (props: Props) => {
     const currentStepIdx = steps.findIndex((i) => i.isCurrent);
     const lastCompleteIdx = findLastIndex(steps, (i) => i.isComplete);
 
+    console.log(transferParams);
+    console.log(steps);
+    // console.log(stepIdx);
+    // console.log(currentStepIdx);
+    // console.log(lastCompleteIdx);
     if (stepIdx !== -1 && currentStepIdx !== -1) {
       // Если произошло нажатие на предыдущие (пройденные) шаги или на первый шаг, следующий после последнего пройденного
       if (
         stepIdx < currentStepIdx ||
-        (lastCompleteIdx !== -1 && lastCompleteIdx + 1 === stepIdx)
+        (lastCompleteIdx !== -1 && lastCompleteIdx + 1 === stepIdx) ||
+        stepIdx <= lastCompleteIdx
       ) {
         setSteps((prev) =>
           prev.map((i) => ({
@@ -183,11 +190,30 @@ export const Content = (props: Props) => {
           }))
         );
       }
+      if (transferParams.comment && !steps[2].isComplete && currentIdx === 2) {
+        setSteps((prev) =>
+          prev.map((i, idx) => ({
+            ...i,
+            isComplete: idx === currentIdx ? true : i.isComplete,
+          }))
+        );
+      } else if (
+        !transferParams.comment &&
+        steps[2].isComplete &&
+        currentIdx === 2
+      ) {
+        setSteps((prev) =>
+          prev.map((i, idx) => ({
+            ...i,
+            isComplete: idx === currentIdx ? false : i.isComplete,
+          }))
+        );
+      }
     }
-  }, [transferParams]);
+  }, [transferParams, steps]);
 
   useEffect(() => {
-    if (transferDirection) {
+    if (transferDirection && oneOfTheBookings && transferVariants) {
       setTransferDirection((prev) =>
         prev.map((i) => {
           // Установка выбранного типа направления маршрута для переключателя
@@ -220,7 +246,39 @@ export const Content = (props: Props) => {
     transferParams.to_hotel,
     transferParams.time_from,
     transferParams.time_to,
+    oneOfTheBookings,
   ]);
+
+  // Синхронизация параметров трансфера с только что установленным трансфером для букингов
+  const updateTransferParams = useCallback(() => {
+    if (oneOfTheBookings && transferVariants) {
+      const orderedTransferId = oneOfTheBookings.transfer_id;
+      const orderedTransferComment = oneOfTheBookings.transfer_comment;
+      if (orderedTransferId) {
+        const orderedTransfer =
+          transferVariants.find(
+            (i) => i._id === oneOfTheBookings.transfer_id
+          ) || null;
+
+        if (orderedTransfer) {
+          setTransferParams((prev) => ({
+            ...prev,
+            time_from: orderedTransfer.time_from,
+            time_to: orderedTransfer.time_to,
+            from_hotel: orderedTransfer.from_hotel,
+            to_hotel: orderedTransfer.to_hotel,
+            car_id: orderedTransfer.car_id,
+            comment: orderedTransferComment || "",
+            price: orderedTransfer.price,
+          }));
+        }
+      }
+    }
+  }, [oneOfTheBookings, transferVariants]);
+
+  useEffect(() => {
+    updateTransferParams();
+  }, [updateTransferParams]);
 
   const getTransferVariant = (): TransferVariantType | null => {
     if (
@@ -234,7 +292,8 @@ export const Content = (props: Props) => {
           i.from_hotel === transferParams.from_hotel &&
           i.to_hotel === transferParams.to_hotel &&
           i.time_from === transferParams.time_from &&
-          i.time_to === transferParams.time_to
+          i.time_to === transferParams.time_to &&
+          i.car_id === transferParams.car_id
       );
 
       if (transfer) {
@@ -255,6 +314,16 @@ export const Content = (props: Props) => {
   }, [transferVariants, transferParams]);
 
   const removeTransferDraft = () => {
+    const { step: currentStep } = bookingProgressCurrentStep;
+    if (currentStep && roomCategory) {
+      updateBookingDraft({
+        currentStep,
+        roomCategory,
+        tempBookingId: currentStep.roomId,
+        transferId: "",
+        transferComment: "",
+      });
+    }
     setTransferParams({
       from_hotel: false,
       to_hotel: false,
@@ -342,6 +411,7 @@ export const Content = (props: Props) => {
           />
 
           <ArrivalStepContent
+            comment={transferParams.comment}
             setComment={(val) => {
               setTransferParams((prev) => ({
                 ...prev,

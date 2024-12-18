@@ -1,5 +1,5 @@
 import React, { useContext, useMemo } from "react";
-import { Box, Button, Stack, Typography } from "@mui/material";
+import { Box, Button, Stack, SxProps, Typography } from "@mui/material";
 import { theme } from "../../../theme";
 import { CustomButton } from "../../components/shared/CustomButton";
 import { BookingContext } from "../BookingPage";
@@ -14,6 +14,14 @@ export const BookingInfoWidget = (props: Props) => {
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
   const { bookingServices } = useAppSelector((state) => state.bookingServices);
   const { paymentMethods } = useAppSelector((state) => state.paymentMethods);
+  const { roomBedVariants } = useAppSelector((state) => state.roomBedVariants);
+  const { viewsFromRoomWindow } = useAppSelector(
+    (state) => state.viewsFromRoomWindow
+  );
+  const { transferVariants } = useAppSelector(
+    (state) => state.transfersVariants
+  );
+  const { transferCars } = useAppSelector((state) => state.transfersCars);
   const {
     currentBooking,
     currentRoomCategory: roomCategory,
@@ -53,24 +61,6 @@ export const BookingInfoWidget = (props: Props) => {
     );
   };
 
-  // const bookingGuests = useMemo(() => {
-  //   if (currentBooking) {
-  //     return filterParams.rooms.find((i) => i.id === currentBooking.tempId);
-  //   }
-  //   return false;
-  // }, [filterParams, currentBooking]);
-
-  // const roomCategoryPrice = useMemo(() => {
-  //   if (bookingGuests && roomCategory) {
-  //     const questsTotal = bookingGuests.adults + bookingGuests.children;
-
-  //     return questsTotal > 1
-  //       ? roomCategory.price_per_night_for_two_quest
-  //       : roomCategory.price_per_night_for_one_quest;
-  //   }
-  //   return 0;
-  // }, [bookingGuests, roomCategory]);
-
   const bookingTariff = useMemo(
     () =>
       (currentBooking &&
@@ -99,7 +89,44 @@ export const BookingInfoWidget = (props: Props) => {
     [currentBooking, paymentMethods]
   );
 
-  // if (!bookingGuests) return null;
+  const bedTypeSpecialWish = useMemo(
+    () =>
+      (currentBooking &&
+        roomBedVariants &&
+        roomBedVariants.find((i) => i._id === currentBooking.bed_type_id)) ||
+      null,
+    [currentBooking, roomBedVariants]
+  );
+
+  const viewsFromRoomWindowSpecialWish = useMemo(
+    () =>
+      (currentBooking &&
+        viewsFromRoomWindow &&
+        viewsFromRoomWindow.find(
+          (i) => i._id === currentBooking.view_from_window_id
+        )) ||
+      null,
+    [currentBooking, viewsFromRoomWindow]
+  );
+
+  const transfer = useMemo(
+    () =>
+      (currentBooking &&
+        transferVariants &&
+        transferVariants.find((i) => i._id === currentBooking.transfer_id)) ||
+      null,
+    [currentBooking, transferVariants]
+  );
+
+  const transferCar = useMemo(
+    () =>
+      (currentBooking &&
+        transfer &&
+        transferCars &&
+        transferCars.find((i) => i._id === transfer.car_id)) ||
+      null,
+    [currentBooking, transferCars, transfer]
+  );
 
   if (!roomCategory || !currentBooking) return null;
 
@@ -112,7 +139,32 @@ export const BookingInfoWidget = (props: Props) => {
       ? "2 взрослых на одном месте"
       : null;
 
-  console.log(bookingServicesList);
+  const ValueContainer = ({
+    children,
+    containerStyles,
+  }: {
+    children: any;
+    containerStyles?: SxProps;
+  }) => {
+    return (
+      <Box
+        sx={{
+          background: theme.palette.primary.extraLight,
+          borderRadius: "16px",
+          padding: "12px 24px",
+          display: "flex",
+          justifyContent: "center",
+          alignItems: "center",
+          flexDirection: "row",
+          gap: "10px",
+          ...containerStyles,
+        }}
+      >
+        {children}
+      </Box>
+    );
+  };
+
   return (
     <Stack
       sx={{
@@ -123,37 +175,17 @@ export const BookingInfoWidget = (props: Props) => {
         boxShadow: "0px 3.2px 16px rgba(0, 0, 0, 0.25)",
       }}
     >
-      <Box
-        sx={{
-          background: theme.palette.primary.extraLight,
-          borderRadius: "16px",
-          padding: "24px",
-          display: "flex",
-          justifyContent: "center",
-          alignItems: "center",
-        }}
-      >
+      <ValueContainer containerStyles={{ padding: "24px" }}>
         <Typography variant="h7" sx={{ fontWeight: 600, alignSelf: "center" }}>
           Ваше бронирование
         </Typography>
-      </Box>
+      </ValueContainer>
 
       <Typography variant="body" sx={{ margin: "10px auto" }}>
         <span style={{ fontWeight: 600 }}>1</span> ночь
       </Typography>
 
-      <Box
-        sx={{
-          background: theme.palette.primary.extraLight,
-          borderRadius: "16px",
-          padding: "12px 24px",
-          display: "flex",
-          flexDirection: "row",
-          justifyContent: "center",
-          alignItems: "center",
-          gap: "10px",
-        }}
-      >
+      <ValueContainer>
         <BookingDateInfo
           dayNumber={"15"}
           month={"Октябрь"}
@@ -171,7 +203,7 @@ export const BookingInfoWidget = (props: Props) => {
           time={"До 12:00"}
           dateType="departure"
         />
-      </Box>
+      </ValueContainer>
 
       <Typography variant="body" sx={{ margin: "10px auto" }}>
         Номер:{" "}
@@ -185,17 +217,8 @@ export const BookingInfoWidget = (props: Props) => {
         {roomCategory.title}
       </Typography>
 
-      <Box
-        sx={{
-          background: theme.palette.primary.extraLight,
-          borderRadius: "16px",
-          padding: "12px 24px",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: "5px",
-          marginTop: "10px",
-        }}
+      <ValueContainer
+        containerStyles={{ flexDirection: "column", marginTop: "10px" }}
       >
         {currentBooking.adults_count + currentBooking.children_count ? (
           <Typography variant="label">{bookingGuestsCount}</Typography>
@@ -207,42 +230,150 @@ export const BookingInfoWidget = (props: Props) => {
             <span style={{ fontWeight: 600 }}>{bookingTariff.cost} ₽</span>
           </Typography>
         ) : null}
+      </ValueContainer>
 
-        {bookingServicesList && bookingServicesList.length ? (
-          <>
-            <Typography
-              variant="label"
-              sx={{ textAlign: "center", fontWeight: 600, marginTop: "10px" }}
-            >
-              Услуги
+      {bookingServicesList && bookingServicesList.length ? (
+        <>
+          <Typography
+            variant="label"
+            sx={{ textAlign: "center", fontWeight: 600, marginTop: "10px" }}
+          >
+            Услуги
+          </Typography>
+
+          <Box
+            sx={{
+              background: theme.palette.primary.extraLight,
+              borderRadius: "16px",
+              padding: "12px 24px",
+              display: "flex",
+              flexDirection: "column",
+              alignItems: "center",
+              gap: "5px",
+              marginTop: "10px",
+            }}
+          >
+            {bookingServicesList.map((item, index) => {
+              return (
+                <Typography
+                  key={index}
+                  variant="body"
+                  sx={{ textAlign: "center" }}
+                >
+                  {item.title}:{" "}
+                  <span style={{ fontWeight: 600 }}>
+                    {item.price > 0 ? item.price + "₽" : "Вкл"}
+                  </span>
+                </Typography>
+              );
+            })}
+          </Box>
+        </>
+      ) : null}
+
+      {bedTypeSpecialWish || viewsFromRoomWindowSpecialWish ? (
+        <>
+          <Typography
+            variant="body"
+            sx={{
+              textAlign: "center",
+              margin: "10px 0px",
+              fontWeight: 600,
+            }}
+          >
+            Особые пожелания
+          </Typography>
+
+          <ValueContainer containerStyles={{ flexDirection: "column" }}>
+            {bedTypeSpecialWish ? (
+              <Typography variant="body" sx={{ textAlign: "center" }}>
+                Тип кровати:{" "}
+                <span style={{ fontWeight: 600 }}>
+                  {bedTypeSpecialWish.title}
+                </span>
+              </Typography>
+            ) : null}
+
+            {viewsFromRoomWindowSpecialWish ? (
+              <Typography variant="body" sx={{ textAlign: "center" }}>
+                Вид из окна:{" "}
+                <span style={{ fontWeight: 600 }}>
+                  {viewsFromRoomWindowSpecialWish.title}
+                </span>
+              </Typography>
+            ) : null}
+          </ValueContainer>
+        </>
+      ) : null}
+
+      {transfer ? (
+        <>
+          <Typography
+            variant="body"
+            sx={{
+              textAlign: "center",
+              margin: "10px 0px",
+              fontWeight: 600,
+            }}
+          >
+            Трансфер
+          </Typography>
+
+          <ValueContainer containerStyles={{ flexDirection: "column" }}>
+            <Typography variant="body" sx={{ textAlign: "center" }}>
+              Направление:{" "}
+              <span style={{ fontWeight: 600 }}>
+                {transfer.from_hotel
+                  ? "В отель"
+                  : transfer.to_hotel
+                  ? "Из отеля"
+                  : ""}
+              </span>
             </Typography>
 
-            <Stack sx={{ alignItems: "stretch", gap: "5px" }}>
-              {bookingServicesList.map((item, index) => {
-                return (
-                  <Typography
-                    key={index}
-                    variant="body"
-                    sx={{ textAlign: "center" }}
-                  >
-                    {item.title}:{" "}
-                    <span style={{ fontWeight: 600 }}>
-                      {item.price > 0 ? item.price + "₽" : "Вкл"}
-                    </span>
-                  </Typography>
-                );
-              })}
-            </Stack>
-          </>
-        ) : null}
+            <Typography variant="body" sx={{ textAlign: "center" }}>
+              Время:{" "}
+              <span style={{ fontWeight: 600 }}>
+                {transfer.time_from + "-" + transfer.time_to}
+              </span>
+            </Typography>
 
-        {paymentMethod ? (
-          <Typography variant="body" sx={{ textAlign: "center" }}>
-            Способ оплаты:{" "}
-            <span style={{ fontWeight: 600 }}>{paymentMethod.title}</span>
+            <Typography variant="body" sx={{ textAlign: "center" }}>
+              Тип транспорта:{" "}
+              <span style={{ fontWeight: 600 }}>
+                {transferCar
+                  ? transferCar.brand + " " + transferCar.model
+                  : "Не указано"}
+              </span>
+            </Typography>
+
+            <Typography variant="body" sx={{ textAlign: "center" }}>
+              Цена: <span style={{ fontWeight: 600 }}>{transfer.price} ₽</span>
+            </Typography>
+          </ValueContainer>
+        </>
+      ) : null}
+
+      {paymentMethod ? (
+        <>
+          <Typography
+            variant="body"
+            sx={{
+              textAlign: "center",
+              margin: "10px 0px",
+              fontWeight: 600,
+            }}
+          >
+            Способ оплаты
           </Typography>
-        ) : null}
-      </Box>
+
+          <ValueContainer>
+            <Typography variant="body" sx={{ textAlign: "center" }}>
+              {paymentMethod.title}
+            </Typography>
+          </ValueContainer>
+        </>
+      ) : null}
 
       <Stack
         sx={{
@@ -268,10 +399,7 @@ export const BookingInfoWidget = (props: Props) => {
               fontSize: "20.8px",
             }}
           >
-            {currentBooking.roomPrice +
-              currentBooking.tariffPrice +
-              currentBooking.servicePriceTotal}{" "}
-            ₽
+            {currentBooking.price} ₽
           </Typography>
         </Box>
 
