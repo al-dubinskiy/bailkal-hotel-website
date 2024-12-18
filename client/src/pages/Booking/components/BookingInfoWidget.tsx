@@ -11,6 +11,8 @@ export const BookingInfoWidget = (props: Props) => {
   const {} = props;
   const { bookingProgressCurrentStep, toNextStep } = useContext(BookingContext);
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
+  const { bookingServices } = useAppSelector((state) => state.bookingServices);
+  const { paymentMethods } = useAppSelector((state) => state.paymentMethods);
   const {
     currentBooking,
     currentRoomCategory: roomCategory,
@@ -68,15 +70,40 @@ export const BookingInfoWidget = (props: Props) => {
     return 0;
   }, [bookingGuests, roomCategory]);
 
+  const bookingTariff = useMemo(
+    () =>
+      (currentBooking &&
+        bookingTariffs &&
+        bookingTariffs.find((i) => i._id === currentBooking.tariff_id)) ||
+      null,
+    [currentBooking, bookingTariffs]
+  );
+
+  const bookingServicesList = useMemo(
+    () =>
+      (currentBooking &&
+        bookingServices &&
+        bookingServices.filter((i) =>
+          currentBooking.service_id.includes(i._id)
+        )) ||
+      null,
+    [currentBooking, bookingServices]
+  );
+
+  const paymentMethod = useMemo(
+    () =>
+      (currentBooking &&
+        paymentMethods &&
+        paymentMethods.find(
+          (i) => i._id === currentBooking.payment_method_id
+        )) ||
+      null,
+    [currentBooking, paymentMethods]
+  );
+
   if (!bookingGuests) return null;
 
   if (!roomCategory || !currentBooking) return null;
-
-  const bookingTariff =
-    (currentBooking &&
-      bookingTariffs &&
-      bookingTariffs.find((i) => i._id === currentBooking.tariff_id)) ||
-    null;
 
   const bookingGuestsCount =
     currentBooking.children_count == 1
@@ -178,6 +205,39 @@ export const BookingInfoWidget = (props: Props) => {
           <Typography variant="body" sx={{ textAlign: "center" }}>
             {bookingTariff.title}:{" "}
             <span style={{ fontWeight: 600 }}>{bookingTariff.cost} ₽</span>
+          </Typography>
+        ) : null}
+
+        {bookingServicesList && bookingServicesList.length ? (
+          <>
+            <Typography
+              variant="label"
+              sx={{ textAlign: "center", fontWeight: 600, marginTop: "10px" }}
+            >
+              Сервисы
+            </Typography>
+
+            <Stack sx={{ alignItems: "stretch", gap: "5px" }}>
+              {bookingServicesList.map((item, index) => {
+                return (
+                  <Typography
+                    key={index}
+                    variant="body"
+                    sx={{ textAlign: "center" }}
+                  >
+                    {item.title}:{" "}
+                    <span style={{ fontWeight: 600 }}>{item.price} ₽</span>
+                  </Typography>
+                );
+              })}
+            </Stack>
+          </>
+        ) : null}
+
+        {paymentMethod ? (
+          <Typography variant="body" sx={{ textAlign: "center" }}>
+            Способ оплаты:{" "}
+            <span style={{ fontWeight: 600 }}>{paymentMethod.title}</span>
           </Typography>
         ) : null}
       </Box>

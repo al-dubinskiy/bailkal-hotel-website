@@ -7,6 +7,7 @@ import React, {
 } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
+  BookingStepNameType,
   BookingStepType,
   BookingType,
   BookingUserInfoType,
@@ -102,6 +103,7 @@ export const BookingContext = createContext<{
     transferComment,
     allServices,
     newRoomCategory,
+    paymentMethodId,
   }: {
     tempBookingId: string;
     currentStep: BookingStepType;
@@ -115,6 +117,7 @@ export const BookingContext = createContext<{
     bedTypeId?: string;
     viewFromWindowId?: string;
     newRoomCategory?: RoomCategoryType & { additionalPayment: number };
+    paymentMethodId?: string;
   }) => void;
   bookingProgressCurrentStep: BookingProgressStepType;
   toPrevStep: () => void;
@@ -138,9 +141,8 @@ export const BookingPage = () => {
     (state) => state.unavailableBookingDates
   );
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
-  const { bookings, newBookings, bookingSteps, filterParams } = useAppSelector(
-    (state) => state.bookings
-  );
+  const { bookings, newBookings, bookingSteps, filterParams, currentBooking } =
+    useAppSelector((state) => state.bookings);
   const [curLocale, setCurLocale] = useState<LocaleType>(locales[0]);
   const [promoCode, setPromoCode] = useState<string | null>(null);
   const [userInfo, setUserInfo] = useState<BookingUserInfoType>({
@@ -314,6 +316,7 @@ export const BookingPage = () => {
       newRoomCategory,
       bedTypeId,
       viewFromWindowId,
+      paymentMethodId,
     }: {
       tempBookingId: string;
       currentStep: BookingStepType;
@@ -326,11 +329,12 @@ export const BookingPage = () => {
       newRoomCategory?: RoomCategoryType & { additionalPayment: number };
       bedTypeId?: string;
       viewFromWindowId?: string;
+      paymentMethodId?: string;
     }) => {
       // Проверяем правильно ли переданы данные и соответствуют ли они друг другу
       if (
-        tempBookingId &&
-        currentStep.roomId === tempBookingId &&
+        ((tempBookingId && currentStep.roomId === tempBookingId) ||
+          tempBookingId === "") &&
         bookings &&
         roomsCategories
       ) {
@@ -350,7 +354,10 @@ export const BookingPage = () => {
                       room_category_id: newRoomCategory._id,
                       roomPrice:
                         i.roomPrice + newRoomCategory.additionalPayment,
+                      tariffPrice: 0,
+                      servicePriceTotal: 0,
                       tariff_id: "",
+                      service_id: [],
                       view_from_window_id: "",
                       bed_type_id: "",
                       isRoomCategoryWasChanged: true,
@@ -360,6 +367,8 @@ export const BookingPage = () => {
                 }),
               })
             );
+
+            toSpecificStep("Select a tariff");
           } else if (bedTypeId !== undefined) {
             dispatch(
               setNewBookings({
@@ -501,6 +510,20 @@ export const BookingPage = () => {
                     };
                   }
                   return i;
+                }),
+              })
+            );
+          }
+        } else if (currentStep.name === "Enter guest details") {
+          if (paymentMethodId) {
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i) => {
+                  return {
+                    ...i,
+                    payment_method_id: paymentMethodId,
+                  };
                 }),
               })
             );
@@ -1030,6 +1053,20 @@ export const BookingPage = () => {
     };
   }, [bookingSteps]);
 
+  const toSpecificStep = (stepName: BookingStepNameType) => {
+    const nextStepIdx = bookingSteps.findIndex((i) => i.name === stepName);
+    if (nextStepIdx) {
+      dispatch(
+        setBookingSteps(
+          bookingSteps.map((item, idx) => ({
+            ...item,
+            isCurrent: idx === nextStepIdx ? true : false,
+          }))
+        )
+      );
+    }
+  };
+
   const toPrevStep = () => {
     const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
     if (curIdx) {
@@ -1152,9 +1189,19 @@ export const BookingPage = () => {
 
   useEffect(() => {
     if (bookingProgress.currentStep) {
-      const a = newBookings.bookings.find(
-        (i) => i.tempId === bookingProgress.currentStep.step?.roomId
-      );
+      let a = null;
+      // Если бы обновлен payment_method
+      if (bookingProgress.currentStep.step?.roomId) {
+        a = newBookings.bookings.find(
+          (i) => i.tempId === bookingProgress.currentStep.step?.roomId
+        );
+      } else {
+        if (currentBooking) {
+          a = newBookings.bookings.find(
+            (i) => i.tempId === currentBooking.tempId
+          );
+        }
+      }
       if (a) {
         dispatch(setCurrentBooking(a));
       }
@@ -1178,7 +1225,7 @@ export const BookingPage = () => {
         dispatch(setCurrentRoomCategory(a));
       }
     }
-  }, [bookingProgress.currentStep]);
+  }, [bookingProgress.currentStep, newBookings]);
 
   console.log("filterParams ", JSON.stringify(filterParams));
   console.log("bookingsSteps ", JSON.stringify(bookingSteps));

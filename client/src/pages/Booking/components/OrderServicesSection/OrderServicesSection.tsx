@@ -41,14 +41,19 @@ export const OrderServicesSection = memo(
               flex: 0.7,
             }}
           >
-            <Typography
-              variant="label"
-              sx={{ fontWeight: 600, alignSelf: "center" }}
-            >
-              Повысить комфорт
-            </Typography>
-
-            <MoreAdvantageousRoomCategoryCard />
+            {/* Если еще не выбран Suite */}
+            {currentRoomCategory._id !== "672cd65af65cf0e5caff9686" &&
+            currentRoomCategory._id !== "6757519407763b1fc5c07e72" ? (
+              <>
+                <Typography
+                  variant="label"
+                  sx={{ fontWeight: 600, alignSelf: "center" }}
+                >
+                  Повысить комфорт
+                </Typography>
+                <MoreAdvantageousRoomCategoryCard />
+              </>
+            ) : null}
 
             <Typography
               variant="label"

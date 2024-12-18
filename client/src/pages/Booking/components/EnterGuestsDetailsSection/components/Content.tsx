@@ -8,6 +8,7 @@ import { authMethods } from "../../../../../assets/images";
 import { UserDataForm } from "./UserDataForm";
 import { AuthMethodButtons } from "./AuthMethodButtons";
 import { AdditionalInfoForm } from "./AdditionalInfoForm";
+import { PaymentMethods } from "./PaymentMethods";
 
 interface Props {}
 
@@ -54,6 +55,23 @@ export const Content = (props: Props) => {
       </Typography>
 
       <AdditionalInfoForm />
+
+      <Stack sx={{ gap: "24px" }}>
+        <Typography
+          variant="label"
+          sx={{ fontWeight: 600, alignSelf: "center" }}
+        >
+          Выберите способ оплаты
+        </Typography>
+
+        <Typography variant="label">
+          Фактом бронирования вы соглашаетесь с правилами
+          онлайн-бронирования, обработкой персональных данных и политикой
+          конфиденциальности
+        </Typography>
+
+        <PaymentMethods />
+      </Stack>
     </Stack>
   );
 };

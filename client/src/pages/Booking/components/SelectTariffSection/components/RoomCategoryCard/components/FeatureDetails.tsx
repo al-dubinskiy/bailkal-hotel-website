@@ -61,7 +61,6 @@ export const FeatureDetails = (props: Props) => {
 
   if (!roomFeaturesCategories || !roomFeatures) return null;
 
-  console.log(roomFeaturesByCategories);
   return (
     <Stack
       sx={{

@@ -54,6 +54,13 @@ const validationSchema = yup.object({
   comment: yup.string(),
 });
 
+const defaultSelectItem: SelectItemType = {
+  id: 0,
+  label: "Не важно",
+  value: "not-important",
+  icon: null,
+};
+
 interface Props {}
 
 export const AdditionalInfoForm = (props: Props) => {
@@ -67,11 +74,11 @@ export const AdditionalInfoForm = (props: Props) => {
     (state) => state.viewsFromRoomWindow
   );
   const [bedSpecialWish, setBedSpecialWish] = useState<SelectItemType[]>([
-    { id: 0, label: "Не важно", value: "not-important", icon: null },
+    defaultSelectItem,
   ]);
   const [viewsFromWindowSpecialWish, setViewsFromWindowSpecialWish] = useState<
     SelectItemType[]
-  >([{ id: 0, label: "Не важно", value: "not-important", icon: null }]);
+  >([defaultSelectItem]);
 
   useEffect(() => {
     if (roomCategory && roomBedVariants) {
@@ -79,6 +86,7 @@ export const AdditionalInfoForm = (props: Props) => {
         roomCategory.available_bed_variant_id.includes(i._id)
       );
       setBedSpecialWish((prev) => [
+        defaultSelectItem,
         ...a.map((i, idx) => {
           return {
             id: idx,
@@ -97,6 +105,7 @@ export const AdditionalInfoForm = (props: Props) => {
         roomCategory.additional_view_from_room_window_id.includes(i._id)
       );
       setViewsFromWindowSpecialWish((prev) => [
+        defaultSelectItem,
         ...a.map((i, idx) => {
           return {
             id: idx,

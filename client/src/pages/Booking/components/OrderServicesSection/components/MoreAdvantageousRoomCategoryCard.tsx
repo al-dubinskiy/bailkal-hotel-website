@@ -31,7 +31,11 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
     currentBooking,
     filterParams,
   } = useAppSelector((state) => state.bookings);
-  const { availableRoomCategories } = useContext(BookingContext);
+  const {
+    availableRoomCategories,
+    updateBookingDraft,
+    bookingProgressCurrentStep,
+  } = useContext(BookingContext);
 
   const bookingGuestsTotal = useMemo(() => {
     if (currentBooking) {
@@ -45,7 +49,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
     return false;
   }, [filterParams, currentBooking]);
 
-  const moreAdvantageousRoomCategory = useMemo(() => {
+  const moreAdvantageousRoomCategory = useMemo((): RoomCategoryType | null => {
     if (availableRoomCategories && roomsCategories && prevRoomCategory) {
       // Получаем id доступных категорий комнат
       const ids = Array.from(availableRoomCategories, (i) => i.id);
@@ -99,7 +103,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
     return [];
   }, [moreAdvantageousRoomCategory]);
 
-  const additionaPayment = useMemo(() => {
+  const additionalPayment = useMemo(() => {
     if (roomPrice && bookingGuestsTotal && prevRoomCategory) {
       return (
         roomPrice -
@@ -111,7 +115,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
     return null;
   }, [roomPrice, bookingGuestsTotal, prevRoomCategory]);
 
-  if (!moreAdvantageousRoomCategory || !additionaPayment) return null;
+  if (!moreAdvantageousRoomCategory || !additionalPayment) return null;
 
   return (
     <Stack
@@ -227,7 +231,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
             fontSize: "20.8px",
           }}
         >
-          + {additionaPayment} ₽
+          + {additionalPayment} ₽
         </Typography>
 
         <Typography
@@ -239,7 +243,19 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
 
         <CustomButton
           label={"Да, поменять номер"}
-          onClick={() => null}
+          onClick={() => {
+            const { step: currentStep } = bookingProgressCurrentStep;
+            if (currentStep && moreAdvantageousRoomCategory) {
+              updateBookingDraft({
+                currentStep,
+                tempBookingId: currentStep.roomId,
+                newRoomCategory: {
+                  ...moreAdvantageousRoomCategory,
+                  additionalPayment,
+                },
+              });
+            }
+          }}
           containerVariant={"contained"}
           containerStyle={{
             padding: "0 24px",

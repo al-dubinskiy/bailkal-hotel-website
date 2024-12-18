@@ -1,4 +1,6 @@
+import { paymentServices } from "../../../../../assets/images";
 import { SelectItemType } from "../../../../components/shared/FormElements/CustomSelect";
+import { ItemType } from "./PaymentMethods";
 
 export const countries: SelectItemType[] = [
   {

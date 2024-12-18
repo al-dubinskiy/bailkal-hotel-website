@@ -20,6 +20,9 @@ import SuiteRoom7 from "./suiteRoom/suite_7.webp";
 import VkLogo from "./authMethods/vkLogo.png";
 import SberBankLogo from "./authMethods/sberBankLogo.png";
 import TBankLogo from "./authMethods/tBankLogo.png";
+// Payment methods
+import PaymentServices from "./payment_methods.png";
+import PaymentServices2 from "./payment_methods_2.png";
 
 export const deluxeKingRooms = [
   DeluxeKingRoom1,
@@ -46,3 +49,5 @@ export const suiteRooms = [
 ];
 
 export const authMethods = { VkLogo, SberBankLogo, TBankLogo };
+
+export const paymentServices = { PaymentServices, PaymentServices2 };

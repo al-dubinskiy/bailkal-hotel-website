@@ -14,8 +14,8 @@ export type ToogleButtonModeType = {
 
 interface Props {
   label?: string;
-  modes: ToogleButtonModeType[];
-  setMode: Function;
+  modes: ToogleButtonModeType[] | any;
+  setMode: (val: ToogleButtonModeType[] | any) => void;
   contentStyle?: SxProps;
   buttonsDirection?: "row" | "column";
   isCanUnchecked?: boolean;
@@ -34,17 +34,19 @@ export const ToogleModeButton = (props: Props) => {
   } = props;
 
   const changeModeHandler = (val: ToogleButtonModeType) => {
-    const found = modes.find((i) => i.value === val.value);
+    const found = modes.find(
+      (i: ToogleButtonModeType) => i.value === val.value
+    );
     if (found && !found.isSelected) {
       setMode(
-        modes.map((i) => ({
+        modes.map((i: ToogleButtonModeType) => ({
           ...i,
           isSelected: i.value === found.value ? true : false,
         }))
       );
     } else if (found && found.isSelected && isCanUnchecked) {
       setMode(
-        modes.map((i) => ({
+        modes.map((i: ToogleButtonModeType) => ({
           ...i,
           isSelected: false,
         }))
@@ -72,7 +74,7 @@ export const ToogleModeButton = (props: Props) => {
             border: `1px solid ${theme.palette.primary.light}`,
           }}
         >
-          {modes.map((i, idx) => {
+          {modes.map((i: ToogleButtonModeType, idx: number) => {
             return (
               <CustomButton
                 key={idx}
