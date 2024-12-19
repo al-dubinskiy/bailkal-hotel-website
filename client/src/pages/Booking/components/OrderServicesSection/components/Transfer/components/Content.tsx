@@ -104,11 +104,6 @@ export const Content = (props: Props) => {
     const currentStepIdx = steps.findIndex((i) => i.isCurrent);
     const lastCompleteIdx = findLastIndex(steps, (i) => i.isComplete);
 
-    console.log(transferParams);
-    console.log(steps);
-    // console.log(stepIdx);
-    // console.log(currentStepIdx);
-    // console.log(lastCompleteIdx);
     if (stepIdx !== -1 && currentStepIdx !== -1) {
       // Если произошло нажатие на предыдущие (пройденные) шаги или на первый шаг, следующий после последнего пройденного
       if (
