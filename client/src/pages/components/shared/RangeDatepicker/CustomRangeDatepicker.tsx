@@ -9,6 +9,7 @@ import { theme } from "../../../../theme";
 import moment, { Moment } from "moment";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import { setFilterParams } from "../../../../redux/slices/Bookings/bookingsSlice";
+import { times } from "../../../Booking/components/EnterGuestsDetailsSection/components/constants";
 
 interface Props {}
 
@@ -36,8 +37,12 @@ export const CustomRangeDatepicker = (props: Props) => {
       dispatch(
         setFilterParams({
           ...filterParams,
-          arrival_datetime: moment(start),
-          departure_datetime: moment(end),
+          arrival_datetime: moment(start)
+            .set("hours", Number(times[0].value.split(":")[0])) // 07:00
+            .set("minutes", Number(times[0].value.split(":")[1])),
+          departure_datetime: moment(end)
+            .set("hours", Number(times[8].value.split(":")[0])) // 15:00
+            .set("minutes", Number(times[8].value.split(":")[1])),
         })
       );
     }

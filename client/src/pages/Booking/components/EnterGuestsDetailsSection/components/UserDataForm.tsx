@@ -1,6 +1,14 @@
-import { FormGroup, Stack } from "@mui/material";
-import { useFormik } from "formik";
-import React, { useMemo } from "react";
+import { Box, Button, FormGroup, Stack } from "@mui/material";
+import { FormikProps, useFormik } from "formik";
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
+import { isEqual } from "lodash";
 import * as yup from "yup";
 import { CustomInput } from "../../../../components/shared/FormElements/CustomInput";
 import {
@@ -12,6 +20,13 @@ import { CustomLabelCheckbox } from "../../../../components/shared/FormElements/
 import { EmailIcon } from "../../../../../assets/icons/EmailIcon";
 import { theme } from "../../../../../theme";
 import { Phone, PhoneOutlined } from "@mui/icons-material";
+import { useAppDispatch, useAppSelector } from "../../../../../hooks/redux";
+import { BookingContext } from "../../../BookingPage";
+import {
+  BookingGuestsDetailsType,
+  BookingUserInfoType,
+} from "../../../../../redux/slices/Bookings/types";
+import { bookingUserInfoDefault } from "../../../../../redux/slices/Bookings/default";
 
 const validationSchema = yup.object({
   name: yup.string().required("Поле обязательно для заполнения"),
@@ -19,11 +34,11 @@ const validationSchema = yup.object({
   surname: yup.string().required("Поле обязательно для заполнения"),
   phone: yup
     .string()
-    .email("Введите Вашу електронную почту")
+    .matches(/^\+?[1-9][0-9]{7,14}$/, "Введите корректный номер телефона")
     .required("Поле обязательно для заполнения"),
   email: yup
     .string()
-    .email("Введите Вашу електронную почту")
+    .email("Введите корректную электронную почту")
     .required("Поле обязательно для заполнения"),
   nationality: yup
     .object({
@@ -36,27 +51,112 @@ const validationSchema = yup.object({
   wantToKnowAboutSpecialOffersAndNews: yup.boolean(),
 });
 
-interface Props {}
+interface Props {
+  formik: FormikProps<BookingGuestsDetailsType>;
+  isUpdateBookingsUserInfo: boolean;
+  setIsUpdateBookingsUserInfo: (val: boolean) => void;
+  isEnableContinueButton: boolean;
+  setIsEnableContinueButton: (val: boolean) => void;
+}
 
 export const UserDataForm = (props: Props) => {
-  const {} = props;
+  const {
+    formik,
+    isUpdateBookingsUserInfo,
+    setIsUpdateBookingsUserInfo,
+    isEnableContinueButton,
+    setIsEnableContinueButton,
+  } = props;
+  const dispatch = useAppDispatch();
+  const { newBookings } = useAppSelector((state) => state.bookings);
+  // const bookingUserInfo = newBookings.bookings[0].user;
+  const { updateBookingDraft, bookingProgressCurrentStep } =
+    useContext(BookingContext);
 
-  const formik = useFormik({
-    initialValues: {
-      name: "",
-      lastname: "",
-      surname: "",
-      phone: "",
-      email: "",
-      nationality: countries[0],
-      sendConfirmOnPhone: false,
-      wantToKnowAboutSpecialOffersAndNews: true,
-    },
-    validationSchema: validationSchema,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-    },
-  });
+  // const formik = useFormik({
+  //   initialValues: {
+  //     name: bookingUserInfo.name,
+  //     lastname: bookingUserInfo.lastname,
+  //     surname: bookingUserInfo.surname,
+  //     phone: bookingUserInfo.phone,
+  //     email: bookingUserInfo.email,
+  //     nationality: bookingUserInfo.nationality
+  //       ? countries.find((i) => i.value === bookingUserInfo.nationality) ||
+  //         countries[0]
+  //       : countries[0],
+  //     sendConfirmOnPhone: bookingUserInfo.sendConfirmOnPhone,
+  //     wantToKnowAboutSpecialOffersAndNews:
+  //       bookingUserInfo.wantToKnowAboutSpecialOffersAndNews,
+  //   },
+  //   validationSchema: validationSchema,
+  //   onSubmit: (values) => {
+  //     alert(JSON.stringify(values, null, 2));
+  //   },
+  // });
+
+  // const formValues = useMemo(() => {
+  //   const a = formik.values;
+  //   return {
+  //     name: a.name,
+  //     lastname: a.lastname,
+  //     surname: a.surname,
+  //     phone: a.phone,
+  //     email: a.email,
+  //     nationality: a.nationality ? a.nationality.value : "",
+  //     sendConfirmOnPhone: a.sendConfirmOnPhone,
+  //     wantToKnowAboutSpecialOffersAndNews:
+  //       a.wantToKnowAboutSpecialOffersAndNews,
+  //   };
+  // }, [formik.values]);
+
+  // const prevValues = useMemo(() => {
+  //   const b = newBookings.bookings[0].user; // берем любой букинг, так как у всех их одинаковые данные клиента
+  //   return {
+  //     name: b.name,
+  //     lastname: b.lastname,
+  //     surname: b.surname,
+  //     phone: b.phone,
+  //     email: b.email,
+  //     nationality: b.nationality,
+  //     sendConfirmOnPhone: b.sendConfirmOnPhone,
+  //     wantToKnowAboutSpecialOffersAndNews:
+  //       b.wantToKnowAboutSpecialOffersAndNews,
+  //   };
+  // }, [newBookings.bookings]);
+
+  // useEffect(() => {
+  //   if (isUpdateBookingsUserInfo) {
+  //     if (!isEqual(formValues, prevValues)) {
+  //       const { step: currentStep } = bookingProgressCurrentStep;
+  //       if (currentStep) {
+  //         updateBookingDraft({
+  //           currentStep,
+  //           userInfo: formValues,
+  //         });
+  //       }
+  //     }
+  //     setIsUpdateBookingsUserInfo(false);
+  //   }
+  // }, [isUpdateBookingsUserInfo]);
+
+  // useEffect(() => {
+  //   // Если все поля заполнены
+  //   if (
+  //     Object.values({
+  //       ...formValues,
+  //       sendConfirmOnPhone: true,
+  //       wantToKnowAboutSpecialOffersAndNews: true,
+  //     }).every((item) => item)
+  //   ) {
+  //     if (!isEnableContinueButton) {
+  //       setIsEnableContinueButton(true);
+  //     }
+  //   } else {
+  //     if (isEnableContinueButton) {
+  //       setIsEnableContinueButton(false);
+  //     }
+  //   }
+  // }, [formValues]);
 
   return (
     <div>
@@ -173,8 +273,13 @@ export const UserDataForm = (props: Props) => {
               labelPosition={"left"}
               containerStyles={{ flex: 0.5 }}
               onBlur={formik.handleBlur}
-              error={formik.touched.email && Boolean(formik.errors.email)}
-              helperText={formik.touched.email && formik.errors.email}
+              error={
+                formik.touched.nationality && Boolean(formik.errors.nationality)
+              }
+              helperText={
+                formik.touched.nationality?.value &&
+                formik.errors.nationality?.value
+              }
             />
           </Stack>
 

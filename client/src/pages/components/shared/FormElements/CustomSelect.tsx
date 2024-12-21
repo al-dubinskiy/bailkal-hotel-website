@@ -8,7 +8,7 @@ import { SxProps, Typography } from "@mui/material";
 import { theme } from "../../../../theme";
 
 export type SelectItemType = {
-  id: number;
+  id: number | string;
   label: string;
   value: string;
   icon?: React.ReactNode;

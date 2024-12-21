@@ -26,7 +26,7 @@ export const CustomLabelCheckbox = (props: Props) => {
       required={required}
       control={
         <Checkbox
-          defaultChecked={defaultChecked}
+          // defaultChecked={defaultChecked}
           sx={{
             color: theme.palette.gray.extraLight,
             "&.MuiCheckbox-root": {},

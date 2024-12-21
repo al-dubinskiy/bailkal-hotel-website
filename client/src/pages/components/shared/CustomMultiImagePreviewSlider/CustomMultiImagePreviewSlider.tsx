@@ -103,7 +103,9 @@ export const CustomMultiImagePreviewSlider = (props: Props) => {
   };
 
   const Photos = ({ total }: { total: number }) => {
-    const sizes = gridItemSizes.find((i) => i.total === total);
+    const sizes = gridItemSizes.find((i) =>
+      total > 4 ? i.total === 4 : i.total === total
+    );
     if (sizes) {
       return (
         <Stack
@@ -118,7 +120,7 @@ export const CustomMultiImagePreviewSlider = (props: Props) => {
             overflow: "hidden",
           }}
         >
-          {images.map((item, idx) => {
+          {images.slice(0, 4).map((item, idx) => {
             return (
               <Box
                 key={idx}

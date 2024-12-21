@@ -12,14 +12,23 @@ import {
 import { theme } from "../../../theme";
 import { CustomButton } from "../../components/shared/CustomButton";
 import { BookingContext } from "../BookingPage";
-import { useAppSelector } from "../../../hooks/redux";
+import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
 import { getBookingServicesInfo } from "../utils";
 import { ExpandMore } from "@mui/icons-material";
 
-interface Props {}
+interface Props {
+  setIsUpdateBookingsUserInfo?: (val: boolean) => void;
+  isEnableContinueButton?: boolean;
+  helperText?: string;
+}
 
 export const BookingInfoWidget = (props: Props) => {
-  const {} = props;
+  const {
+    setIsUpdateBookingsUserInfo = () => null,
+    isEnableContinueButton = true,
+    helperText = "Заполните все данные",
+  } = props;
+  const dispatch = useAppDispatch();
   const { bookingProgressCurrentStep, toNextStep } = useContext(BookingContext);
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
@@ -473,14 +482,19 @@ export const BookingInfoWidget = (props: Props) => {
           label={"Продолжить"}
           onClick={() => {
             if (
-              bookingProgressCurrentStep.step?.name === "Order services" ||
-              bookingProgressCurrentStep.step?.isComplete
+              bookingProgressCurrentStep.step?.name === "Order services" || // этот шаг не обязательный для прохождения, поэтому можно сразу переходить к следующему шагу
+              (bookingProgressCurrentStep.step?.isComplete &&
+                bookingProgressCurrentStep.step?.name !== "Enter guest details") // c этого шага по условию isComplete переход на следующий шаг происходит не будет, так как этот шаг последний
             ) {
               toNextStep();
+            } else if (
+              bookingProgressCurrentStep.step?.name === "Enter guest details"
+            ) {
+              setIsUpdateBookingsUserInfo(true);
             }
           }}
           containerVariant={"contained"}
-          disabled={false}
+          disabled={!isEnableContinueButton}
           containerBackgroundColor={"buttonDark"}
           containerStyle={{
             padding: "0 10px",
@@ -489,6 +503,14 @@ export const BookingInfoWidget = (props: Props) => {
           withoutAnimation
         />
       </Stack>
+      {helperText && !isEnableContinueButton ? (
+        <Typography
+          variant="small"
+          sx={{ margin: "-10px 24px 24px 24px", textAlign: "center" }}
+        >
+          {helperText}
+        </Typography>
+      ) : null}
     </Stack>
   );
 };

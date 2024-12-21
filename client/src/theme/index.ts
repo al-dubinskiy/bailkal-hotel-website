@@ -110,6 +110,12 @@ const themeOptions: ThemeOptions = {
             color: "#ffffff",
             display: "flex",
 
+            "&.Mui-disabled": {
+              background: "#2F70D9",
+              color: "#ffffff",
+              opacity: 0.7,
+            },
+
             "& .MuiButton-startIcon": {
               margin: 0,
             },

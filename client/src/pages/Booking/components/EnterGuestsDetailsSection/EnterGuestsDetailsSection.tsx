@@ -1,5 +1,5 @@
 import { Stack, SxProps, Typography } from "@mui/material";
-import React from "react";
+import React, { memo, useState } from "react";
 import { Content } from "./components/Content";
 import { BookingInfoWidget } from "../BookingInfoWidget";
 
@@ -9,6 +9,11 @@ interface Props {
 
 export const EnterGuestsDetailsSection = (props: Props) => {
   const { containerStyles } = props;
+  const [isEnableContinueButton, setIsEnableContinueButton] =
+    useState<boolean>(false);
+  const [isUpdateBookingsUserInfo, setIsUpdateBookingsUserInfo] =
+    useState<boolean>(false);
+
   return (
     <Stack sx={{ alignItems: "stretch", ...containerStyles }}>
       <Stack
@@ -26,10 +31,18 @@ export const EnterGuestsDetailsSection = (props: Props) => {
             flex: 0.7,
           }}
         >
-          <Content />
+          <Content
+            isUpdateBookingsUserInfo={isUpdateBookingsUserInfo}
+            setIsUpdateBookingsUserInfo={setIsUpdateBookingsUserInfo}
+            isEnableContinueButton={isEnableContinueButton}
+            setIsEnableContinueButton={setIsEnableContinueButton}
+          />
         </Stack>
 
-        <BookingInfoWidget />
+        <BookingInfoWidget
+          setIsUpdateBookingsUserInfo={setIsUpdateBookingsUserInfo}
+          isEnableContinueButton={isEnableContinueButton}
+        />
       </Stack>
     </Stack>
   );

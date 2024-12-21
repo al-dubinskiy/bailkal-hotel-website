@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
   BookingStepType,
   BookingType,
+  BookingUserInfoType,
   CreateBookingApiResponseType,
   CreateBookingLocalType,
   CreateBookingType,
@@ -20,6 +21,9 @@ import {
 import { RoomCategoryType } from "../RoomsCategories/types";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
+import { bookingUserInfoDefault } from "./default";
+import { boolean } from "yup";
+import { times } from "../../../pages/Booking/components/EnterGuestsDetailsSection/components/constants";
 
 const DEBUG = true;
 
@@ -217,8 +221,13 @@ const initialState: IBookingState = {
   currentRoomCategory: null,
   bookingSteps: [],
   filterParams: {
-    arrival_datetime: moment(),
-    departure_datetime: moment().add(1, "days"),
+    arrival_datetime: moment()
+      .set("hours", Number(times[0].value.split(":")[0])) // 07:00
+      .set("minutes", Number(times[0].value.split(":")[1])),
+    departure_datetime: moment()
+      .add(1, "days")
+      .set("hours", Number(times[8].value.split(":")[0])) // 15:00
+      .set("minutes", Number(times[8].value.split(":")[1])),
     rooms: [{ id: uuidv4(), adults: 1, children: 0 }],
   },
 };
@@ -342,6 +351,7 @@ export const bookingsSlice = createSlice({
 });
 
 export const {
+  // setBookingUserInfo,
   setNewBookings,
   setCurrentBooking,
   setCurrentRoomCategory,
