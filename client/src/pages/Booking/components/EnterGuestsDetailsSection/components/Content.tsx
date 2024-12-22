@@ -98,20 +98,21 @@ export const Content = (props: Props) => {
     useContext(BookingContext);
 
   const bookingInfo = newBookings.bookings[0]; // берем любой букинг, так как "даты заезда/выезда" у них одинаковые
-  const bookingUserInfo = newBookings.bookings[0].user; // берем любой букинг, так как "данные гостей" у них одинаковые
+  const bookingUserInfo = bookingInfo.user; // берем любой букинг, так как "данные гостей" у них одинаковые
 
   const [bookingForWhom, setBookingForWhom] = useState<ToogleButtonModeType[]>([
     {
       id: "1",
       label: "Для себя",
       value: "for_yourself",
-      isSelected: true,
+      isSelected:
+        bookingInfo.booking_for_whom === "for_yourself" ? true : false,
     },
     {
       id: "2",
       label: "Для другого",
       value: "for_another",
-      isSelected: false,
+      isSelected: bookingInfo.booking_for_whom === "for_another" ? true : false,
     },
   ]);
 
@@ -209,14 +210,16 @@ export const Content = (props: Props) => {
         ? countries.find((i) => i.value === bookingUserInfo.nationality) ||
           countries[0]
         : countries[0],
-      sendConfirmOnPhone: bookingUserInfo.sendConfirmOnPhone,
+      sendConfirmOnPhone: bookingUserInfo.send_confirm_on_phone,
       wantToKnowAboutSpecialOffersAndNews:
-        bookingUserInfo.wantToKnowAboutSpecialOffersAndNews,
+        bookingUserInfo.want_to_know_about_special_offers_and_news,
       arrivalTime: getPrevArrivalTime(),
       departureTime: getPrevDepartureTime(),
       bedTypeSpecialWish: bedSpecialWish[0],
       viewFromWindowSpecialWish: viewsFromWindowSpecialWish[0],
-      comment: bookingInfo.comment,
+      comment: bookingInfo.comment ? bookingInfo.comment : "",
+      bookingForWhom: "for_yourself",
+      paymentMethodId: bookingInfo.payment_method_id,
     },
     validationSchema: validationSchema,
     onSubmit: (values) => {
@@ -241,32 +244,10 @@ export const Content = (props: Props) => {
       bedTypeId: a.bedTypeSpecialWish.id.toString(),
       viewFromWindowId: a.viewFromWindowSpecialWish.id.toString(),
       comment: a.comment,
+      bookingForWhom: a.bookingForWhom,
+      paymentMethodId: a.paymentMethodId,
     };
   }, [formik.values]);
-
-  const prevValues = useMemo((): BookingGuestsDetailsPrimitiveType => {
-    const b = bookingUserInfo;
-    const c = bookingInfo;
-
-    return {
-      name: b.name,
-      lastname: b.lastname,
-      surname: b.surname,
-      phone: b.phone,
-      email: b.email,
-      nationality: b.nationality,
-      sendConfirmOnPhone: b.sendConfirmOnPhone,
-      wantToKnowAboutSpecialOffersAndNews:
-        b.wantToKnowAboutSpecialOffersAndNews,
-      arrivalTime: moment(c.arrival_datetime, dateTimeFormat).format("HH:mm"),
-      departureTime: moment(c.departure_datetime, dateTimeFormat).format(
-        "HH:mm"
-      ),
-      bedTypeId: c.bed_type_id ? c.bed_type_id : "", // выбор "типа кровати" на этом шаге доступен только для одиночного бронирования
-      viewFromWindowId: c.view_from_window_id ? c.view_from_window_id : "", // выбор "вид из окна" на этом шаге доступен только для одиночного бронирования
-      comment: c.comment,
-    };
-  }, [bookingInfo, bookingUserInfo]);
 
   useEffect(() => {
     formik.setValues({
@@ -284,23 +265,30 @@ export const Content = (props: Props) => {
 
   useEffect(() => {
     if (isUpdateBookingsUserInfo) {
-      if (!isEqual(formValues, prevValues)) {
-        const { step: currentStep } = bookingProgressCurrentStep;
-        if (currentStep) {
-          updateBookingDraft({
-            currentStep,
-            guestsDetails: formValues,
-          });
-        }
+      const { step: currentStep } = bookingProgressCurrentStep;
+      if (currentStep) {
+        updateBookingDraft({
+          currentStep,
+          guestsDetails: formValues,
+        });
       }
+      // }
       setIsUpdateBookingsUserInfo(false);
     }
   }, [isUpdateBookingsUserInfo]);
 
   useEffect(() => {
-    // Если все поля заполнены
-    const { name, lastname, surname, email, phone, nationality } = formValues;
+    const {
+      name,
+      lastname,
+      surname,
+      email,
+      phone,
+      nationality,
+      paymentMethodId,
+    } = formValues;
 
+    // Если все поля заполнены
     if (
       Object.values({
         name,
@@ -309,6 +297,7 @@ export const Content = (props: Props) => {
         email,
         phone,
         nationality,
+        paymentMethodId,
       }).every((item) => item)
     ) {
       if (!isEnableContinueButton) {
@@ -330,7 +319,13 @@ export const Content = (props: Props) => {
       <ToogleModeButton
         label="Я бронирую"
         modes={bookingForWhom}
-        setMode={setBookingForWhom}
+        setMode={(val) => {
+          const selected = val.find((i: ToogleButtonModeType) => i.isSelected);
+          if (selected) {
+            formik.setFieldValue("bookingForWhom", selected.value);
+          }
+          setBookingForWhom(val);
+        }}
         isCanUnchecked={false}
         helperText={
           "Укажите данные основного гостя. Остальных гостей — при заселении"
@@ -339,13 +334,7 @@ export const Content = (props: Props) => {
 
       <AuthMethodButtons />
 
-      <UserDataForm
-        formik={formik}
-        isUpdateBookingsUserInfo={isUpdateBookingsUserInfo}
-        setIsUpdateBookingsUserInfo={setIsUpdateBookingsUserInfo}
-        isEnableContinueButton={isEnableContinueButton}
-        setIsEnableContinueButton={setIsEnableContinueButton}
-      />
+      <UserDataForm formik={formik} />
 
       <Typography variant="label" sx={{ fontWeight: 600, alignSelf: "center" }}>
         Дополнительная информация
@@ -355,8 +344,6 @@ export const Content = (props: Props) => {
         formik={formik}
         bedSpecialWish={bedSpecialWish}
         viewsFromWindowSpecialWish={viewsFromWindowSpecialWish}
-        isUpdateBookingsUserInfo={isUpdateBookingsUserInfo}
-        setIsUpdateBookingsUserInfo={setIsUpdateBookingsUserInfo}
       />
 
       <Stack sx={{ gap: "24px" }}>
@@ -373,7 +360,7 @@ export const Content = (props: Props) => {
           конфиденциальности
         </Typography>
 
-        <PaymentMethods />
+        <PaymentMethods formik={formik} />
       </Stack>
     </Stack>
   );

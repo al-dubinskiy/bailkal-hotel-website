@@ -8,6 +8,8 @@ import { PaymentMethodType } from "../../../../../redux/slices/PaymentMethods/ty
 import { CustomButton } from "../../../../components/shared/CustomButton";
 import { BookingContext } from "../../../BookingPage";
 import { paymentServices } from "../../../../../assets/images";
+import { FormikProps } from "formik";
+import { BookingGuestsDetailsType } from "../../../../../redux/slices/Bookings/types";
 
 export type ItemType = {
   title: string;
@@ -17,10 +19,12 @@ export type ItemType = {
   paymentServicesImage: string;
 };
 
-interface Props {}
+interface Props {
+  formik: FormikProps<BookingGuestsDetailsType>;
+}
 
 export const PaymentMethods = (props: Props) => {
-  const {} = props;
+  const { formik } = props;
   const dispatch = useAppDispatch();
   const { paymentMethods } = useAppSelector((state) => state.paymentMethods);
   const { currentBooking, currentRoomCategory } = useAppSelector(
@@ -48,8 +52,7 @@ export const PaymentMethods = (props: Props) => {
 
   const Card = useCallback(
     ({ item }: { item: PaymentMethodType }) => {
-      const isSelected =
-        currentBooking && currentBooking.payment_method_id.includes(item._id);
+      const isSelected = formik.values.paymentMethodId === item._id;
 
       const paymentSystems = item.paymentSystems?.length
         ? item.paymentSystems.join(", ")
@@ -143,18 +146,14 @@ export const PaymentMethods = (props: Props) => {
               <CustomButton
                 label={!isSelected ? "Выбрать" : "Выбрано"}
                 onClick={() => {
-                  const { step: currentStep } = bookingProgressCurrentStep;
-                  if (currentStep && currentRoomCategory && currentBooking) {
-                    updateBookingDraft({
-                      currentStep: {
-                        ...currentStep,
-                        roomId: currentBooking.tempId,
-                      },
-                      tempBookingId: currentBooking.tempId,
-                      roomCategory: currentRoomCategory,
-                      paymentMethodId: item._id,
-                    });
-                  }
+                  formik.setFieldValue("paymentMethodId", item._id);
+                  // const { step: currentStep } = bookingProgressCurrentStep;
+                  // if (currentStep && currentRoomCategory && currentBooking) {
+                  //   updateBookingDraft({
+                  //     currentStep,
+                  //     paymentMethodId: item._id,
+                  //   });
+                  // }
                 }}
                 containerVariant={!isSelected ? "contained" : "outlined"}
                 containerBackgroundColor={"buttonDark"}
@@ -166,7 +165,7 @@ export const PaymentMethods = (props: Props) => {
         </Stack>
       );
     },
-    [currentBooking]
+    [currentBooking, formik.values.paymentMethodId]
   );
 
   if (!paymentMethods || !currentBooking) return null;

@@ -1,5 +1,13 @@
-import { Button, ButtonOwnProps, SxProps, Typography } from "@mui/material";
+import {
+  Button,
+  ButtonOwnProps,
+  CircularProgress,
+  LinearProgress,
+  SxProps,
+  Typography,
+} from "@mui/material";
 import React from "react";
+import { theme } from "../../../theme";
 
 interface Props {
   label?: string;
@@ -12,6 +20,7 @@ interface Props {
   containerVariant?: ButtonOwnProps["variant"];
   containerBackgroundColor?: ButtonOwnProps["color"];
   withoutAnimation?: boolean;
+  loading?: boolean;
 }
 
 export const CustomButton = (props: Props) => {
@@ -26,6 +35,7 @@ export const CustomButton = (props: Props) => {
     containerVariant = "contained",
     containerBackgroundColor = "buttonDark",
     withoutAnimation = false,
+    loading = false,
   } = props;
 
   return (
@@ -55,7 +65,14 @@ export const CustomButton = (props: Props) => {
       onClick={onClick}
       disabled={disabled}
     >
-      {label ? (
+      {loading ? (
+        <CircularProgress
+          sx={{
+            color: "#fff",
+          }}
+          size={"24px"}
+        />
+      ) : label ? (
         <Typography variant="label" color="inherit" sx={textStyle}>
           {label}
         </Typography>

@@ -3,8 +3,8 @@ import React from "react";
 import { theme } from "../../../../theme";
 
 interface Props {
-  id: string;
-  name: string;
+  id?: string;
+  name?: string;
   label?: string;
   value: string;
   placeholder?: string;

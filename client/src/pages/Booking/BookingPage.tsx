@@ -36,7 +36,7 @@ import { GetUnavailableBookingDates } from "../../redux/slices/UnavailableBookin
 import { theme } from "../../theme";
 import { CustomRangeDatepicker } from "../components/shared/RangeDatepicker/CustomRangeDatepicker";
 import { CustomSelect } from "../components/shared/FormElements/CustomSelect";
-import { findLastIndex } from "lodash";
+import { findLastIndex, isEqual } from "lodash";
 import { SelectRoomSection } from "./components/SelectRoomSection";
 import { BookingProgressIndicatorBaner } from "./components/BookingProgressIndicatorBaner";
 import { SelectTariffSection } from "./components/SelectTariffSection/SelectTariffSection";
@@ -45,7 +45,6 @@ import { BookingTariffType } from "../../redux/slices/BookingTariffs/types";
 import { BookingServiceType } from "../../redux/slices/BookingServices/types";
 import { EnterGuestsDetailsSection } from "./components/EnterGuestsDetailsSection/EnterGuestsDetailsSection";
 import { SelectGuestsDropdown } from "./components/FiltersBar/SelectGuestsDropdown";
-import { bookingUserInfoDefault } from "../../redux/slices/Bookings/default";
 
 // Типы
 export type RoomCategoryPriceType = {
@@ -107,7 +106,6 @@ export const BookingContext = createContext<{
     bedTypeId,
     viewFromWindowId,
     newRoomCategory,
-    paymentMethodId,
     guestsDetails,
   }: {
     tempBookingId?: string;
@@ -122,12 +120,12 @@ export const BookingContext = createContext<{
     bedTypeId?: string;
     viewFromWindowId?: string;
     newRoomCategory?: RoomCategoryType & { additionalPayment: number };
-    paymentMethodId?: string;
     guestsDetails?: BookingGuestsDetailsPrimitiveType;
   }) => void;
   bookingProgressCurrentStep: BookingProgressStepType;
   toPrevStep: () => void;
   toNextStep: (isSetPrevComplete?: boolean) => void;
+  setCompleteStep: (stepName: BookingStepNameType, status: boolean) => void;
 }>({
   availableRoomCategories: null,
   updateBookingDraft: () => null,
@@ -137,6 +135,7 @@ export const BookingContext = createContext<{
   },
   toPrevStep: () => null,
   toNextStep: () => null,
+  setCompleteStep: () => null,
 });
 
 interface Props {}
@@ -318,7 +317,6 @@ export const BookingPage = () => {
       newRoomCategory,
       bedTypeId,
       viewFromWindowId,
-      paymentMethodId,
       guestsDetails,
     }: {
       tempBookingId?: string;
@@ -332,7 +330,6 @@ export const BookingPage = () => {
       newRoomCategory?: RoomCategoryType & { additionalPayment: number };
       bedTypeId?: string;
       viewFromWindowId?: string;
-      paymentMethodId?: string;
       guestsDetails?: BookingGuestsDetailsPrimitiveType;
     }) => {
       const getRoomCategoryPrice = ({
@@ -580,59 +577,106 @@ export const BookingPage = () => {
               bedTypeId,
               viewFromWindowId,
               comment,
+              bookingForWhom,
+              paymentMethodId,
             } = guestsDetails;
 
-            dispatch(
-              setNewBookings({
-                ...newBookings,
-                bookings: newBookings.bookings.map((i) => {
-                  return {
-                    ...i,
-                    user: {
-                      name,
-                      lastname,
-                      surname,
-                      email,
-                      phone,
-                      nationality,
-                      sendConfirmOnPhone,
-                      wantToKnowAboutSpecialOffersAndNews,
-                    },
-                    arrival_datetime: arrivalTime
-                      ? moment(i.arrival_datetime, dateTimeFormat)
-                          .set("hours", Number(arrivalTime.split(":")[0]))
-                          .set("minutes", Number(arrivalTime.split(":")[1]))
-                          .format(dateTimeFormat)
-                      : i.arrival_datetime,
-                    departure_datetime: departureTime
-                      ? moment(i.departure_datetime, dateTimeFormat)
-                          .set("hours", Number(departureTime.split(":")[0]))
-                          .set("minutes", Number(departureTime.split(":")[1]))
-                          .format(dateTimeFormat)
-                      : i.departure_datetime,
-                    bed_type_id:
-                      bedTypeId !== undefined ? bedTypeId : i.bed_type_id,
-                    view_from_window_id:
-                      viewFromWindowId !== undefined
-                        ? viewFromWindowId
-                        : i.view_from_window_id,
-                  };
-                }),
-              })
-            );
+            const bookingInfo = newBookings.bookings[0]; // берем любой букинг, так как "даты заезда/выезда" и "данные гостей" у них одинаковые
+            const bookingUserInfo = bookingInfo.user;
 
-            // Если все поля заполнены
-            if (
-              Object.values({
-                name,
-                lastname,
-                surname,
-                email,
-                phone,
-                nationality,
-              }).every((item) => item)
-            ) {
-              setCompleteStep("Enter guest details");
+            const prevValues = {
+              name: bookingUserInfo.name,
+              lastname: bookingUserInfo.lastname,
+              surname: bookingUserInfo.surname,
+              email: bookingUserInfo.email,
+              phone: bookingUserInfo.phone,
+              nationality: bookingUserInfo.nationality,
+              sendConfirmOnPhone: bookingUserInfo.send_confirm_on_phone,
+              wantToKnowAboutSpecialOffersAndNews:
+                bookingUserInfo.want_to_know_about_special_offers_and_news,
+              arrivalTime: moment(
+                bookingInfo.arrival_datetime,
+                dateTimeFormat
+              ).format("HH:mm"),
+              departureTime: moment(
+                bookingInfo.departure_datetime,
+                dateTimeFormat
+              ).format("HH:mm"),
+              bedTypeId: bookingInfo.bed_type_id,
+              viewFromWindowId: bookingInfo.view_from_window_id,
+              comment: bookingInfo.comment,
+              bookingForWhom: bookingInfo.booking_for_whom,
+            };
+
+            const isCanUpdate = () => {
+              if (newBookings.bookings.length === 1) {
+                // если одиночное бронирование
+                return !isEqual(guestsDetails, prevValues);
+              } else if (newBookings.bookings.length > 1) {
+                // если не одиночное бронирование
+                const excludedKeys = ["bedTypeId", "viewFromWindowId"]; // исключаем эти поля, так как на множественном бронирование их не будет на этом шаге
+                return !isEqual(
+                  Object.fromEntries(
+                    Object.entries(guestsDetails).filter(
+                      ([key]) => !excludedKeys.includes(key)
+                    )
+                  ),
+                  Object.fromEntries(
+                    Object.entries(prevValues).filter(
+                      ([key]) => !excludedKeys.includes(key)
+                    )
+                  )
+                );
+              }
+            };
+
+            if (isCanUpdate()) {
+              dispatch(
+                setNewBookings({
+                  ...newBookings,
+                  bookings: newBookings.bookings.map((i) => {
+                    return {
+                      ...i,
+                      user: {
+                        name,
+                        lastname,
+                        surname,
+                        email,
+                        phone,
+                        nationality,
+                        send_confirm_on_phone: sendConfirmOnPhone,
+                        want_to_know_about_special_offers_and_news:
+                          wantToKnowAboutSpecialOffersAndNews,
+                      },
+                      arrival_datetime: arrivalTime
+                        ? moment(i.arrival_datetime, dateTimeFormat)
+                            .set("hours", Number(arrivalTime.split(":")[0]))
+                            .set("minutes", Number(arrivalTime.split(":")[1]))
+                            .format(dateTimeFormat)
+                        : i.arrival_datetime,
+                      departure_datetime: departureTime
+                        ? moment(i.departure_datetime, dateTimeFormat)
+                            .set("hours", Number(departureTime.split(":")[0]))
+                            .set("minutes", Number(departureTime.split(":")[1]))
+                            .format(dateTimeFormat)
+                        : i.departure_datetime,
+                      bed_type_id:
+                        bedTypeId !== undefined ? bedTypeId : i.bed_type_id,
+                      view_from_window_id:
+                        viewFromWindowId !== undefined
+                          ? viewFromWindowId
+                          : i.view_from_window_id,
+                      comment,
+                      booking_for_whom: bookingForWhom,
+                      payment_method_id: paymentMethodId,
+                    };
+                  }),
+                })
+              );
+            }
+
+            if (!currentStep.isComplete) {
+              setCompleteStep("Enter guest details", true);
             }
           }
         }
@@ -656,7 +700,16 @@ export const BookingPage = () => {
       tempId: tempId,
       room_id: "",
       room_category_id: "",
-      user: bookingUserInfoDefault,
+      user: {
+        name: "",
+        lastname: "",
+        surname: "",
+        phone: "",
+        email: "",
+        nationality: "",
+        send_confirm_on_phone: false,
+        want_to_know_about_special_offers_and_news: false,
+      },
       adults_count: adultsCount,
       children_count: childrenCount,
       arrival_datetime: arrival_datetime.format(dateTimeFormat),
@@ -674,13 +727,13 @@ export const BookingPage = () => {
       servicePriceTotal: 0,
       transferPrice: 0,
       comment: "",
+      booking_for_whom: "for_yourself",
       isRoomCategoryWasChanged: false,
     };
   };
 
   const updateBookingSteps = useCallback(() => {
     const actionType = newBookings.actionType;
-    // console.log("actionType ", actionType);
     if (actionType !== "") {
       let steps: BookingStepType[] = [...bookingSteps];
       const rooms = filterParams.rooms;
@@ -688,8 +741,6 @@ export const BookingPage = () => {
       const { bookings } = newBookings;
 
       if (actionType === "addRooms") {
-        // console.log("roomsCount ", roomsCount);
-
         // Если список шагов еще пустой
         if (!steps.length) {
           if (roomsCount === 1) {
@@ -1186,6 +1237,10 @@ export const BookingPage = () => {
             bookingSteps.map((item, idx) => ({
               ...item,
               isCurrent: idx === prevCurIdx ? true : false,
+              isComplete:
+                item.name === "Enter guest details" && item.isComplete
+                  ? false
+                  : item.isComplete, // убрать статус isComplete=true (чтобы модалка на "Подтверждение бронирования" не реагировал каждый раз на значение true). Значение true можно будет вернуть после повторного нажатия на кнопку "Продолжить" на шаге "Введите данные гостей"
             }))
           )
         );
@@ -1214,11 +1269,11 @@ export const BookingPage = () => {
     }
   };
 
-  const setCompleteStep = (stepName: BookingStepNameType) => {
+  const setCompleteStep = (stepName: BookingStepNameType, status: boolean) => {
     dispatch(
       setBookingSteps(
         bookingSteps.map((item, idx) =>
-          item.name === stepName ? { ...item, isComplete: true } : item
+          item.name === stepName ? { ...item, isComplete: status } : item
         )
       )
     );
@@ -1363,6 +1418,7 @@ export const BookingPage = () => {
           bookingProgressCurrentStep: bookingProgress.currentStep,
           toPrevStep,
           toNextStep,
+          setCompleteStep,
         }}
       >
         <StepContent />

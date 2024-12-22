@@ -32,8 +32,6 @@ export const ArrivalStepContent = (props: Props) => {
   return (
     <Stack sx={{ alignItems: "stretch", gap: "24px", ...containerStyles }}>
       <CustomInput
-        id="comment"
-        name="comment"
         placeholder="Введите комментарий"
         value={input}
         onChange={(event) => setInput(event.target.value)}

@@ -1,36 +1,55 @@
-import React, { useMemo } from "react";
+import React, { useContext, useEffect, useMemo } from "react";
 import { CustomModal } from "../../components/shared/CustomModal/CustomModal";
 import { Stack, Typography } from "@mui/material";
+import Grid from "@mui/material/Grid2";
 import { theme } from "../../../theme";
 import { CustomLabelAndDescription } from "../../components/shared/CustomLabelAndDescription";
-import { useAppSelector } from "../../../hooks/redux";
-import { CreateBookingLocalType } from "../../../redux/slices/Bookings/types";
+import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
+import {
+  CreateBookingLocalType,
+  CreateBookingType,
+} from "../../../redux/slices/Bookings/types";
 import { RoomCategoryType } from "../../../redux/slices/RoomsCategories/types";
 import { getBookingServicesInfo } from "../utils";
+import {
+  CreateBooking,
+  resetCreateBookingState,
+} from "../../../redux/slices/Bookings/bookingsSlice";
+import { BookingContext } from "../BookingPage";
 
 interface Props {
   open: boolean;
   setOpen: (val: boolean) => void;
+  setIsOpenWishCreateNewBookingModal: (val: boolean) => void;
+  handleCloseModal: () => void;
 }
 
 export const ConfirmBookingModal = (props: Props) => {
-  const { open, setOpen } = props;
-  const { currentBooking, currentRoomCategory } = useAppSelector(
+  const {
+    open,
+    setOpen,
+    setIsOpenWishCreateNewBookingModal,
+    handleCloseModal,
+  } = props;
+  const dispatch = useAppDispatch();
+  const { newBookings, createBooking } = useAppSelector(
     (state) => state.bookings
   );
+  const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
   const { bookingServices } = useAppSelector((state) => state.bookingServices);
   const { roomBedVariants } = useAppSelector((state) => state.roomBedVariants);
   const { viewsFromRoomWindow } = useAppSelector(
     (state) => state.viewsFromRoomWindow
   );
-
-  if (!currentBooking || !currentRoomCategory) return null;
+  const { bookingProgressCurrentStep } = useContext(BookingContext);
 
   const BookingShortInfoCard = ({
+    index,
     booking,
     roomCategory,
   }: {
+    index: number;
     booking: CreateBookingLocalType;
     roomCategory: RoomCategoryType;
   }) => {
@@ -52,47 +71,40 @@ export const ConfirmBookingModal = (props: Props) => {
     const bookingServicesInfo = getBookingServicesInfo({
       bookingServices,
       roomCategory,
-      currentBooking,
+      currentBooking: booking,
     });
 
     const bedTypeSpecialWish = useMemo(
       () =>
-        (currentBooking &&
-          roomBedVariants &&
-          roomBedVariants.find((i) => i._id === currentBooking.bed_type_id)) ||
+        (roomBedVariants &&
+          roomBedVariants.find((i) => i._id === booking.bed_type_id)) ||
         null,
-      [currentBooking, roomBedVariants]
+      [booking, roomBedVariants]
     );
 
     const viewsFromRoomWindowSpecialWish = useMemo(
       () =>
-        (currentBooking &&
-          viewsFromRoomWindow &&
+        (viewsFromRoomWindow &&
           viewsFromRoomWindow.find(
-            (i) => i._id === currentBooking.view_from_window_id
+            (i) => i._id === booking.view_from_window_id
           )) ||
         null,
-      [currentBooking, viewsFromRoomWindow]
+      [booking, viewsFromRoomWindow]
     );
 
     return (
       <Stack
         sx={{
           alignItems: "stretch",
-          border: `1px solid ${theme.palette.primary.extraLight}`,
+          border: `1px solid ${theme.palette.primary.light}`,
           borderRadius: "16px",
           padding: "24px",
-          gap: "10px",
+          gap: "15px",
         }}
       >
         <CustomLabelAndDescription
-          label={"Номер"}
+          label={`${index > 0 ? index + 1 + " " : ""}Номер`}
           description={roomCategory.title}
-        />
-
-        <CustomLabelAndDescription
-          label={"Общая стоимость"}
-          description={`${booking.price} ₽`}
         />
 
         <CustomLabelAndDescription
@@ -101,10 +113,10 @@ export const ConfirmBookingModal = (props: Props) => {
         />
 
         {bookingTariff ? (
-          <>
+          <Stack sx={{ gap: "5px" }}>
             <Typography
               variant="label"
-              sx={{ textAlign: "center", fontWeight: 600, marginTop: "10px" }}
+              sx={{ fontWeight: 600, marginTop: "5px" }}
             >
               Тариф
             </Typography>
@@ -113,14 +125,14 @@ export const ConfirmBookingModal = (props: Props) => {
               {bookingTariff.title}:{" "}
               <span style={{ fontWeight: 600 }}>{bookingTariff.cost} ₽</span>
             </Typography>
-          </>
+          </Stack>
         ) : null}
 
         {bookingServicesInfo ? (
-          <>
+          <Stack sx={{ gap: "5px" }}>
             <Typography
               variant="label"
-              sx={{ textAlign: "center", fontWeight: 600, marginTop: "10px" }}
+              sx={{ fontWeight: 600, marginTop: "5px" }}
             >
               Услуги
             </Typography>
@@ -131,41 +143,144 @@ export const ConfirmBookingModal = (props: Props) => {
                   <Typography
                     key={index}
                     variant="body"
-                    sx={{ textAlign: "center" }}
+                    sx={{ textAlign: "center", alignSelf: "flex-start" }}
                   >
                     {item.title}:{" "}
-                    <span style={{ fontWeight: 600 }}>
+                    <span style={{ fontWeight: 600, alignSelf: "flex-start" }}>
                       {item.price > 0 ? item.price + "₽" : "Вкл"}
                     </span>
                   </Typography>
                 );
               })}
             </Stack>
-          </>
+          </Stack>
         ) : null}
 
-        {/* Специальные пожелания */}
+        {bedTypeSpecialWish || viewsFromRoomWindowSpecialWish ? (
+          <Stack sx={{ gap: "10px" }}>
+            <Typography
+              variant="label"
+              sx={{ textAlign: "center", fontWeight: 600 }}
+            >
+              Специальные пожелания
+            </Typography>
+
+            <Grid container spacing={"24px"}>
+              {bedTypeSpecialWish ? (
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <CustomLabelAndDescription
+                    label={"Тип кровати"}
+                    description={bedTypeSpecialWish.title}
+                  />
+                </Grid>
+              ) : null}
+
+              {viewsFromRoomWindowSpecialWish ? (
+                <Grid size={{ xs: 12, md: 6 }}>
+                  <CustomLabelAndDescription
+                    label={"Вид из окна"}
+                    description={viewsFromRoomWindowSpecialWish.title}
+                  />
+                </Grid>
+              ) : null}
+            </Grid>
+          </Stack>
+        ) : null}
+
+        <CustomLabelAndDescription
+          label={"Общая стоимость"}
+          description={`${booking.price} ₽`}
+          containerStyle={{ marginTop: "10px" }}
+        />
       </Stack>
     );
   };
+
+  const createNewBooking = () => {
+    dispatch(
+      CreateBooking({
+        bookings: newBookings.bookings.map((i: CreateBookingLocalType) => {
+          let booking: CreateBookingType = {
+            room_id: i.room_id,
+            room_category_id: i.room_category_id,
+            user: i.user,
+            adults_count: i.adults_count,
+            children_count: i.children_count,
+            arrival_datetime: i.arrival_datetime,
+            departure_datetime: i.departure_datetime,
+            tariff_id: i.tariff_id,
+            service_id: i.service_id,
+            payment_method_id: i.payment_method_id,
+            price: i.price,
+            booking_for_whom: i.booking_for_whom,
+          };
+          if (i.bed_type_id) {
+            booking = { ...booking, bed_type_id: i.bed_type_id };
+          }
+          if (i.view_from_window_id) {
+            booking = {
+              ...booking,
+              view_from_window_id: i.view_from_window_id,
+            };
+          }
+          if (i.transfer_id) {
+            booking = { ...booking, transfer_id: i.transfer_id };
+          }
+          if (i.transfer_comment) {
+            booking = { ...booking, transfer_comment: i.transfer_comment };
+          }
+          if (i.comment) {
+            booking = { ...booking, transfer_comment: i.comment };
+          }
+          return booking;
+        })[0],
+      })
+    );
+  };
+
+  useEffect(() => {
+    if (createBooking.successMessage) {
+      setIsOpenWishCreateNewBookingModal(true);
+      setOpen(false);
+      dispatch(resetCreateBookingState());
+    }
+  }, [createBooking.successMessage]);
+
+  if (!roomsCategories) return null;
 
   return (
     <CustomModal
       modalTitle="Подтверждение бронирование"
       modalContent={
-        <Stack sx={{ alignItems: "stretch", gap: "24px" }}>
-          <Typography variant="label">Ваше бронирование</Typography>
-
-          <BookingShortInfoCard
-            booking={currentBooking}
-            roomCategory={currentRoomCategory}
-          />
+        <Stack sx={{ alignItems: "stretch", gap: "15px" }}>
+          <Stack sx={{ alignItems: "stretch", gap: "10px" }}>
+            {newBookings.bookings.map((item, index) => {
+              const roomCategory = roomsCategories.find(
+                (i) => i._id === item.room_category_id
+              );
+              if (roomCategory) {
+                return (
+                  <BookingShortInfoCard
+                    key={index}
+                    index={index}
+                    booking={item}
+                    roomCategory={roomCategory}
+                  />
+                );
+              }
+              return null;
+            })}
+          </Stack>
         </Stack>
       }
       actionButtonsVariants="yes_no"
-      handleConfirm={() => null}
+      handleConfirm={createNewBooking}
+      handleCancel={handleCloseModal}
+      confirmLoading={createBooking.isLoading}
       open={open}
       setOpen={setOpen}
+      modalStyle={{ width: "500px" }}
+      footerMessage="Вы подтверждаете данное бронирование?"
     />
   );
 };

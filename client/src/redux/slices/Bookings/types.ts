@@ -2,17 +2,6 @@ import { Moment } from "moment";
 import { SelectItemType } from "../../../pages/components/shared/FormElements/CustomSelect";
 
 // Local
-export type BookingUserInfoType = {
-  name: string;
-  lastname: string;
-  surname: string;
-  phone: string;
-  email: string;
-  nationality: string;
-  sendConfirmOnPhone: boolean;
-  wantToKnowAboutSpecialOffersAndNews: boolean;
-};
-
 export type BookingGuestsDetailsType = {
   name: string;
   lastname: string;
@@ -27,6 +16,8 @@ export type BookingGuestsDetailsType = {
   bedTypeSpecialWish: SelectItemType;
   viewFromWindowSpecialWish: SelectItemType;
   comment: string;
+  bookingForWhom: "for_yourself" | "for_another";
+  paymentMethodId: string;
 };
 
 export type BookingGuestsDetailsPrimitiveType = {
@@ -43,6 +34,19 @@ export type BookingGuestsDetailsPrimitiveType = {
   bedTypeId: string;
   viewFromWindowId: string;
   comment: string;
+  bookingForWhom: "for_yourself" | "for_another";
+  paymentMethodId: string;
+};
+
+export type BookingUserInfoType = {
+  name: string;
+  lastname: string;
+  surname: string;
+  phone: string;
+  email: string;
+  nationality: string;
+  send_confirm_on_phone: boolean;
+  want_to_know_about_special_offers_and_news: boolean;
 };
 
 export type CreateBookingType = {
@@ -61,7 +65,8 @@ export type CreateBookingType = {
   transfer_id?: string;
   transfer_comment?: string;
   price: number;
-  comment: string;
+  comment?: string;
+  booking_for_whom: "for_yourself" | "for_another";
 };
 
 export type BookingType = CreateBookingType & {

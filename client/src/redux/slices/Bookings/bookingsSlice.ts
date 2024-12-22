@@ -21,8 +21,6 @@ import {
 import { RoomCategoryType } from "../RoomsCategories/types";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
-import { bookingUserInfoDefault } from "./default";
-import { boolean } from "yup";
 import { times } from "../../../pages/Booking/components/EnterGuestsDetailsSection/components/constants";
 
 const DEBUG = true;
@@ -32,7 +30,6 @@ export const GetBookings = createAsyncThunk(
   "bookings/getAll",
   async (_, thunkAPI) => {
     try {
-      console.log(getBookings.url);
       const res = await fetch(`${getBookings.url}`, {
         method: getBookings.method,
         headers: {
@@ -59,22 +56,22 @@ export const CreateBooking = createAsyncThunk(
   "bookings/create",
   async (
     payload: {
-      booking: CreateBookingType;
+      bookings: CreateBookingType;
     },
     thunkAPI
   ) => {
     try {
-      const { booking } = payload;
+      const { bookings } = payload;
 
       const res = await fetch(`${createBooking.url}`, {
         method: createBooking.method,
         headers: {
           ...createBooking.headers,
         },
-        body: JSON.stringify(booking),
+        body: JSON.stringify(bookings),
       });
 
-      if (res.status === 200) {
+      if (res.status === 201) {
         const json = await res.json();
 
         return json;
@@ -253,11 +250,14 @@ export const bookingsSlice = createSlice({
       state.currentRoomCategory = payload;
     },
     setBookingSteps: (state, { payload }: { payload: BookingStepType[] }) => {
-      console.log("payload", payload);
       state.bookingSteps = payload;
     },
     setFilterParams: (state, { payload }: { payload: FiltersParamsType }) => {
       state.filterParams = payload;
+    },
+    resetCreateBookingState: (state) => {
+      state.createBooking.successMessage = null;
+      state.createBooking.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -283,8 +283,11 @@ export const bookingsSlice = createSlice({
     builder.addCase(
       CreateBooking.fulfilled,
       (state, { payload }: { payload: CreateBookingApiResponseType }) => {
+        state.createBooking.successMessage = "CreateBooking (API): success";
         state.createBooking.isLoading = false;
         const booking = payload.data;
+        console.log("ffff", booking);
+        console.log("ffffff", state.bookings);
         if (state.bookings) {
           state.bookings.push(booking);
         } else {
@@ -357,4 +360,5 @@ export const {
   setCurrentRoomCategory,
   setBookingSteps,
   setFilterParams,
+  resetCreateBookingState,
 } = bookingsSlice.actions;

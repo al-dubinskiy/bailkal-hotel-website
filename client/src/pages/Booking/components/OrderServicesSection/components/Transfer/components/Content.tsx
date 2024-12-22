@@ -73,7 +73,21 @@ export const Content = (props: Props) => {
       comment: "",
     });
 
-  const [steps, setSteps] = useState<TransferStepType[]>(stepsData);
+  const [steps, setSteps] = useState<TransferStepType[]>(
+    oneOfTheBookings?.transfer_id || oneOfTheBookings?.transfer_comment
+      ? stepsData.map((item, index) => {
+          return {
+            ...item,
+            isComplete:
+              !oneOfTheBookings?.transfer_comment &&
+              index === stepsData.length - 1
+                ? false
+                : true,
+            isCurrent: index === stepsData.length - 1 ? true : false,
+          };
+        })
+      : stepsData
+  );
 
   const [transferDirection, setTransferDirection] = useState<
     TransferDirectionType[]
@@ -205,7 +219,7 @@ export const Content = (props: Props) => {
         );
       }
     }
-  }, [transferParams, steps]);
+  }, [transferParams]);
 
   useEffect(() => {
     if (transferDirection && oneOfTheBookings && transferVariants) {
@@ -231,7 +245,6 @@ export const Content = (props: Props) => {
                   : false,
             })),
           };
-
           return updated;
         })
       );
