@@ -10,10 +10,10 @@ import {
   useTheme,
 } from "@mui/material";
 import { Nav } from "./components/Nav/Nav";
-import HotelLogo from "../../../assets/images/hotel_logo_ru.png";
 import { theme } from "../../../theme";
 import { LocaleButton } from "./components/LocaleButton";
 import { CustomButton } from "../shared/CustomButton";
+import { hotelLogo } from "../../../assets/images";
 
 interface Props {}
 
@@ -45,7 +45,7 @@ export const Header = (props: Props) => {
           width="100%"
           gap={{ xs: "30px", lg: "40px" }}
         >
-          <img height={"50px"} src={HotelLogo} />
+          <img height={"50px"} src={hotelLogo.HotelLogoRu} />
 
           <Stack
             flex="1"

@@ -52,13 +52,8 @@ export type RoomCategoryPriceType = {
   price: number;
 };
 
-export type BookingDateTimeType = {
-  arrival_datetime: string;
-  departure_datetime: string;
-};
-
-type SortedBookingType = {
-  [key: string]: BookingDateTimeType[];
+export type SortedBookingType = {
+  [key: string]: BookingType[];
 };
 
 type LocaleType = {
@@ -230,7 +225,7 @@ export const BookingPage = () => {
 
           let bookedOnDateCount = 0;
 
-          bookingsOnCategory.map((i: BookingDateTimeType) => {
+          bookingsOnCategory.map((i: BookingType) => {
             // Подсчет забронированных комнат, диапазону "дата заезда/выезда"
             // которых принадлежит дата, переданная в ф-цию
             // (а значит на эту дату уже нельзя забронировать эти комнаты)

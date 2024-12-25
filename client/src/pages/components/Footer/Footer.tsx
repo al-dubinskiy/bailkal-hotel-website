@@ -1,13 +1,13 @@
 import React from "react";
 import Grid from "@mui/material/Grid2";
 import { Link, Stack, Typography } from "@mui/material";
-import HotelLogo from "../../../assets/images/hotel_logo_ru.png";
 import { SocialButtons } from "../SocialButtons";
 import { CustomIconLabel } from "../shared/CustomIconLabel";
 import { LocationIcon } from "../../../assets/icons/LocationIcon";
 import { PhoneIcon } from "../../../assets/icons/PhoneIcon";
 import { EmailIcon } from "../../../assets/icons/EmailIcon";
 import { ContactUsForm } from "./components/ContactUsForm/ContactUsForm";
+import { hotelLogo } from "../../../assets/images";
 
 interface Props {}
 
@@ -27,7 +27,7 @@ export const Footer = (props: Props) => {
         >
           <img
             height={"50px"}
-            src={HotelLogo}
+            src={hotelLogo.HotelLogoRu}
             style={{ objectFit: "contain" }}
           />
           <Typography variant="body">

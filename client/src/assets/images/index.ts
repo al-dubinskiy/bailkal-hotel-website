@@ -1,3 +1,6 @@
+import HotelLogoEn from "./hotel_logo_en.png";
+import HotelLogoRu from "./hotel_logo_ru.png";
+import HotelLogoIcon from "./hotel_logo_icon.png";
 // Deluxe King room
 import DeluxeKingRoom1 from "./deluxeKingRoom/deluxe_king_1.webp";
 import DeluxeKingRoom2 from "./deluxeKingRoom/deluxe_king_2.webp";
@@ -23,6 +26,12 @@ import TBankLogo from "./authMethods/tBankLogo.png";
 // Payment methods
 import PaymentServices from "./payment_methods.png";
 import PaymentServices2 from "./payment_methods_2.png";
+
+export const hotelLogo = {
+  HotelLogoEn,
+  HotelLogoRu,
+  HotelLogoIcon,
+};
 
 export const deluxeKingRooms = [
   DeluxeKingRoom1,

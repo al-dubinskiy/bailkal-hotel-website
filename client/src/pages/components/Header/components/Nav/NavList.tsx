@@ -1,5 +1,5 @@
 import { Stack, SxProps } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { ReactElement, useMemo } from "react";
 import { theme } from "../../../../../theme";
 import { useTranslation } from "react-i18next";
 import { NavItem } from "./NavItem";
@@ -14,6 +14,7 @@ export type NavItemType = {
     id: string;
     link?: string;
   }[];
+  icon?: ReactElement;
 };
 
 interface Props {
