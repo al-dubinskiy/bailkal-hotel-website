@@ -100,9 +100,23 @@ export const AdminBookingsStatusesPage = (props: Props) => {
           categoryRoomsBookingStatuses: i.room_id.map((k) => {
             const booking = b && b[1].find((l) => l.room_id === k); // поиск букинга на этот номер
             return {
+              id: k,
               isBooked: booking ? true : false, // если есть букинг на эту комнату
               number: rooms.find((p) => p._id === k)?.number || -1,
               booking,
+              bookingDate: booking
+                ? {
+                    arrival_datetime: booking.arrival_datetime,
+                    departure_datetime: booking.departure_datetime,
+                  }
+                : undefined,
+              bookingGuests: booking
+                ? {
+                    adults_count: booking.adults_count,
+                    children_count: booking.children_count,
+                  }
+                : undefined,
+              bookingUser: booking ? booking.user : undefined,
             };
           }),
         };
@@ -183,11 +197,13 @@ export const AdminBookingsStatusesPage = (props: Props) => {
                   }}
                 >
                   <Typography
+                    variant="label"
                     sx={{ alignSelf: "flex-start" }}
                   >{`Номера (${item.roomCategory.room_id.length})`}</Typography>
 
                   <BookingsTable
                     data={item.categoryRoomsBookingStatuses}
+                    roomsCategories={roomsCategories}
                     isLoading={false}
                   />
                 </Stack>

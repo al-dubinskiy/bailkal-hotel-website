@@ -11,10 +11,10 @@ interface Props {
   modalContent: React.ReactElement;
   open: boolean;
   setOpen: (val: boolean) => void;
-  actionButtonsVariants: "yes_no" | "continue_close" | "save_cancel";
-  handleConfirm: () => void;
+  actionButtonsVariants?: "yes_no" | "continue_close" | "save_cancel" | "";
+  handleConfirm?: () => void;
   handleCancel?: () => void;
-  confirmLoading: boolean;
+  confirmLoading?: boolean;
   modalStyle?: SxProps;
   footerMessage?: string;
 }
@@ -26,7 +26,7 @@ export const CustomModal = (props: Props) => {
     modalContent,
     open,
     setOpen,
-    actionButtonsVariants,
+    actionButtonsVariants = "",
     handleConfirm,
     handleCancel,
     confirmLoading,
@@ -120,49 +120,55 @@ export const CustomModal = (props: Props) => {
             </Typography>
           ) : null}
 
-          <Stack
-            sx={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: "24px",
-              marginTop: "15px",
-            }}
-          >
-            <CustomButton
-              label={
-                actionButtonsVariants === "continue_close"
-                  ? "Продолжить"
-                  : actionButtonsVariants === "save_cancel"
-                  ? "Cохранить"
-                  : actionButtonsVariants === "yes_no"
-                  ? "Да"
-                  : ""
-              }
-              onClick={handleConfirm}
-              loading={confirmLoading}
-              containerVariant={"contained"}
-              containerBackgroundColor={"buttonDark"}
-              containerStyle={{ flex: 1, padding: "0 40px" }}
-              withoutAnimation
-            />
+          {actionButtonsVariants !== "" ? (
+            <Stack
+              sx={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                gap: "24px",
+                marginTop: "15px",
+              }}
+            >
+              {handleConfirm ? (
+                <CustomButton
+                  label={
+                    actionButtonsVariants === "continue_close"
+                      ? "Продолжить"
+                      : actionButtonsVariants === "save_cancel"
+                      ? "Cохранить"
+                      : actionButtonsVariants === "yes_no"
+                      ? "Да"
+                      : ""
+                  }
+                  onClick={handleConfirm}
+                  loading={confirmLoading}
+                  containerVariant={"contained"}
+                  containerBackgroundColor={"buttonDark"}
+                  containerStyle={{ flex: 1, padding: "0 40px" }}
+                  withoutAnimation
+                />
+              ) : null}
 
-            <CustomButton
-              label={
-                actionButtonsVariants === "continue_close"
-                  ? "Закрыть"
-                  : actionButtonsVariants === "save_cancel"
-                  ? "Отменить"
-                  : actionButtonsVariants === "yes_no"
-                  ? "Нет"
-                  : ""
-              }
-              onClick={handleClose}
-              containerVariant={"outlined"}
-              containerBackgroundColor={"buttonDark"}
-              containerStyle={{ flex: 1, padding: "0 40px" }}
-              withoutAnimation
-            />
-          </Stack>
+              {handleClose ? (
+                <CustomButton
+                  label={
+                    actionButtonsVariants === "continue_close"
+                      ? "Закрыть"
+                      : actionButtonsVariants === "save_cancel"
+                      ? "Отменить"
+                      : actionButtonsVariants === "yes_no"
+                      ? "Нет"
+                      : ""
+                  }
+                  onClick={handleClose}
+                  containerVariant={"outlined"}
+                  containerBackgroundColor={"buttonDark"}
+                  containerStyle={{ flex: 1, padding: "0 40px" }}
+                  withoutAnimation
+                />
+              ) : null}
+            </Stack>
+          ) : null}
         </Stack>
       </Box>
     </Modal>

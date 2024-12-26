@@ -1,6 +1,11 @@
-import React, { MouseEventHandler, useCallback, useEffect } from "react";
+import React, {
+  MouseEventHandler,
+  useCallback,
+  useEffect,
+  useState,
+} from "react";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
-import { Box, Theme, Typography, useTheme } from "@mui/material";
+import { Box, Stack, Theme, Typography, useTheme } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
 import { useTranslation } from "react-i18next";
@@ -11,28 +16,64 @@ import {
   BookingUserInfoType,
 } from "../../../../redux/slices/Bookings/types";
 import { RoomType } from "../../../../redux/slices/Rooms/types";
-import { OpenInNew } from "@mui/icons-material";
+import { Close, Edit, OpenInNew } from "@mui/icons-material";
+import { dateTimeFormat } from "../../../../constants";
+import { CustomModal } from "../../../../pages/components/shared/CustomModal/CustomModal";
+import { RoomCategoryType } from "../../../../redux/slices/RoomsCategories/types";
+import { CustomLabelAndDescription } from "../../../../pages/components/shared/CustomLabelAndDescription";
+
+type BookingDateType = { arrival_datetime: string; departure_datetime: string };
+type BookingGuestsCountType = { adults_count: number; children_count: number };
 
 export type CategoryRoomsBookingStatusType = {
+  id: string;
   isBooked: boolean;
-} & { number: number } & { booking: BookingType | undefined };
+  number: number;
+  bookingUser: BookingUserInfoType | undefined;
+  bookingGuests: BookingGuestsCountType | undefined;
+  bookingDate: BookingDateType | undefined;
+} & { booking: BookingType | undefined };
 
 interface Props {
   data: CategoryRoomsBookingStatusType[];
+  roomsCategories: RoomCategoryType[] | null;
   isLoading: boolean;
 }
 
 export const BookingsTable = (props: Props) => {
-  const { data, isLoading } = props;
+  const { data, isLoading, roomsCategories } = props;
 
+  const [openBookingDetailsModal, setOpenBookingDetailsModal] = useState<{
+    booking: CategoryRoomsBookingStatusType | undefined;
+    status: boolean;
+  }>({ booking: undefined, status: false });
   const classes = useStyles();
   const theme = useTheme();
 
+  const getGuestsCount = (guests: BookingGuestsCountType): string => {
+    const { adults_count, children_count } = guests;
+
+    return `
+       ${
+         adults_count > 0
+           ? `${adults_count} взрослы${adults_count === 1 ? "й" : "x"}`
+           : ""
+       }
+        ${children_count > 0 ? ", " : ""}
+        ${
+          children_count >= 5
+            ? `${children_count} детей`
+            : children_count > 0
+            ? `${children_count} ребен${children_count === 1 ? "ок" : "ка"}`
+            : ""
+        }
+      `;
+  };
   const columns: GridColDef<CategoryRoomsBookingStatusType>[] = [
     {
       field: "isBooked",
       headerName: "Статус",
-      width: 170,
+      width: 200,
       renderCell: (params: any) => {
         const { value }: { value: boolean } = params;
         return (
@@ -44,55 +85,132 @@ export const BookingsTable = (props: Props) => {
                 : theme.palette.primary.main,
             }}
           >
-            <Typography className={classes.statusLabel}>
+            <Typography variant="body">
               {value ? "Забронирован" : "Не забронирован"}
             </Typography>
           </Box>
         );
       },
-      sortComparator: (v1: string, v2: string) => v1.localeCompare(v2),
+      sortComparator: (v1: boolean, v2: boolean) => {
+        if (v1 === v2) {
+          return 0;
+        }
+        return v1 ? -1 : 1;
+      },
     },
     {
       field: "number",
       headerName: "Номер",
-      flex: 1,
+      width: 100,
       renderCell: (params: any) => {
         const { value }: { value: string } = params;
-        return (
-          <Typography className={classes.roomNumberLabel}>{value}</Typography>
-        );
+        return <Typography variant="body">{value}</Typography>;
       },
-      sortComparator: (v1: string, v2: string) => v1.localeCompare(v2),
+      sortComparator: (v1: number, v2: number) =>
+        v1.toString().localeCompare(v2.toString()),
     },
     {
-      field: "user",
+      field: "bookingUser",
       headerName: "ФИО",
-      width: 200,
+      flex: 1,
       renderCell: (params: any) => {
-        const { value }: { value: BookingUserInfoType } = params;
+        const { value }: { value: BookingUserInfoType | undefined } = params;
+
+        if (!value) return <Typography variant="body">-</Typography>;
+
         return (
-          <Typography
-            className={classes.fullNameLabel}
-          >{`${value.lastname} ${value.name} ${value.surname}`}</Typography>
+          <Typography variant="body">{`${value.lastname} ${value.name} ${value.surname}`}</Typography>
         );
       },
-      sortComparator: (v1: BookingUserInfoType, v2: BookingUserInfoType) =>
-        `${v1.lastname} ${v1.name} ${v1.surname}`.localeCompare(
-          `${v2.lastname} ${v2.name} ${v2.surname}`
-        ),
+      sortComparator: (v1: BookingUserInfoType, v2: BookingUserInfoType) => {
+        if (v1 && v2) {
+          return `${v1.lastname} ${v1.name} ${v1.surname}`.localeCompare(
+            `${v2.lastname} ${v2.name} ${v2.surname}`
+          );
+        }
+        return 0;
+      },
+    },
+    {
+      field: "bookingGuests",
+      headerName: "Количество гостей",
+      width: 190,
+      renderCell: (params: any) => {
+        const { value }: { value: BookingGuestsCountType | undefined } = params;
+
+        if (!value) return <Typography variant="body">-</Typography>;
+
+        const { adults_count, children_count } = value;
+        return (
+          <Typography variant="body">
+            {getGuestsCount({ adults_count, children_count })}
+          </Typography>
+        );
+      },
+    },
+    {
+      field: "bookingDate",
+      headerName: "Дата заезда и выезда",
+      width: 210,
+      renderCell: (params: any) => {
+        const { value }: { value: BookingDateType | undefined } = params;
+
+        if (!value) return <Typography variant="body">-</Typography>;
+
+        return (
+          <Typography variant="body">
+            {`${moment(value.arrival_datetime).format(
+              dateTimeFormat
+            )} - ${moment(value.departure_datetime).format(dateTimeFormat)}`}
+          </Typography>
+        );
+      },
     },
     {
       field: "actions",
       type: "actions",
       headerName: "",
-      width: 40,
+      width: 150,
       cellClassName: "actions",
       getActions: ({ row }: { row: CategoryRoomsBookingStatusType }) => {
         return [
           <GridActionsCellItem
-            icon={<OpenInNew sx={{ fontSize: "24px" }} />}
+            icon={
+              <Edit
+                htmlColor={theme.palette.text.primary}
+                sx={{ fontSize: "24px" }}
+              />
+            }
             label=""
             onClick={() => null}
+            className={classes.openDetailsActionButton}
+          />,
+
+          <GridActionsCellItem
+            icon={
+              <Close
+                htmlColor={theme.palette.text.primary}
+                sx={{ fontSize: "24px" }}
+              />
+            }
+            label=""
+            onClick={() => null}
+            className={classes.openDetailsActionButton}
+          />,
+          <GridActionsCellItem
+            icon={
+              <OpenInNew
+                htmlColor={theme.palette.text.primary}
+                sx={{ fontSize: "24px" }}
+              />
+            }
+            label=""
+            onClick={() =>
+              setOpenBookingDetailsModal({
+                booking: row,
+                status: true,
+              })
+            }
             className={classes.openDetailsActionButton}
           />,
         ];
@@ -145,135 +263,196 @@ export const BookingsTable = (props: Props) => {
     );
   };
 
+  const BookingDetailsModalContent = () => {
+    const row = openBookingDetailsModal.booking;
+    const booking = row?.booking || null;
+    const user = row?.bookingUser || null;
+    const guests = row?.bookingGuests || null;
+
+    if (booking && user && guests) {
+      const roomCategory =
+        roomsCategories?.find((i) => i._id === booking.room_category_id) ||
+        null;
+
+      return (
+        <Stack sx={{ alignItems: "stretch", gap: "15px" }}>
+          <CustomLabelAndDescription
+            label={"Номер"}
+            description={row?.number.toString() || "-"}
+          />
+
+          <CustomLabelAndDescription
+            label={"Категория комнаты"}
+            description={roomCategory?.title || "-"}
+          />
+
+          <CustomLabelAndDescription
+            label={"ФИО"}
+            description={`${user.lastname} ${user.name} ${user.surname}`}
+          />
+
+          <CustomLabelAndDescription
+            label={"Количество гостей"}
+            description={getGuestsCount({
+              adults_count: guests.adults_count,
+              children_count: guests.children_count,
+            })}
+          />
+        </Stack>
+      );
+    }
+    return null;
+  };
   return (
-    <div className={classes.root}>
-      <DataGrid
-        getRowHeight={() => "auto"}
-        getEstimatedRowHeight={() => 60}
-        disableColumnMenu
-        loading={isLoading}
-        hideFooterPagination
-        hideFooterSelectedRowCount
-        rows={data}
-        columns={columns}
-        initialState={{
-          sorting: {
-            sortModel: [
-              // { field: 'medicalSpecialist', sort: 'asc' },
-            ],
-          },
-        }}
-        slots={{
-          columnSortedDescendingIcon: SortedDescendingIcon,
-          columnSortedAscendingIcon: SortedAscendingIcon,
-          columnUnsortedIcon: UnsortedIcon,
-        }}
-        sx={{
-          border: "none",
-          flex: 1,
-
-          ".MuiDataGrid-virtualScroller": {
-            overflowX: "hidden",
-            minHeight: "50px",
-
-            "&::-webkit-scrollbar": {
-              width: "0.4em",
+    <>
+      <div className={classes.root}>
+        <DataGrid
+          getRowId={(row) => row.id}
+          getRowHeight={() => "auto"}
+          getEstimatedRowHeight={() => 60}
+          disableColumnMenu
+          loading={isLoading}
+          hideFooterPagination
+          hideFooterSelectedRowCount
+          rows={data}
+          columns={columns}
+          initialState={{
+            sorting: {
+              sortModel: [
+                // { field: 'medicalSpecialist', sort: 'asc' },
+              ],
             },
-            "&::-webkit-scrollbar-track": {
-              "-webkit-box-shadow": "inset 0 0 6px rgba(0,0,0,0.00)",
-            },
-            "&::-webkit-scrollbar-thumb": {
-              background: theme.palette.primary.main,
-              borderRadius: "30px",
+          }}
+          slots={{
+            columnSortedDescendingIcon: SortedDescendingIcon,
+            columnSortedAscendingIcon: SortedAscendingIcon,
+            columnUnsortedIcon: UnsortedIcon,
+          }}
+          sx={{
+            border: "none",
+            flex: 1,
 
-              "&:hover": {
-                opacity: 0.7,
-                background: theme.palette.primary.main,
+            "& .MuiDataGrid-virtualScroller": {
+              overflowX: "hidden",
+              minHeight: "50px",
+
+              "&::-webkit-scrollbar": {
+                width: "0.4em",
               },
-            },
-          },
+              "&::-webkit-scrollbar-track": {
+                "-webkit-box-shadow": "inset 0 0 6px rgba(0,0,0,0.00)",
+              },
+              "&::-webkit-scrollbar-thumb": {
+                background: theme.palette.primary.main,
+                borderRadius: "30px",
 
-          "&.MuiDataGrid-root .MuiDataGrid-columnHeader:focus, &.MuiDataGrid-root .MuiDataGrid-cell:focus":
-            {
-              outline: "none !important",
-            },
-
-          "& .MuiDataGrid-row": {
-            background: "#fff !important",
-            borderRadius: "20px",
-            marginBottom: "10px",
-            padding: "10px 0",
-            border: "1px solid #E5EEFF",
-            // width: 'calc(100% - 2px)',
-
-            "& .MuiDataGrid-actionsCell": {
-              marginRight: "10px",
-            },
-
-            "& .MuiDataGrid-actionsCell .MuiIconButton-root": {
-              opacity: 0,
-            },
-
-            "&.Mui-hovered, &.Mui-selected, &:hover, &:focus, &.Mui-selected.Mui-hovered":
-              {
-                border: `1px solid ${theme.palette.primary.main}`,
-                filter: "drop-shadow(0px 20px 40px rgba(23, 50, 54, 0.1))",
-
-                "&  .MuiDataGrid-actionsCell .MuiIconButton-root": {
-                  opacity: 1,
+                "&:hover": {
+                  opacity: 0.7,
+                  background: theme.palette.primary.main,
                 },
               },
-          },
+            },
 
-          "&>.MuiDataGrid-main": {
-            "&>.MuiDataGrid-columnHeaders": {
-              borderBottom: "none",
-              background: "#F1F6FA",
-              borderRadius: "10px",
+            "&.MuiDataGrid-root .MuiDataGrid-columnHeader:focus, &.MuiDataGrid-root .MuiDataGrid-cell:focus":
+              {
+                outline: "none !important",
+              },
+
+            "& .MuiDataGrid-row": {
+              background: "#fff !important",
+              borderRadius: "16px",
               marginBottom: "10px",
+              padding: "10px 0",
+              border: "1px solid #E5EEFF",
+              // width: 'calc(100% - 2px)',
+
+              "& .MuiDataGrid-actionsCell": {
+                marginRight: "10px",
+              },
+
+              "&.Mui-hovered, &.Mui-selected, &:hover, &:focus, &.Mui-selected.Mui-hovered":
+                {
+                  border: `1px solid ${theme.palette.primary.main}`,
+                  filter: "drop-shadow(0px 10px 20px rgba(23, 50, 54, 0.1))",
+                },
             },
 
-            "& .MuiDataGrid-columnHeader--sortable": {
-              outline: "none !important",
-              "&:hover": {
-                opacity: 0.7,
+            "& .MuiDataGrid-main": {
+              "& .MuiDataGrid-columnHeaders": {
+                borderBottom: "none",
+                borderRadius: "16px",
+                marginBottom: "10px",
+                overflow: "hidden",
+              },
+
+              "& .MuiDataGrid-columnHeader": {
+                backgroundColor: theme.palette.primary.light,
+              },
+              "& .MuiDataGrid-columnHeader--sortable": {
+                outline: "none !important",
+                "&:hover": {
+                  opacity: 0.7,
+                },
+              },
+              "& .MuiDataGrid-columnHeaderTitle": {
+                fontFamily: "Raleway",
+                fontSize: "16px",
+                fontWeight: "500",
+                color: theme.palette.text.primary,
+              },
+
+              "& .MuiDataGrid-columnSeparator": {
+                display: "none",
+              },
+
+              "& div div div div .MuiDataGrid-cell": {
+                borderBottom: "none",
+                outline: "none",
+
+                "&.actions": {
+                  // paddingRight: '20px',
+                },
               },
             },
-            "& .MuiDataGrid-columnHeaderTitle": {
-              fontSize: "14px",
-              fontWeight: "500",
-              color: "#000",
+
+            "& .MuiDataGrid-footerContainer": {
+              height: "0px",
+              display: "none",
             },
 
-            "& div div div div >.MuiDataGrid-cell": {
-              borderBottom: "none",
-              outline: "none",
+            ".MuiDataGrid-iconButtonContainer": {
+              visibility: "visible",
 
-              "&.actions": {
-                // paddingRight: '20px',
+              "& .MuiIconButton-root": {
+                padding: "0 !important",
+                marginLeft: "8.25px",
               },
             },
-          },
-
-          "& .MuiDataGrid-footerContainer": {
-            height: "0px",
-            display: "none",
-          },
-
-          ".MuiDataGrid-iconButtonContainer": {
-            visibility: "visible",
-
-            "& .MuiIconButton-root": {
-              padding: "0 !important",
-              marginLeft: "8.25px",
+            ".MuiDataGrid-sortIcon": {
+              opacity: "inherit !important",
             },
-          },
-          ".MuiDataGrid-sortIcon": {
-            opacity: "inherit !important",
-          },
-        }}
+
+            ".MuiDataGrid-cell": {
+              border: "none",
+            },
+          }}
+        />
+      </div>
+
+      <CustomModal
+        modalTitle="Информация о бронировании"
+        modalContent={
+          <Stack sx={{ alignItems: "stretch", gap: "15px" }}>
+            <BookingDetailsModalContent />
+          </Stack>
+        }
+        open={openBookingDetailsModal.status}
+        setOpen={() =>
+          setOpenBookingDetailsModal({ booking: undefined, status: false })
+        }
+        modalStyle={{ width: "500px" }}
       />
-    </div>
+    </>
   );
 };
 
@@ -292,8 +471,11 @@ const useStyles = makeStyles((theme: Theme) => ({
   },
   // Status column
   statusContainer: {
-    padding: "9px 10px",
-    borderRadius: "20px",
+    padding: "9px 15px",
+    borderRadius: "16px",
+    display: "flex",
+    justifyContent: "center",
+    alignItems: "center",
   },
   statusLabel: {
     fontSize: "12px",
@@ -323,20 +505,7 @@ const useStyles = makeStyles((theme: Theme) => ({
   openDetailsActionButton: {
     width: "40px",
     height: "40px",
-    background: theme.palette.background.paper,
-    border: "1px solid #D2E1F5",
-
-    "& svg path": {
-      fill: theme.palette.primary.main,
-    },
-
-    "&:hover": {
-      border: `1px solid ${theme.palette.primary.main}`,
-      background: theme.palette.primary.main,
-
-      "& svg path": {
-        fill: "#29F499",
-      },
-    },
+    border: `1px solid ${theme.palette.text.primary}`,
+    borderRadius: "100%",
   },
 }));
