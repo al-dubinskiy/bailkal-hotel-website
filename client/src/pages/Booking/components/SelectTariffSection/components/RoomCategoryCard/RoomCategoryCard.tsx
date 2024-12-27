@@ -36,6 +36,7 @@ import { CustomMultiImagePreviewSlider } from "../../../../../components/shared/
 import { FeatureDetails } from "./components/FeatureDetails";
 import { BookingContext } from "../../../../BookingPage";
 import { shallowEqual } from "react-redux";
+import { getRoomCategoryPhotos } from "../../../../utils";
 
 export const RoomMainFeatureGridItem = ({
   icon,
@@ -112,17 +113,7 @@ export const RoomCategoryCard = memo((props: Props) => {
 
   if (!roomCategory) return null;
 
-  const roomPhotos =
-    roomCategory._id === "672cd21f0ae43935e03a79dd" ||
-    roomCategory._id === "672cd2a790ef8a2d0cdfcac3"
-      ? deluxeKingRooms
-      : roomCategory._id === "672cd30090ef8a2d0cdfcac6" ||
-        roomCategory._id === "672cd34e90ef8a2d0cdfcac9"
-      ? deluxeTwinRooms
-      : roomCategory._id === "672cd65af65cf0e5caff9686" ||
-        roomCategory._id === "6757519407763b1fc5c07e72"
-      ? suiteRooms
-      : [];
+  const roomPhotos = getRoomCategoryPhotos(roomCategory);
 
   const Title = () => {
     return <Typography variant="h5">{roomCategory.title}</Typography>;

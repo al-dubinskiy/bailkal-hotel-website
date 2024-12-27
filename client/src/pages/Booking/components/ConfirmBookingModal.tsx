@@ -224,7 +224,7 @@ export const ConfirmBookingModal = (props: Props) => {
             booking = { ...booking, transfer_comment: i.transfer_comment };
           }
           if (i.comment) {
-            booking = { ...booking, transfer_comment: i.comment };
+            booking = { ...booking, comment: i.comment };
           }
           return booking;
         })[0],

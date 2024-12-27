@@ -49,6 +49,11 @@ export type BookingUserInfoType = {
   want_to_know_about_special_offers_and_news: boolean;
 };
 
+export type BookingDateTimeType = {
+  arrival_datetime: Moment;
+  departure_datetime: Moment;
+};
+
 export type CreateBookingType = {
   room_id: string;
   room_category_id: string;

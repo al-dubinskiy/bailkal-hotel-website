@@ -401,7 +401,7 @@ export const BookingsTable = (props: Props) => {
                       : transfer.to_hotel
                       ? "Из отеля, "
                       : "-"
-                  }, ${transfer.time_from + "-" + transfer.time_to}, ${
+                  }${transfer.time_from + "-" + transfer.time_to}, ${
                     transferCar
                       ? transferCar.brand + " " + transferCar.model
                       : "Не указано"
@@ -412,12 +412,10 @@ export const BookingsTable = (props: Props) => {
 
           {transfer && transferCar ? (
             <CustomLabelAndDescription
-              label={"Трансфер, время, автомобиль"}
-              description={transfer.comment}
+              label={"Комментарий трансферу"}
+              description={transfer.comment || "-"}
             />
-          ) : (
-            ""
-          )}
+          ) : null}
 
           <CustomLabelAndDescription
             label={"Способ оплаты"}

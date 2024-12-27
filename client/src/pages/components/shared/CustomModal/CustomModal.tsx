@@ -1,5 +1,5 @@
 import { Box, Modal, Paper, Stack, SxProps, Typography } from "@mui/material";
-import React from "react";
+import React, { ReactElement } from "react";
 import { theme } from "../../../../theme";
 import { CustomButton } from "../CustomButton";
 import { CloseOutlined } from "@mui/icons-material";
@@ -17,6 +17,7 @@ interface Props {
   confirmLoading?: boolean;
   modalStyle?: SxProps;
   footerMessage?: string;
+  closeIcon?: ReactElement;
 }
 
 export const CustomModal = (props: Props) => {
@@ -32,6 +33,7 @@ export const CustomModal = (props: Props) => {
     confirmLoading,
     modalStyle,
     footerMessage,
+    closeIcon,
   } = props;
 
   const handleClose = () => {
@@ -66,7 +68,7 @@ export const CustomModal = (props: Props) => {
         }}
       >
         <CustomCircleIconButton
-          icon={<CloseOutlined />}
+          icon={closeIcon ? closeIcon : <CloseOutlined />}
           onClick={handleClose}
           sx={{
             position: "absolute",

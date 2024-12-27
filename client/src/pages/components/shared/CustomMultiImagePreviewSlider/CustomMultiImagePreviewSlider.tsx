@@ -11,6 +11,7 @@ import "yet-another-react-lightbox/plugins/thumbnails.css";
 
 interface Props {
   images: string[];
+  containerStyle?: SxProps;
 }
 
 const gridItemSizes: {
@@ -80,7 +81,7 @@ const gridItemSizes: {
 ];
 
 export const CustomMultiImagePreviewSlider = (props: Props) => {
-  const { images } = props;
+  const { images, containerStyle } = props;
 
   const thumbnailsRef = React.useRef<any>(null);
   const fullscreenRef = React.useRef<any>(null);
@@ -118,6 +119,7 @@ export const CustomMultiImagePreviewSlider = (props: Props) => {
             marginBottom: "24px",
             borderRadius: "16px",
             overflow: "hidden",
+            ...containerStyle,
           }}
         >
           {images.slice(0, 4).map((item, idx) => {

@@ -10,11 +10,18 @@ import moment, { Moment } from "moment";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import { setFilterParams } from "../../../../redux/slices/Bookings/bookingsSlice";
 import { times } from "../../../Booking/components/EnterGuestsDetailsSection/components/constants";
+import { CheckDateAvailableType } from "../../../Booking/BookingPage";
 
-interface Props {}
+interface Props {
+  checkDateAvailable: ({
+    date,
+  }: {
+    date: Moment;
+  }) => CheckDateAvailableType | null;
+}
 
 export const CustomRangeDatepicker = (props: Props) => {
-  const {} = props;
+  const { checkDateAvailable } = props;
 
   const dispatch = useAppDispatch();
   const { filterParams } = useAppSelector((state) => state.bookings);
@@ -50,6 +57,7 @@ export const CustomRangeDatepicker = (props: Props) => {
 
   const CustomDay = ({ date }: { date: Date }) => {
     // console.log(date);
+    const isDateAvailable = checkDateAvailable({ date: moment(date) });
     return (
       <Stack flexDirection={"column"} gap={"15px"}>
         {date.getDate()}

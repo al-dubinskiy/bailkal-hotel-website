@@ -15,14 +15,15 @@ import {
   CreateBookingLocalType,
   CreateBookingType,
   RoomGuestsCountType,
+  BookingDateTimeType,
 } from "../../redux/slices/Bookings/types";
 import { RoomCategoryType } from "../../redux/slices/RoomsCategories/types";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import moment, { Moment } from "moment";
 import { Box, Button, Card, Stack, Typography } from "@mui/material";
-import { dateTimeFormat } from "../../constants";
+import { dateFormat, dateTimeFormat } from "../../constants";
 import { BookingInfoWidget } from "./components/BookingInfoWidget";
-import { GroupObjectByKey } from "./utils";
+import { GroupObjectByKey, isDateTimeRangeContained } from "./utils";
 import { GetRoomsCategories } from "../../redux/slices/RoomsCategories/roomsCategoriesSlice";
 import {
   GetBookings,
@@ -136,6 +137,11 @@ export const BookingContext = createContext<{
   setCompleteStep: () => null,
 });
 
+export type CheckDateAvailableType = {
+  isAvailable: boolean;
+  roomMinPrice: number | null;
+};
+
 interface Props {}
 
 export const BookingPage = () => {
@@ -211,10 +217,7 @@ export const BookingPage = () => {
   const getAvailableRoomCategories = ({
     arrival_datetime,
     departure_datetime,
-  }: {
-    arrival_datetime: string;
-    departure_datetime: string;
-  }): RoomCategoryPriceType[] | null => {
+  }: BookingDateTimeType): RoomCategoryPriceType[] | null => {
     if (roomsCategories && sortedBookingsByRoomCategories) {
       const availableRoomCategories: RoomCategoryPriceType[] = [];
 
@@ -238,17 +241,36 @@ export const BookingPage = () => {
             // которых принадлежит дата, переданная в ф-цию
             // (а значит на эту дату уже нельзя забронировать эти комнаты)
 
+            // console.log(
+            //   "i ",
+            //   moment(moment(i.arrival_datetime).format(dateFormat)),
+            //   moment(moment(i.departure_datetime).format(dateFormat))
+            // );
+            // console.log(
+            //   "b",
+            //   moment(arrival_datetime.format(dateFormat)),
+            //   moment(departure_datetime.format(dateFormat))
+            // );
             if (
-              (moment(date).isBetween(
-                moment(i.arrival_datetime),
-                moment(i.departure_datetime)
-              ),
-              "[]")
+              isDateTimeRangeContained({
+                start1: moment(moment(i.arrival_datetime).format(dateFormat)),
+                end1: moment(moment(i.departure_datetime).format(dateFormat)),
+                start2: moment(arrival_datetime.format(dateFormat)),
+                end2: moment(departure_datetime.format(dateFormat)),
+              })
+              // (
+              // moment(date).isBetween(
+              //   moment(i.arrival_datetime),
+              //   moment(i.departure_datetime)
+              // ),
+              // "[]"
+              // )
             ) {
               bookedOnDateCount += 1;
             }
           });
 
+          console.log(categoryRoom.title, bookedOnDateCount, categoryRoomCount);
           // Если в данной "категории комнат" еще есть доступные комнаты
           if (bookedOnDateCount < categoryRoomCount) {
             // То записываем данные "категории комнат" в перечень доступных "категорий комнат", а именно id и price (в зав. от кол. гостей)
@@ -276,19 +298,29 @@ export const BookingPage = () => {
   };
 
   const availableRoomCategories = useMemo(() => {
-    return getAvailableRoomCategories(
-      filterParams.arrival_datetime.format(dateTimeFormat)
-    );
-  }, [filterParams.arrival_datetime, roomsCategories, bookings]);
+    const { arrival_datetime, departure_datetime } = filterParams;
+    return getAvailableRoomCategories({
+      arrival_datetime: arrival_datetime,
+      departure_datetime: departure_datetime,
+    });
+  }, [
+    filterParams.arrival_datetime,
+    filterParams.departure_datetime,
+    roomsCategories,
+    bookings,
+  ]);
 
   const checkDateAvailable = ({
     date,
   }: {
-    date: string;
-  }): { isAvailable: boolean; roomMinPrice: number | null } | null => {
+    date: Moment;
+  }): CheckDateAvailableType | null => {
     if (unavailableBookingDates) {
       // Определение доступных категорий комнат
-      const availableRoomCategories = getAvailableRoomCategories(date);
+      const availableRoomCategories = getAvailableRoomCategories({
+        arrival_datetime: date,
+        departure_datetime: date,
+      });
 
       if (availableRoomCategories && availableRoomCategories.length) {
         // Определение минимальной стоимости комнаты
@@ -297,8 +329,9 @@ export const BookingPage = () => {
 
         return {
           isAvailable:
-            !unavailableBookingDates.find((i) => i.date === date) &&
-            availableRoomCategories.length > 0,
+            !unavailableBookingDates.find(
+              (i) => i.date === date.format(dateFormat)
+            ) && availableRoomCategories.length > 0,
           roomMinPrice,
         };
       }
@@ -1086,7 +1119,7 @@ export const BookingPage = () => {
           flexWrap: "wrap",
         }}
       >
-        <CustomRangeDatepicker />
+        <CustomRangeDatepicker checkDateAvailable={checkDateAvailable} />
 
         <SelectGuestsDropdown />
 
@@ -1412,10 +1445,10 @@ export const BookingPage = () => {
     }
   }, [bookingProgress.currentStep, newBookings]);
 
-  console.log("filterParams ", JSON.stringify(filterParams));
-  console.log("bookingsSteps ", JSON.stringify(bookingSteps));
-  console.log("newBookings ", JSON.stringify(newBookings));
-  console.log("bookingProgress ", JSON.stringify(bookingProgress));
+  // console.log("filterParams ", JSON.stringify(filterParams));
+  // console.log("bookingsSteps ", JSON.stringify(bookingSteps));
+  // console.log("newBookings ", JSON.stringify(newBookings));
+  // console.log("bookingProgress ", JSON.stringify(bookingProgress));
 
   return (
     <BasePageLayout isShowPageTitleBanner>

@@ -19,6 +19,7 @@ import { RoomSizeIcon } from "../../../../../assets/icons/RoomSizeIcon";
 import { RoomsCountIcon } from "../../../../../assets/icons/RoomsCountIcon";
 import { CustomButton } from "../../../../components/shared/CustomButton";
 import { RoomCategoryType } from "../../../../../redux/slices/RoomsCategories/types";
+import { getRoomCategoryPhotos } from "../../../utils";
 
 interface Props {}
 
@@ -89,16 +90,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
 
   const roomPhotos = useMemo(() => {
     if (moreAdvantageousRoomCategory) {
-      return moreAdvantageousRoomCategory._id === "672cd21f0ae43935e03a79dd" ||
-        moreAdvantageousRoomCategory._id === "672cd2a790ef8a2d0cdfcac3"
-        ? deluxeKingRooms
-        : moreAdvantageousRoomCategory._id === "672cd30090ef8a2d0cdfcac6" ||
-          moreAdvantageousRoomCategory._id === "672cd34e90ef8a2d0cdfcac9"
-        ? deluxeTwinRooms
-        : moreAdvantageousRoomCategory._id === "672cd65af65cf0e5caff9686" ||
-          moreAdvantageousRoomCategory._id === "6757519407763b1fc5c07e72"
-        ? suiteRooms
-        : [];
+      getRoomCategoryPhotos(moreAdvantageousRoomCategory);
     }
     return [];
   }, [moreAdvantageousRoomCategory]);
