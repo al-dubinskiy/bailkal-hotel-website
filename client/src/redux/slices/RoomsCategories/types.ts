@@ -14,13 +14,18 @@ export type CreateRoomCategoryType = {
   room_id: string[];
   price_per_night_for_one_quest: number;
   price_per_night_for_two_quest: number;
-  booked_rooms: BookedRoomType[];
+  discount: number;
+  include_service_id: string[];
+  available_bed_variant_id: string[];
+  available_tariff_id: string[];
+  main_view_from_room_window_id: string;
+  additional_view_from_room_window_id: string[];
 };
 
 export type UpdateRoomCategoryType = CreateRoomCategoryType;
 
 export type RoomCategoryType = CreateRoomCategoryType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

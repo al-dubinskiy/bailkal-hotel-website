@@ -4,7 +4,7 @@ export type CreateRoomType = {
 };
 
 export type RoomType = CreateRoomType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

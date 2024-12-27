@@ -19,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetTransferCars = createAsyncThunk(
   "transferCars/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getTransferCars.url}`, {
         method: getTransferCars.method,
@@ -192,7 +192,7 @@ const initialState: IRoomTypeState = {
   },
 };
 
-export const transfersVariantsSlice = createSlice({
+export const transfersCarsSlice = createSlice({
   name: "transferCars",
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
@@ -250,7 +250,7 @@ export const transfersVariantsSlice = createSlice({
         const updatedTransferCar = payload.data;
         if (state.transferCars)
           state.transferCars = state.transferCars.map((transferCar) => {
-            return transferCar.id === updatedTransferCar.id
+            return transferCar._id === updatedTransferCar._id
               ? updatedTransferCar
               : transferCar;
           });
@@ -274,7 +274,7 @@ export const transfersVariantsSlice = createSlice({
         state.updateTransferCar.isLoading = false;
         if (state.transferCars)
           state.transferCars = state.transferCars.filter(
-            (transferCar) => transferCar.id !== payload.id
+            (transferCar) => transferCar._id !== payload.id
           );
 
         if (DEBUG)
@@ -293,4 +293,4 @@ export const transfersVariantsSlice = createSlice({
   },
 });
 
-export const {} = transfersVariantsSlice.actions;
+export const {} = transfersCarsSlice.actions;

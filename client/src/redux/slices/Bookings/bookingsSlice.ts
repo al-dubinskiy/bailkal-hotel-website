@@ -1,9 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import {
+  BookingStepType,
   BookingType,
+  BookingUserInfoType,
   CreateBookingApiResponseType,
+  CreateBookingLocalType,
   CreateBookingType,
+  FiltersParamsType,
   GetBookingsApiResponseType,
+  NewBookingsType,
   UpdateBookingApiResponseType,
   UpdateBookingType,
 } from "./types";
@@ -13,13 +18,17 @@ import {
   getBookings,
   updateBooking,
 } from "./httpRequests";
+import { RoomCategoryType } from "../RoomsCategories/types";
+import moment from "moment";
+import { v4 as uuidv4 } from "uuid";
+import { times } from "../../../pages/Booking/components/EnterGuestsDetailsSection/components/constants";
 
 const DEBUG = true;
 
 // API requests
 export const GetBookings = createAsyncThunk(
   "bookings/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getBookings.url}`, {
         method: getBookings.method,
@@ -47,22 +56,22 @@ export const CreateBooking = createAsyncThunk(
   "bookings/create",
   async (
     payload: {
-      booking: CreateBookingType;
+      bookings: CreateBookingType;
     },
     thunkAPI
   ) => {
     try {
-      const { booking } = payload;
+      const { bookings } = payload;
 
       const res = await fetch(`${createBooking.url}`, {
         method: createBooking.method,
         headers: {
           ...createBooking.headers,
         },
-        body: JSON.stringify(booking),
+        body: JSON.stringify(bookings),
       });
 
-      if (res.status === 200) {
+      if (res.status === 201) {
         const json = await res.json();
 
         return json;
@@ -88,7 +97,7 @@ export const UpdateBooking = createAsyncThunk(
     try {
       const { booking } = payload;
 
-      const res = await fetch(`${updateBooking.url}/${booking.id}`, {
+      const res = await fetch(`${updateBooking.url}/${booking._id}`, {
         method: updateBooking.method,
         headers: {
           ...updateBooking.headers,
@@ -143,6 +152,7 @@ export const DeleteBooking = createAsyncThunk(
 );
 
 interface IBookingState {
+  roomGuestsMax: number;
   bookings: BookingType[] | null;
   getBookings: {
     successMessage: string | null;
@@ -165,9 +175,17 @@ interface IBookingState {
     error: any;
     isLoading: boolean;
   };
+  /* --- Booking page --- */
+  // ... add/remove new bookings drafts
+  newBookings: NewBookingsType;
+  currentBooking: CreateBookingLocalType | null;
+  currentRoomCategory: RoomCategoryType | null;
+  bookingSteps: BookingStepType[];
+  filterParams: FiltersParamsType;
 }
 
 const initialState: IBookingState = {
+  roomGuestsMax: 2,
   bookings: null,
   getBookings: {
     successMessage: null,
@@ -190,13 +208,58 @@ const initialState: IBookingState = {
     error: null,
     isLoading: false,
   },
+  /* --- Booking page --- */
+  // ... add/remove new bookings drafts
+  newBookings: {
+    bookings: [],
+    actionType: "",
+  },
+  currentBooking: null,
+  currentRoomCategory: null,
+  bookingSteps: [],
+  filterParams: {
+    arrival_datetime: moment()
+      .set("hours", Number(times[0].value.split(":")[0])) // 07:00
+      .set("minutes", Number(times[0].value.split(":")[1])),
+    departure_datetime: moment()
+      .add(1, "days")
+      .set("hours", Number(times[8].value.split(":")[0])) // 15:00
+      .set("minutes", Number(times[8].value.split(":")[1])),
+    rooms: [{ id: uuidv4(), adults: 1, children: 0 }],
+  },
 };
 
 export const bookingsSlice = createSlice({
   name: "bookings",
   // `createSlice` will infer the state type from the `initialState` argument
   initialState,
-  reducers: {},
+  reducers: {
+    setNewBookings: (state, { payload }: { payload: NewBookingsType }) => {
+      state.newBookings = payload;
+    },
+    setCurrentBooking: (
+      state,
+      { payload }: { payload: CreateBookingLocalType | null }
+    ) => {
+      state.currentBooking = payload;
+    },
+    setCurrentRoomCategory: (
+      state,
+      { payload }: { payload: RoomCategoryType | null }
+    ) => {
+      state.currentRoomCategory = payload;
+    },
+    setBookingSteps: (state, { payload }: { payload: BookingStepType[] }) => {
+      state.bookingSteps = payload;
+    },
+    setFilterParams: (state, { payload }: { payload: FiltersParamsType }) => {
+      state.filterParams = payload;
+    },
+    resetCreateBookingState: (state) => {
+      state.createBooking.successMessage = null;
+      state.createBooking.error = null;
+    },
+  },
   extraReducers: (builder) => {
     builder.addCase(
       GetBookings.fulfilled,
@@ -220,8 +283,11 @@ export const bookingsSlice = createSlice({
     builder.addCase(
       CreateBooking.fulfilled,
       (state, { payload }: { payload: CreateBookingApiResponseType }) => {
+        state.createBooking.successMessage = "CreateBooking (API): success";
         state.createBooking.isLoading = false;
         const booking = payload.data;
+        console.log("ffff", booking);
+        console.log("ffffff", state.bookings);
         if (state.bookings) {
           state.bookings.push(booking);
         } else {
@@ -246,7 +312,9 @@ export const bookingsSlice = createSlice({
         const updatedBooking = payload.data;
         if (state.bookings)
           state.bookings = state.bookings.map((booking) => {
-            return booking.id === updatedBooking.id ? updatedBooking : booking;
+            return booking._id === updatedBooking._id
+              ? updatedBooking
+              : booking;
           });
 
         if (DEBUG) console.log("CreateBooking (API): booking was updated.");
@@ -267,7 +335,7 @@ export const bookingsSlice = createSlice({
         state.updateBooking.isLoading = false;
         if (state.bookings)
           state.bookings = state.bookings.filter(
-            (booking) => booking.id !== payload.id
+            (booking) => booking._id !== payload.id
           );
 
         if (DEBUG) console.log("CreateBooking (API): booking was deleted.");
@@ -285,4 +353,12 @@ export const bookingsSlice = createSlice({
   },
 });
 
-export const {} = bookingsSlice.actions;
+export const {
+  // setBookingUserInfo,
+  setNewBookings,
+  setCurrentBooking,
+  setCurrentRoomCategory,
+  setBookingSteps,
+  setFilterParams,
+  resetCreateBookingState,
+} = bookingsSlice.actions;

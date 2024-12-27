@@ -6,6 +6,10 @@ const router = Router();
 // Get booking services
 router.get("/", async (req, res) => {
   try {
+    const bookingsServices = await BookingService.find();
+    res.status(200).json({
+      data: bookingsServices,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get booking services: статус 500. Ошибка сервера.",
@@ -17,7 +21,7 @@ router.get("/", async (req, res) => {
 router.post("/", async (req, res) => {
   try {
     const data = req.body;
-    const existingRecord = await BookingService.findOne({ title: data.title });
+    const existingRecord = await BookingService.findOne({ value: data.value });
     if (existingRecord) {
       return res.status(409).json({
         error:

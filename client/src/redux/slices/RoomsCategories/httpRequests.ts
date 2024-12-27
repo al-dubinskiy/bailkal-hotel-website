@@ -1,7 +1,8 @@
+import { baseUrl } from "../../constants";
 import { RequestTypeHTTP } from "../../types";
 
 export const getRoomsCategories: RequestTypeHTTP = {
-  url: "/api/roomsCategories",
+  url: baseUrl + "/api/roomsCategories",
   method: "GET",
   headers: {
     Accept: "application/json",
@@ -9,7 +10,7 @@ export const getRoomsCategories: RequestTypeHTTP = {
 };
 
 export const createRoomCategory: RequestTypeHTTP = {
-  url: "/api/roomsCategories",
+  url: baseUrl + "/api/roomsCategories",
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -18,7 +19,7 @@ export const createRoomCategory: RequestTypeHTTP = {
 };
 
 export const updateRoomCategory: RequestTypeHTTP = {
-  url: "/api/roomsCategories",
+  url: baseUrl + "/api/roomsCategories",
   method: "PUT" /* .../{id} */,
   headers: {
     "Content-Type": "application/json",
@@ -27,6 +28,6 @@ export const updateRoomCategory: RequestTypeHTTP = {
 };
 
 export const deleteRoomCategory: RequestTypeHTTP = {
-  url: "/api/roomsCategories",
+  url: baseUrl + "/api/roomsCategories",
   method: "DELETE" /* .../{id} */,
 };

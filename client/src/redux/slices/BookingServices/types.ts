@@ -2,6 +2,7 @@
 export type CreateBookingServiceType = {
   title: string;
   description?: string;
+  value: string;
   price: number;
   isPricePerNight: boolean;
   forGuestsNumber: string;
@@ -11,7 +12,7 @@ export type CreateBookingServiceType = {
 export type UpdateBookingServiceType = CreateBookingServiceType;
 
 export type BookingServiceType = CreateBookingServiceType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

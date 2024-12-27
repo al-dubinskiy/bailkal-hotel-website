@@ -19,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetRoomsCategories = createAsyncThunk(
   "roomsCategories/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getRoomsCategories.url}`, {
         method: getRoomsCategories.method,
@@ -248,7 +248,7 @@ export const roomsCategoriesSlice = createSlice({
         const updatedRoomCategory = payload.data;
         if (state.roomsCategories)
           state.roomsCategories = state.roomsCategories.map((roomType) => {
-            return roomType.id === updatedRoomCategory.id
+            return roomType._id === updatedRoomCategory._id
               ? updatedRoomCategory
               : roomType;
           });
@@ -272,7 +272,7 @@ export const roomsCategoriesSlice = createSlice({
         state.updateRoomCategory.isLoading = false;
         if (state.roomsCategories)
           state.roomsCategories = state.roomsCategories.filter(
-            (roomCategory) => roomCategory.id !== payload.id
+            (roomCategory) => roomCategory._id !== payload.id
           );
 
         if (DEBUG)

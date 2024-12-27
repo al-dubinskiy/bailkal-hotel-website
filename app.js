@@ -1,8 +1,15 @@
 const express = require("express");
 const config = require("config");
 const { default: mongoose } = require("mongoose");
+const cors = require("cors");
 
 const app = express();
+
+app.use(
+  cors({
+    origin: "http://localhost:3000", // Replace with your frontend's origin
+  })
+);
 
 const PORT = config.get("port") || 5000;
 
@@ -13,6 +20,10 @@ app.use("/api/roomsCategories", require("./routes/roomsCategories.routes.js"));
 app.use("/api/rooms", require("./routes/rooms.routes.js"));
 app.use("/api/roomBedVariants", require("./routes/roomBedVariants.routes.js"));
 app.use("/api/roomFeatures", require("./routes/roomFeatures.routes.js"));
+app.use(
+  "/api/roomFeaturesCategories",
+  require("./routes/roomFeaturesCategories.routes.js")
+);
 app.use(
   "/api/viewsFromRoomWindow",
   require("./routes/viewsFromRoomWindow.routes.js")
@@ -25,6 +36,10 @@ app.use(
   require("./routes/transferVariants.routes.js")
 );
 app.use("/api/transferCars", require("./routes/transferCars.routes.js"));
+app.use(
+  "/api/unavailableBookingDates",
+  require("./routes/unavailableBookingDates.routes.js")
+);
 
 async function start() {
   try {

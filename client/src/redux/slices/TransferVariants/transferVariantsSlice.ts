@@ -19,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetTransferVariants = createAsyncThunk(
   "transferVariants/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getTransferVariants.url}`, {
         method: getTransferVariants.method,
@@ -277,7 +277,7 @@ export const transfersVariantsSlice = createSlice({
         if (state.transferVariants)
           state.transferVariants = state.transferVariants.map(
             (transferVariant) => {
-              return transferVariant.id === updatedTransferVariant.id
+              return transferVariant._id === updatedTransferVariant._id
                 ? updatedTransferVariant
                 : transferVariant;
             }
@@ -302,7 +302,7 @@ export const transfersVariantsSlice = createSlice({
         state.updateTransferVariant.isLoading = false;
         if (state.transferVariants)
           state.transferVariants = state.transferVariants.filter(
-            (transferVariant) => transferVariant.id !== payload.id
+            (transferVariant) => transferVariant._id !== payload.id
           );
 
         if (DEBUG)

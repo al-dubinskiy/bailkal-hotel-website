@@ -6,7 +6,10 @@ const router = Router();
 // Get rooms
 router.get("/", async (req, res) => {
   try {
-    res.send("");
+    const rooms = await Room.find();
+    res.status(200).json({
+      data: rooms,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get rooms: статус 500. Ошибка сервера.",

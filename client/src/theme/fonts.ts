@@ -9,14 +9,13 @@ import RalewayMedium from "../assets/fonts/Raleway/Raleway-Medium.ttf";
 import RalewaySemiBold from "../assets/fonts/Raleway/Raleway-SemiBold.ttf";
 import RalewayBold from "../assets/fonts/Raleway/Raleway-Bold.ttf";
 
-export const fontList = `CormorantInfant, Raleway, sans-serif`;
 export const fontFaceOverrides = `
 @font-face {
   font-family: 'CormorantInfant';
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: local('CormorantInfant'), local('CormorantInfant-Regular'), url(${CormorantInfantRegular}) format('ttf');
+  src: local('CormorantInfant'), local('CormorantInfant-Regular'), url(${CormorantInfantRegular}) format('truetype');
   unicodeRange: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF;
 }
 @font-face {
@@ -24,7 +23,7 @@ export const fontFaceOverrides = `
   font-style: medium;
   font-display: swap;
   font-weight: 500;
-  src: local('CormorantInfant'), local('CormorantInfant-Medium'), url(${CormorantInfantMedium}) format('ttf');
+  src: local('CormorantInfant'), local('CormorantInfant-Medium'), url(${CormorantInfantMedium}) format('truetype');
   unicodeRange: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF;
 }
 @font-face {
@@ -32,7 +31,7 @@ export const fontFaceOverrides = `
   font-style: semibold;
   font-display: swap;
   font-weight: 600;
-  src: local('CormorantInfant'), local('CormorantInfant-SemiBold'), url(${CormorantInfantSemiBold}) format('ttf');
+  src: local('CormorantInfant'), local('CormorantInfant-SemiBold'), url(${CormorantInfantSemiBold}) format('truetype');
   unicodeRange: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF;
 }
 @font-face {
@@ -40,7 +39,7 @@ export const fontFaceOverrides = `
   font-style: bold;
   font-display: swap;
   font-weight: 700;
-  src: local('CormorantInfant'), local('CormorantInfant-Bold'), url(${CormorantInfantBold}) format('ttf');
+  src: local('CormorantInfant'), local('CormorantInfant-Bold'), url(${CormorantInfantBold}) format('truetype');
   unicodeRange: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF;
 }
 @font-face {
@@ -48,7 +47,7 @@ export const fontFaceOverrides = `
   font-style: light;
   font-display: swap;
   font-weight: 300;
-  src: local('Raleway'), local('Raleway-Light'), url(${RalewayLight}) format('ttf');
+  src: local('Raleway'), local('Raleway-Light'), url(${RalewayLight}) format('truetype');
   unicodeRange: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF;
 }
 @font-face {
@@ -56,7 +55,7 @@ export const fontFaceOverrides = `
   font-style: normal;
   font-display: swap;
   font-weight: 400;
-  src: local('Raleway'), local('Raleway-Regular'), url(${RalewayRegular}) format('ttf');
+  src: local('Raleway'), local('Raleway-Regular'), url(${RalewayRegular}) format('truetype');
   unicodeRange: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF;
 }
 @font-face {
@@ -64,7 +63,7 @@ export const fontFaceOverrides = `
   font-style: italic;
   font-display: swap;
   font-weight: 400;
-  src: local('Raleway'), local('Raleway-Italic'), url(${RalewayItalic}) format('ttf');
+  src: local('Raleway'), local('Raleway-Italic'), url(${RalewayItalic}) format('truetype');
   unicodeRange: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF;
 }
 @font-face {
@@ -72,7 +71,7 @@ export const fontFaceOverrides = `
   font-style: medium;
   font-display: swap;
   font-weight: 500;
-  src: local('Raleway'), local('Raleway-Medium'), url(${RalewayMedium}) format('ttf');
+  src: local('Raleway'), local('Raleway-Medium'), url(${RalewayMedium}) format('truetype');
   unicodeRange: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF;
 }
 @font-face {
@@ -80,7 +79,7 @@ export const fontFaceOverrides = `
   font-style: semibold;
   font-display: swap;
   font-weight: 600;
-  src: local('Raleway'), local('Raleway-SemiBold'), url(${RalewaySemiBold}) format('ttf');
+  src: local('Raleway'), local('Raleway-SemiBold'), url(${RalewaySemiBold}) format('truetype');
   unicodeRange: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF;
 }
 @font-face {
@@ -88,7 +87,7 @@ export const fontFaceOverrides = `
   font-style: bold;
   font-display: swap;
   font-weight: 700;
-  src: local('Raleway'), local('Raleway-Bold'), url(${RalewayBold}) format('ttf');
+  src: local('Raleway'), local('Raleway-Bold'), url(${RalewayBold}) format('truetype');
   unicodeRange: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF;
 }
 `;

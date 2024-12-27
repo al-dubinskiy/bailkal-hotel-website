@@ -17,9 +17,9 @@ import {
 const DEBUG = true;
 
 // API requests
-export const GetRoomRoomBedVariants = createAsyncThunk(
+export const GetRoomBedVariants = createAsyncThunk(
   "roomBedVariants/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getRoomRoomBedVariants.url}`, {
         method: getRoomRoomBedVariants.method,
@@ -34,16 +34,11 @@ export const GetRoomRoomBedVariants = createAsyncThunk(
         return json;
       } else {
         return thunkAPI.rejectWithValue(
-          "GetRoomRoomBedVariants (API error): " +
-            res.status +
-            " " +
-            res.statusText
+          "GetRoomBedVariants (API error): " + res.status + " " + res.statusText
         );
       }
     } catch (err) {
-      return thunkAPI.rejectWithValue(
-        "GetRoomRoomBedVariants (API error): " + err
-      );
+      return thunkAPI.rejectWithValue("GetRoomBedVariants (API error): " + err);
     }
   }
 );
@@ -219,7 +214,7 @@ export const roomBedVariantsSlice = createSlice({
   reducers: {},
   extraReducers: (builder) => {
     builder.addCase(
-      GetRoomRoomBedVariants.fulfilled,
+      GetRoomBedVariants.fulfilled,
       (
         state,
         { payload }: { payload: GetRoomRoomBedVariantsApiResponseType }
@@ -229,16 +224,14 @@ export const roomBedVariantsSlice = createSlice({
         state.roomBedVariants = roomBedVariants;
 
         if (DEBUG)
-          console.log(
-            "GetRoomRoomBedVariants (API): rooms types was recieved."
-          );
+          console.log("GetRoomBedVariants (API): rooms types was recieved.");
       }
     );
-    builder.addCase(GetRoomRoomBedVariants.pending, (state, { payload }) => {
+    builder.addCase(GetRoomBedVariants.pending, (state, { payload }) => {
       state.getRoomRoomBedVariants.error = "";
       state.getRoomRoomBedVariants.isLoading = true;
     });
-    builder.addCase(GetRoomRoomBedVariants.rejected, (state, { payload }) => {
+    builder.addCase(GetRoomBedVariants.rejected, (state, { payload }) => {
       state.getRoomRoomBedVariants.isLoading = false;
       state.getRoomRoomBedVariants.error = payload;
       if (DEBUG) console.log(payload);
@@ -280,7 +273,7 @@ export const roomBedVariantsSlice = createSlice({
         if (state.roomBedVariants)
           state.roomBedVariants = state.roomBedVariants.map(
             (roomBedVariant) => {
-              return roomBedVariant.id === updatedRoomBedVariant.id
+              return roomBedVariant._id === updatedRoomBedVariant._id
                 ? updatedRoomBedVariant
                 : roomBedVariant;
             }
@@ -305,7 +298,7 @@ export const roomBedVariantsSlice = createSlice({
         state.updateRoomBedVariant.isLoading = false;
         if (state.roomBedVariants)
           state.roomBedVariants = state.roomBedVariants.filter(
-            (roomBedVariant) => roomBedVariant.id !== payload.id
+            (roomBedVariant) => roomBedVariant._id !== payload.id
           );
 
         if (DEBUG)

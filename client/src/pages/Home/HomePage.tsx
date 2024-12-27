@@ -1,11 +1,11 @@
 import React from "react";
 import BasePageLayout from "../components/BasePageLayout";
-import { Header } from "../components/Header/Header";
+import { Box } from "@mui/material";
 
 export const HomePage = () => {
   return (
     <BasePageLayout>
-      <div>Home Page</div>
+      <Box marginTop={"24px"}>Home Page</Box>
     </BasePageLayout>
   );
 };

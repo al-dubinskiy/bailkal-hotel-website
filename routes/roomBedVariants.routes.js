@@ -6,6 +6,11 @@ const router = Router();
 // Get room bed variants
 router.get("/", async (req, res) => {
   try {
+    const roomBedVariants = await RoomBedVariant.find();
+
+    res.status(200).json({
+      data: roomBedVariants,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get room bed variants: статус 500. Ошибка сервера.",

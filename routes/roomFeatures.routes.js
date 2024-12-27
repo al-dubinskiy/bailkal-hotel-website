@@ -3,9 +3,14 @@ const RoomFeature = require("../models/RoomFeature");
 const moment = require("moment");
 const router = Router();
 
-// Get room feature features
+// Get room features
 router.get("/", async (req, res) => {
   try {
+    const roomsFeatures = await RoomFeature.find();
+
+    res.status(200).json({
+      data: roomsFeatures,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get room feature features: статус 500. Ошибка сервера.",

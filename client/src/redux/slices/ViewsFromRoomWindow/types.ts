@@ -1,13 +1,14 @@
 // Local
 export type CreateViewFromRoomWindowType = {
   title: string;
-  description?: string;
+  description: string;
+  value: string;
 };
 
 export type UpdateViewFromRoomWindowType = CreateViewFromRoomWindowType;
 
 export type ViewFromRoomWindowType = CreateViewFromRoomWindowType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

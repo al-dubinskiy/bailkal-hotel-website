@@ -1,7 +1,8 @@
+import { baseUrl } from "../../constants";
 import { RequestTypeHTTP } from "../../types";
 
 export const getBookingServices: RequestTypeHTTP = {
-  url: "/api/bookingServices",
+  url: baseUrl + "/api/bookingServices",
   method: "GET",
   headers: {
     Accept: "application/json",
@@ -9,7 +10,7 @@ export const getBookingServices: RequestTypeHTTP = {
 };
 
 export const createBookingService: RequestTypeHTTP = {
-  url: "/api/bookingServices",
+  url: baseUrl + "/api/bookingServices",
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -18,7 +19,7 @@ export const createBookingService: RequestTypeHTTP = {
 };
 
 export const updateBookingService: RequestTypeHTTP = {
-  url: "/api/bookingServices",
+  url: baseUrl + "/api/bookingServices",
   method: "PUT" /* .../{id} */,
   headers: {
     "Content-Type": "application/json",
@@ -27,6 +28,6 @@ export const updateBookingService: RequestTypeHTTP = {
 };
 
 export const deleteBookingService: RequestTypeHTTP = {
-  url: "/api/bookingServices",
+  url: baseUrl + "/api/bookingServices",
   method: "DELETE" /* .../{id} */,
 };

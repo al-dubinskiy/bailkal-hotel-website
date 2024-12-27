@@ -1,7 +1,8 @@
+import { baseUrl } from "../../constants";
 import { RequestTypeHTTP } from "../../types";
 
 export const getTransferVariants: RequestTypeHTTP = {
-  url: "/api/transferVariants",
+  url: baseUrl + "/api/transferVariants",
   method: "GET",
   headers: {
     Accept: "application/json",
@@ -9,7 +10,7 @@ export const getTransferVariants: RequestTypeHTTP = {
 };
 
 export const createTransferVariant: RequestTypeHTTP = {
-  url: "/api/transferVariants",
+  url: baseUrl + "/api/transferVariants",
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -18,7 +19,7 @@ export const createTransferVariant: RequestTypeHTTP = {
 };
 
 export const updateTransferVariant: RequestTypeHTTP = {
-  url: "/api/transferVariants",
+  url: baseUrl + "/api/transferVariants",
   method: "PUT" /* .../{id} */,
   headers: {
     "Content-Type": "application/json",
@@ -27,6 +28,6 @@ export const updateTransferVariant: RequestTypeHTTP = {
 };
 
 export const deleteTransferVariant: RequestTypeHTTP = {
-  url: "/api/transferVariants",
+  url: baseUrl + "/api/transferVariants",
   method: "DELETE" /* .../{id} */,
 };

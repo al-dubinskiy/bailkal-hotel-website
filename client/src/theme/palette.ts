@@ -10,6 +10,7 @@ export const palette: PaletteOptions = {
     contrastText: "#1a1a1a",
   },
   secondary: {
+    lighter: "#f2f6d6",
     light: "#cfdd6d",
     main: "#C4D549",
     dark: "#899533",
@@ -29,6 +30,15 @@ export const palette: PaletteOptions = {
   },
   layoutBackground: {
     light: "#ffffff",
+    lightGray: "#F7F7F7",
     dark: "#1a1a1a",
+  },
+  gray: {
+    extraLight: "#D9D9D9",
+    light: "#606060",
+    dark: "#1a1a1a",
+  },
+  error: {
+    main: "#d32f2f",
   },
 };

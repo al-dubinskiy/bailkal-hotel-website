@@ -2,10 +2,11 @@
 export type CreateRoomFeatureType = {
   title: string;
   description?: string;
+  category_id: string;
 };
 
 export type RoomFeatureType = CreateRoomFeatureType & {
-  id: string;
+  _id: string;
   created_at: string;
   updated_at: string;
 };

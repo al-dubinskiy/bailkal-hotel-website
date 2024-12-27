@@ -8,12 +8,17 @@ import { paymentMethodsSlice } from "./slices/PaymentMethods/paymentMethodsSlice
 import { transfersVariantsSlice } from "./slices/TransferVariants/transferVariantsSlice";
 import { roomBedVariantsSlice } from "./slices/RoomBedVariants/roomBedVariantsSlice";
 import { viewsFromRoomWindowSlice } from "./slices/ViewsFromRoomWindow/viewsFromRoomWindow";
-import { useDispatch } from "react-redux";
+import { unavailableBookingDatesSlice } from "./slices/UnavailableBookingDates/unavailableBookingDates";
+import { roomFeaturesSlice } from "./slices/RoomFeatures/roomFeaturesSlice";
+import { roomFeaturesCategoriesSlice } from "./slices/RoomFeaturesCategories/roomFeaturesSlice";
+import { transfersCarsSlice } from "./slices/TransferCars/transferCarsSlice";
 
 export const store = configureStore({
   reducer: {
     bookings: bookingsSlice.reducer,
     roomsCategories: roomsCategoriesSlice.reducer,
+    roomFeatures: roomFeaturesSlice.reducer,
+    roomFeaturesCategories: roomFeaturesCategoriesSlice.reducer,
     rooms: roomsSlice.reducer,
     roomBedVariants: roomBedVariantsSlice.reducer,
     viewsFromRoomWindow: viewsFromRoomWindowSlice.reducer,
@@ -21,7 +26,13 @@ export const store = configureStore({
     bookingServices: bookingServicesSlice.reducer,
     paymentMethods: paymentMethodsSlice.reducer,
     transfersVariants: transfersVariantsSlice.reducer,
+    transfersCars: transfersCarsSlice.reducer,
+    unavailableBookingDates: unavailableBookingDatesSlice.reducer,
   },
+  middleware: (getDefaultMiddleware) =>
+    getDefaultMiddleware({
+      serializableCheck: false,
+    }),
 });
 
 // Infer the `RootState` and `AppDispatch` types from the store itself

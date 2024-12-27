@@ -6,6 +6,10 @@ const router = Router();
 // Get transfer cars
 router.get("/", async (req, res) => {
   try {
+    const transferCars = await TransferCar.find();
+    res.status(200).json({
+      data: transferCars,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get transfer cars: статус 500. Ошибка сервера.",

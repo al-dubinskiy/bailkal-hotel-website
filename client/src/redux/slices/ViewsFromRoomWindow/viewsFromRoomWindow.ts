@@ -19,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetViewsFromRoomWindow = createAsyncThunk(
   "viewsFromRoomWindow/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getViewsFromRoomWindow.url}`, {
         method: getViewsFromRoomWindow.method,
@@ -280,7 +280,7 @@ export const viewsFromRoomWindowSlice = createSlice({
         if (state.viewsFromRoomWindow)
           state.viewsFromRoomWindow = state.viewsFromRoomWindow.map(
             (viewFromRoomWindow) => {
-              return viewFromRoomWindow.id === updatedViewFromRoomWindow.id
+              return viewFromRoomWindow._id === updatedViewFromRoomWindow._id
                 ? updatedViewFromRoomWindow
                 : viewFromRoomWindow;
             }
@@ -305,7 +305,7 @@ export const viewsFromRoomWindowSlice = createSlice({
         state.updateViewFromRoomWindow.isLoading = false;
         if (state.viewsFromRoomWindow)
           state.viewsFromRoomWindow = state.viewsFromRoomWindow.filter(
-            (viewFromRoomWindow) => viewFromRoomWindow.id !== payload.id
+            (viewFromRoomWindow) => viewFromRoomWindow._id !== payload.id
           );
 
         if (DEBUG)

@@ -6,6 +6,11 @@ const router = Router();
 // Get views from view from room window window
 router.get("/", async (req, res) => {
   try {
+    const viewsFromRoomWindow = await ViewFromRoomWindow.find();
+
+    res.status(200).json({
+      data: viewsFromRoomWindow,
+    });
   } catch (e) {
     res.status(500).json({
       error:
@@ -19,7 +24,7 @@ router.post("/", async (req, res) => {
   try {
     const data = req.body;
     const existingRecord = await ViewFromRoomWindow.findOne({
-      title: data.title,
+      value: data.value,
     });
     if (existingRecord) {
       return res.status(409).json({

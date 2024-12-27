@@ -9,6 +9,7 @@ import {
 } from "./types";
 import {
   createRoomFeature,
+  deleteRoomFeature,
   getRoomFeatures,
   updateRoomFeature,
 } from "./httpRequests";
@@ -18,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetRoomFeatures = createAsyncThunk(
   "roomFeatures/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getRoomFeatures.url}`, {
         method: getRoomFeatures.method,
@@ -87,7 +88,7 @@ export const UpdateRoomFeature = createAsyncThunk(
     try {
       const { roomFeature } = payload;
 
-      const res = await fetch(`${updateRoomFeature.url}/${roomFeature.id}`, {
+      const res = await fetch(`${updateRoomFeature.url}/${roomFeature._id}`, {
         method: updateRoomFeature.method,
         headers: {
           ...updateRoomFeature.headers,
@@ -121,10 +122,10 @@ export const DeleteRoomFeature = createAsyncThunk(
     try {
       const { id } = payload;
 
-      const res = await fetch(`${updateRoomFeature.url}/${id}`, {
-        method: updateRoomFeature.method,
+      const res = await fetch(`${deleteRoomFeature.url}/${id}`, {
+        method: deleteRoomFeature.method,
         headers: {
-          ...updateRoomFeature.headers,
+          ...deleteRoomFeature.headers,
         },
       });
 
@@ -247,13 +248,13 @@ export const roomFeaturesSlice = createSlice({
         const updatedRoomFeature = payload.data;
         if (state.roomFeatures)
           state.roomFeatures = state.roomFeatures.map((roomFeature) => {
-            return roomFeature.id === updatedRoomFeature.id
+            return roomFeature._id === updatedRoomFeature._id
               ? updatedRoomFeature
               : roomFeature;
           });
 
         if (DEBUG)
-          console.log("CreateRoomFeature (API): roomFeature was updated.");
+          console.log("UpdateRoomFeature (API): roomFeature was updated.");
       }
     );
     builder.addCase(UpdateRoomFeature.pending, (state, { payload }) => {
@@ -272,7 +273,7 @@ export const roomFeaturesSlice = createSlice({
 
         if (state.roomFeatures)
           state.roomFeatures = state.roomFeatures.filter(
-            (roomFeature) => roomFeature.id !== payload.id
+            (roomFeature) => roomFeature._id !== payload.id
           );
 
         if (DEBUG)

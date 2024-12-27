@@ -19,7 +19,7 @@ const DEBUG = true;
 // API requests
 export const GetPaymentMethods = createAsyncThunk(
   "paymentMethods/getAll",
-  async (payload: {}, thunkAPI) => {
+  async (_, thunkAPI) => {
     try {
       const res = await fetch(`${getPaymentMethods.url}`, {
         method: getPaymentMethods.method,
@@ -263,7 +263,7 @@ export const paymentMethodsSlice = createSlice({
         const updatedPaymentMethod = payload.data;
         if (state.paymentMethods)
           state.paymentMethods = state.paymentMethods.map((paymentMethod) => {
-            return paymentMethod.id === updatedPaymentMethod.id
+            return paymentMethod._id === updatedPaymentMethod._id
               ? updatedPaymentMethod
               : paymentMethod;
           });
@@ -287,7 +287,7 @@ export const paymentMethodsSlice = createSlice({
         state.updatePaymentMethod.isLoading = false;
         if (state.paymentMethods)
           state.paymentMethods = state.paymentMethods.filter(
-            (paymentMethod) => paymentMethod.id !== payload.id
+            (paymentMethod) => paymentMethod._id !== payload.id
           );
 
         if (DEBUG)

@@ -1,8 +1,13 @@
 import React from "react";
+import BasePageLayout from "../components/BasePageLayout";
 
 interface Props {}
 
 export const RoomsPage = (props: Props) => {
   const {} = props;
-  return <div>RoomsPage</div>;
+  return (
+    <BasePageLayout>
+      <div>RoomsPage</div>
+    </BasePageLayout>
+  );
 };

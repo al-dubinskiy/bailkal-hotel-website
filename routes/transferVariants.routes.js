@@ -6,6 +6,24 @@ const router = Router();
 // Get transfer variants
 router.get("/", async (req, res) => {
   try {
+    const transferVariants = await TransferVariant.find();
+    const updated = transferVariants.map((i) => {
+      return {
+        _id: i._id,
+        from_hotel: i.from_hotel,
+        to_hotel: i.to_hotel,
+        time_from:
+          i.time_from < 10 ? `0${i.time_from}:00` : `${i.time_from}:00`,
+        time_to: i.time_to < 10 ? `0${i.time_to}:00` : `${i.time_to}:00`,
+        car_id: i.car_id,
+        price: i.price,
+        created_at: i.created_at,
+        updated_at: i.updated_at,
+      };
+    });
+    res.status(200).json({
+      data: updated,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Get transfer variants: статус 500. Ошибка сервера.",

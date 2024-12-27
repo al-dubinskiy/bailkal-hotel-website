@@ -1,7 +1,8 @@
+import { baseUrl } from "../../constants";
 import { RequestTypeHTTP } from "../../types";
 
 export const getPaymentMethods: RequestTypeHTTP = {
-  url: "/api/paymentMethods",
+  url: baseUrl + "/api/paymentMethods",
   method: "GET",
   headers: {
     Accept: "application/json",
@@ -9,7 +10,7 @@ export const getPaymentMethods: RequestTypeHTTP = {
 };
 
 export const createPaymentMethod: RequestTypeHTTP = {
-  url: "/api/paymentMethods",
+  url: baseUrl + "/api/paymentMethods",
   method: "POST",
   headers: {
     "Content-Type": "application/json",
@@ -18,7 +19,7 @@ export const createPaymentMethod: RequestTypeHTTP = {
 };
 
 export const updatePaymentMethod: RequestTypeHTTP = {
-  url: "/api/paymentMethods",
+  url: baseUrl + "/api/paymentMethods",
   method: "PUT" /* .../{id} */,
   headers: {
     "Content-Type": "application/json",
@@ -27,6 +28,6 @@ export const updatePaymentMethod: RequestTypeHTTP = {
 };
 
 export const deletePaymentMethod: RequestTypeHTTP = {
-  url: "/api/paymentMethods",
+  url: baseUrl + "/api/paymentMethods",
   method: "DELETE" /* .../{id} */,
 };
