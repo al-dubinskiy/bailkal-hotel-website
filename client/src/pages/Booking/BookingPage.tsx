@@ -45,6 +45,7 @@ import { BookingTariffType } from "../../redux/slices/BookingTariffs/types";
 import { BookingServiceType } from "../../redux/slices/BookingServices/types";
 import { EnterGuestsDetailsSection } from "./components/EnterGuestsDetailsSection/EnterGuestsDetailsSection";
 import { SelectGuestsDropdown } from "./components/FiltersBar/SelectGuestsDropdown";
+import { useGetApiData } from "../../hooks/getApiData";
 
 // Типы
 export type RoomCategoryPriceType = {
@@ -102,6 +103,7 @@ export const BookingContext = createContext<{
     viewFromWindowId,
     newRoomCategory,
     guestsDetails,
+    isSetCompleteStep,
   }: {
     tempBookingId?: string;
     currentStep: BookingStepType;
@@ -116,6 +118,7 @@ export const BookingContext = createContext<{
     viewFromWindowId?: string;
     newRoomCategory?: RoomCategoryType & { additionalPayment: number };
     guestsDetails?: BookingGuestsDetailsPrimitiveType;
+    isSetCompleteStep?: boolean;
   }) => void;
   bookingProgressCurrentStep: BookingProgressStepType;
   toPrevStep: () => void;
@@ -137,6 +140,7 @@ interface Props {}
 
 export const BookingPage = () => {
   const dispatch = useAppDispatch();
+  useGetApiData();
   const { unavailableBookingDates } = useAppSelector(
     (state) => state.unavailableBookingDates
   );
@@ -204,9 +208,13 @@ export const BookingPage = () => {
     }
   }, [bookings, roomsCategories]);
 
-  const getAvailableRoomCategories = (
-    date: string
-  ): RoomCategoryPriceType[] | null => {
+  const getAvailableRoomCategories = ({
+    arrival_datetime,
+    departure_datetime,
+  }: {
+    arrival_datetime: string;
+    departure_datetime: string;
+  }): RoomCategoryPriceType[] | null => {
     if (roomsCategories && sortedBookingsByRoomCategories) {
       const availableRoomCategories: RoomCategoryPriceType[] = [];
 
@@ -313,6 +321,7 @@ export const BookingPage = () => {
       bedTypeId,
       viewFromWindowId,
       guestsDetails,
+      isSetCompleteStep = false,
     }: {
       tempBookingId?: string;
       currentStep: BookingStepType;
@@ -326,6 +335,7 @@ export const BookingPage = () => {
       bedTypeId?: string;
       viewFromWindowId?: string;
       guestsDetails?: BookingGuestsDetailsPrimitiveType;
+      isSetCompleteStep?: boolean;
     }) => {
       const getRoomCategoryPrice = ({
         room,
@@ -415,15 +425,20 @@ export const BookingPage = () => {
         // Для одиночного режима бронирования
         if (currentStep.name === "Select a room" && roomCategory) {
           // Получить id всех комнат, которые забронированы на данную категорию
-          const bookedRoomsOnCategory = Array.from(
+          const currentBookedRoomsOnCategory = Array.from(
             newBookings.bookings.filter(
               (i) => i.room_category_id === roomCategory._id
             ),
             (i) => i.room_id
           );
+          const prevBookedRoomOnCategory = bookings
+            .filter((i) => i.room_category_id === roomCategory._id)
+            .map((i) => i.room_id);
           // Найти id доступной комнаты для бронирования
           const freeRoomId = roomCategory.room_id.find(
-            (i) => !bookedRoomsOnCategory.includes(i)
+            (i) =>
+              !currentBookedRoomsOnCategory.includes(i) &&
+              !prevBookedRoomOnCategory.includes(i)
           );
 
           if (freeRoomId) {
@@ -670,7 +685,7 @@ export const BookingPage = () => {
               );
             }
 
-            if (!currentStep.isComplete) {
+            if (!currentStep.isComplete && isSetCompleteStep) {
               setCompleteStep("Enter guest details", true);
             }
           }

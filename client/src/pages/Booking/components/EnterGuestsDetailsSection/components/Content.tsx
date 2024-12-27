@@ -1,5 +1,12 @@
 import { Button, Stack, Typography } from "@mui/material";
-import React, { memo, useContext, useEffect, useMemo, useState } from "react";
+import React, {
+  memo,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import {
   ToogleButtonModeType,
   ToogleModeButton,
@@ -270,9 +277,9 @@ export const Content = (props: Props) => {
         updateBookingDraft({
           currentStep,
           guestsDetails: formValues,
+          isSetCompleteStep: true,
         });
       }
-      // }
       setIsUpdateBookingsUserInfo(false);
     }
   }, [isUpdateBookingsUserInfo]);
@@ -310,6 +317,114 @@ export const Content = (props: Props) => {
     }
   }, [formValues]);
 
+  // Вкл/выкл кнопку для сохранения личных данных гостя
+  const isEnableSaveUserDataButton = useMemo(() => {
+    const {
+      name: curName,
+      lastname: curLastname,
+      surname: curSurname,
+      email: curEmail,
+      phone: curPhone,
+      nationality: curNationality,
+      sendConfirmOnPhone: curSendConfirmOnPhone,
+      wantToKnowAboutSpecialOffersAndNews:
+        curWantToKnowAboutSpecialOffersAndNews,
+    } = formValues;
+
+    const {
+      name: prevName,
+      lastname: prevLastname,
+      surname: prevSurname,
+      email: prevEmail,
+      phone: prevPhone,
+      nationality: prevNationality,
+      send_confirm_on_phone: prevSendConfirmOnPhone,
+      want_to_know_about_special_offers_and_news:
+        prevWantToKnowAboutSpecialOffersAndNews,
+    } = bookingUserInfo;
+
+    if (
+      curName !== prevName ||
+      curLastname !== prevLastname ||
+      curSurname !== prevSurname ||
+      curEmail !== prevEmail ||
+      curPhone !== prevPhone ||
+      curNationality !== prevNationality ||
+      curSendConfirmOnPhone !== prevSendConfirmOnPhone ||
+      curWantToKnowAboutSpecialOffersAndNews !==
+        prevWantToKnowAboutSpecialOffersAndNews
+    ) {
+      return true;
+    }
+
+    return false;
+  }, [formValues, bookingUserInfo]);
+
+  // Вкл/выкл кнопку для сохранения дополнительных данных
+  const isEnableSaveAdditionalInfoButton = useMemo(() => {
+    const {
+      arrivalTime: curArrivalTime,
+      departureTime: curDepartureTime,
+      bedTypeId: curBedTypeId,
+      viewFromWindowId: curViewFromWindowId,
+      comment: curComment,
+    } = formValues;
+
+    const prevArrivalTime = getPrevArrivalTime().value;
+    const prevDepartureTime = getPrevDepartureTime().value;
+    const {
+      bed_type_id: prevBedTypeId,
+      view_from_window_id: prevViewFromWindowId,
+      comment: prevComment,
+    } = bookingInfo;
+
+    if (
+      curArrivalTime !== prevArrivalTime ||
+      curDepartureTime !== prevDepartureTime ||
+      curBedTypeId !== prevBedTypeId ||
+      curViewFromWindowId !== prevViewFromWindowId ||
+      curComment !== prevComment
+    ) {
+      return true;
+    }
+
+    return false;
+  }, [formValues, bookingUserInfo]);
+
+  const updatePaymentMethod = useCallback(
+    (paymentMethodId: string) => {
+      const a = formik.values;
+      const formikValues = {
+        name: a.name,
+        lastname: a.lastname,
+        surname: a.surname,
+        phone: a.phone,
+        email: a.email,
+        nationality: a.nationality ? a.nationality.value : "",
+        sendConfirmOnPhone: a.sendConfirmOnPhone,
+        wantToKnowAboutSpecialOffersAndNews:
+          a.wantToKnowAboutSpecialOffersAndNews,
+        arrivalTime: a.arrivalTime.value,
+        departureTime: a.departureTime.value,
+        bedTypeId: a.bedTypeSpecialWish.id.toString(),
+        viewFromWindowId: a.viewFromWindowSpecialWish.id.toString(),
+        comment: a.comment,
+        bookingForWhom: a.bookingForWhom,
+        paymentMethodId: a.paymentMethodId,
+      };
+
+      const { step: currentStep } = bookingProgressCurrentStep;
+      if (currentStep) {
+        updateBookingDraft({
+          currentStep,
+          guestsDetails: { ...formikValues, paymentMethodId },
+          isSetCompleteStep: false,
+        });
+      }
+    },
+    [formik.values]
+  );
+
   return (
     <Stack sx={{ alignItems: "stretch", gap: "48px" }}>
       <Typography variant="label" sx={{ fontWeight: 600, alignSelf: "center" }}>
@@ -334,7 +449,20 @@ export const Content = (props: Props) => {
 
       <AuthMethodButtons />
 
-      <UserDataForm formik={formik} />
+      <UserDataForm
+        formik={formik}
+        updateUserData={() => {
+          const { step: currentStep } = bookingProgressCurrentStep;
+          if (currentStep) {
+            updateBookingDraft({
+              currentStep,
+              guestsDetails: formValues,
+              isSetCompleteStep: false,
+            });
+          }
+        }}
+        isEnableSaveButton={isEnableSaveUserDataButton}
+      />
 
       <Typography variant="label" sx={{ fontWeight: 600, alignSelf: "center" }}>
         Дополнительная информация
@@ -344,6 +472,17 @@ export const Content = (props: Props) => {
         formik={formik}
         bedSpecialWish={bedSpecialWish}
         viewsFromWindowSpecialWish={viewsFromWindowSpecialWish}
+        updateAdditionalInfoData={() => {
+          const { step: currentStep } = bookingProgressCurrentStep;
+          if (currentStep) {
+            updateBookingDraft({
+              currentStep,
+              guestsDetails: formValues,
+              isSetCompleteStep: false,
+            });
+          }
+        }}
+        isEnableSaveButton={isEnableSaveAdditionalInfoButton}
       />
 
       <Stack sx={{ gap: "24px" }}>
@@ -360,7 +499,10 @@ export const Content = (props: Props) => {
           конфиденциальности
         </Typography>
 
-        <PaymentMethods formik={formik} />
+        <PaymentMethods
+          formik={formik}
+          updatePaymentMethod={updatePaymentMethod}
+        />
       </Stack>
     </Stack>
   );

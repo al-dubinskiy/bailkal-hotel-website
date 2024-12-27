@@ -25,26 +25,6 @@ export const FeatureDetails = (props: Props) => {
   );
   const { roomFeatures } = useAppSelector((state) => state.roomFeatures);
 
-  const GetFeaturesCategoriesList = useCallback(() => {
-    if (!roomFeaturesCategories) {
-      dispatch(GetRoomFeaturesCategories());
-    }
-  }, [roomFeaturesCategories]);
-
-  useEffect(() => {
-    GetFeaturesCategoriesList();
-  }, [GetFeaturesCategoriesList]);
-
-  const GetFeaturesList = useCallback(() => {
-    if (!roomFeatures) {
-      dispatch(GetRoomFeatures());
-    }
-  }, [roomFeatures]);
-
-  useEffect(() => {
-    GetFeaturesList();
-  }, [GetFeaturesList]);
-
   const roomFeaturesByCategories = useMemo(() => {
     if (!roomFeatures || !roomFeaturesCategories) return [];
     const a = roomFeatures.filter((i) => features_id.includes(i._id));

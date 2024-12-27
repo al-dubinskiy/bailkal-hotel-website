@@ -5,7 +5,7 @@ import { theme } from "../../../theme";
 interface Props {
   icon: React.ReactNode;
   sx?: SxProps;
-  onClick: () => void;
+  onClick?: () => void;
 }
 
 export const CustomCircleIconButton = (props: Props) => {

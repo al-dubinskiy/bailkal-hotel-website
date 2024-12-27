@@ -8,15 +8,24 @@ import {
 } from "../../../../components/shared/FormElements/CustomSelect";
 import { BookingGuestsDetailsType } from "../../../../../redux/slices/Bookings/types";
 import { times } from "./constants";
+import { CustomButton } from "../../../../components/shared/CustomButton";
 
 interface Props {
   formik: FormikProps<BookingGuestsDetailsType>;
   bedSpecialWish: SelectItemType[];
   viewsFromWindowSpecialWish: SelectItemType[];
+  isEnableSaveButton: boolean;
+  updateAdditionalInfoData: () => void;
 }
 
 export const AdditionalInfoForm = (props: Props) => {
-  const { formik, bedSpecialWish, viewsFromWindowSpecialWish } = props;
+  const {
+    formik,
+    bedSpecialWish,
+    viewsFromWindowSpecialWish,
+    isEnableSaveButton,
+    updateAdditionalInfoData,
+  } = props;
 
   return (
     <div>
@@ -121,6 +130,20 @@ export const AdditionalInfoForm = (props: Props) => {
             containerStyles={{ minHeight: "100px" }}
           />
         </Stack>
+
+        <CustomButton
+          label={"Сохранить"}
+          onClick={updateAdditionalInfoData}
+          containerVariant={"contained"}
+          disabled={!isEnableSaveButton}
+          containerBackgroundColor={"buttonDark"}
+          containerStyle={{
+            padding: "0 24px",
+            // flex: 0.5,
+            alignSelf: "flex-start",
+          }}
+          withoutAnimation
+        />
       </form>
     </div>
   );

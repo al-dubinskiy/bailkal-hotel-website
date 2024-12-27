@@ -9,13 +9,16 @@ import { EmailIcon } from "../../../../../assets/icons/EmailIcon";
 import { theme } from "../../../../../theme";
 import { PhoneOutlined } from "@mui/icons-material";
 import { BookingGuestsDetailsType } from "../../../../../redux/slices/Bookings/types";
+import { CustomButton } from "../../../../components/shared/CustomButton";
 
 interface Props {
   formik: FormikProps<BookingGuestsDetailsType>;
+  updateUserData: () => void;
+  isEnableSaveButton: boolean;
 }
 
 export const UserDataForm = (props: Props) => {
-  const { formik } = props;
+  const { formik, updateUserData, isEnableSaveButton } = props;
 
   return (
     <div>
@@ -161,6 +164,20 @@ export const UserDataForm = (props: Props) => {
             />
           </FormGroup>
         </Stack>
+
+        <CustomButton
+          label={"Сохранить"}
+          onClick={updateUserData}
+          containerVariant={"contained"}
+          disabled={!isEnableSaveButton}
+          containerBackgroundColor={"buttonDark"}
+          containerStyle={{
+            padding: "0 24px",
+            // flex: 0.5,
+            alignSelf: "flex-start",
+          }}
+          withoutAnimation
+        />
       </form>
     </div>
   );

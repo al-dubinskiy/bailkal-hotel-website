@@ -22,6 +22,16 @@ import {
   CategoryRoomsBookingStatusType,
 } from "./components/BookingsTable";
 import { GetRooms } from "../../../redux/slices/Rooms/roomsSlice";
+import { GetBookingTariffs } from "../../../redux/slices/BookingTariffs/bookingTariffsSlice";
+import { GetBookingServices } from "../../../redux/slices/BookingServices/bookingServicesSlice";
+import { GetRoomBedVariants } from "../../../redux/slices/RoomBedVariants/roomBedVariantsSlice";
+import { GetViewsFromRoomWindow } from "../../../redux/slices/ViewsFromRoomWindow/viewsFromRoomWindow";
+import { GetPaymentMethods } from "../../../redux/slices/PaymentMethods/paymentMethodsSlice";
+import { GetTransferVariants } from "../../../redux/slices/TransferVariants/transferVariantsSlice";
+import { GetTransferCars } from "../../../redux/slices/TransferCars/transferCarsSlice";
+import { GetRoomFeatures } from "../../../redux/slices/RoomFeatures/roomFeaturesSlice";
+import { GetRoomFeaturesCategories } from "../../../redux/slices/RoomFeaturesCategories/roomFeaturesSlice";
+import { useGetApiData } from "../../../hooks/getApiData";
 
 type DataListType = {
   roomCategory: RoomCategoryType;
@@ -36,43 +46,23 @@ interface Props {}
 
 export const AdminBookingsStatusesPage = (props: Props) => {
   const {} = props;
+
+  useGetApiData();
   const dispatch = useAppDispatch();
   const { bookings } = useAppSelector((state) => state.bookings);
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
   const { rooms } = useAppSelector((state) => state.rooms);
-
-  const [roomDetailsOpen, setRoomDetailsOpen] = useState<boolean>(false);
-
-  // Get data from API
-  const GetBookingsList = useCallback(() => {
-    if (!bookings) {
-      dispatch(GetBookings());
-    }
-  }, [bookings]);
-
-  useEffect(() => {
-    GetBookingsList();
-  }, [GetBookingsList]);
-
-  const GetRoomsCategoriesList = useCallback(() => {
-    if (!roomsCategories) {
-      dispatch(GetRoomsCategories());
-    }
-  }, [roomsCategories]);
-
-  useEffect(() => {
-    GetRoomsCategoriesList();
-  }, [GetRoomsCategoriesList]);
-
-  const GetRoomsList = useCallback(() => {
-    if (!rooms) {
-      dispatch(GetRooms());
-    }
-  }, [rooms]);
-
-  useEffect(() => {
-    GetRoomsList();
-  }, [GetRoomsList]);
+  const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
+  const { bookingServices } = useAppSelector((state) => state.bookingServices);
+  const { roomBedVariants } = useAppSelector((state) => state.roomBedVariants);
+  const { viewsFromRoomWindow } = useAppSelector(
+    (state) => state.viewsFromRoomWindow
+  );
+  const { paymentMethods } = useAppSelector((state) => state.paymentMethods);
+  const { transferVariants } = useAppSelector(
+    (state) => state.transfersVariants
+  );
+  const { transferCars } = useAppSelector((state) => state.transfersCars);
 
   const sortedBookingsByRoomCategories =
     useMemo((): SortedBookingType | null => {
@@ -142,7 +132,6 @@ export const AdminBookingsStatusesPage = (props: Props) => {
               expandIcon={
                 <CustomCircleIconButton
                   icon={<KeyboardArrowDown />}
-                  onClick={() => setRoomDetailsOpen((prev) => !prev)}
                   sx={
                     {
                       // position: "absolute",
@@ -204,6 +193,13 @@ export const AdminBookingsStatusesPage = (props: Props) => {
                   <BookingsTable
                     data={item.categoryRoomsBookingStatuses}
                     roomsCategories={roomsCategories}
+                    bookingTariffs={bookingTariffs}
+                    bookingServices={bookingServices}
+                    roomBedVariants={roomBedVariants}
+                    viewsFromRoomWindow={viewsFromRoomWindow}
+                    transferVariants={transferVariants}
+                    transferCars={transferCars}
+                    paymentMethods={paymentMethods}
                     isLoading={false}
                   />
                 </Stack>

@@ -1,4 +1,7 @@
-import { CreateBookingLocalType } from "../../redux/slices/Bookings/types";
+import {
+  BookingType,
+  CreateBookingLocalType,
+} from "../../redux/slices/Bookings/types";
 import { BookingServiceType } from "../../redux/slices/BookingServices/types";
 import { RoomCategoryType } from "../../redux/slices/RoomsCategories/types";
 
@@ -19,7 +22,7 @@ export const getBookingServicesInfo = ({
 }: {
   bookingServices: BookingServiceType[] | null;
   roomCategory: RoomCategoryType | null;
-  currentBooking: CreateBookingLocalType | null;
+  currentBooking: CreateBookingLocalType | BookingType | null;
 }): BookingServiceType[] | null => {
   let services: BookingServiceType[] | null = null;
   if (bookingServices && roomCategory && currentBooking) {

@@ -8,6 +8,7 @@ import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import { Box, Stack, Theme, Typography, useTheme } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
+import Grid from "@mui/material/Grid2";
 import { useTranslation } from "react-i18next";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
@@ -21,6 +22,15 @@ import { dateTimeFormat } from "../../../../constants";
 import { CustomModal } from "../../../../pages/components/shared/CustomModal/CustomModal";
 import { RoomCategoryType } from "../../../../redux/slices/RoomsCategories/types";
 import { CustomLabelAndDescription } from "../../../../pages/components/shared/CustomLabelAndDescription";
+import { getBookingServicesInfo } from "../../../../pages/Booking/utils";
+import { useAppSelector } from "../../../../hooks/redux";
+import { BookingTariffType } from "../../../../redux/slices/BookingTariffs/types";
+import { BookingServiceType } from "../../../../redux/slices/BookingServices/types";
+import { RoomBedVariantType } from "../../../../redux/slices/RoomBedVariants/types";
+import { ViewFromRoomWindowType } from "../../../../redux/slices/ViewsFromRoomWindow/types";
+import { TransferVariantType } from "../../../../redux/slices/TransferVariants/types";
+import { TransferCarType } from "../../../../redux/slices/TransferCars/types";
+import { PaymentMethodType } from "../../../../redux/slices/PaymentMethods/types";
 
 type BookingDateType = { arrival_datetime: string; departure_datetime: string };
 type BookingGuestsCountType = { adults_count: number; children_count: number };
@@ -37,11 +47,29 @@ export type CategoryRoomsBookingStatusType = {
 interface Props {
   data: CategoryRoomsBookingStatusType[];
   roomsCategories: RoomCategoryType[] | null;
+  bookingTariffs: BookingTariffType[] | null;
+  bookingServices: BookingServiceType[] | null;
+  roomBedVariants: RoomBedVariantType[] | null;
+  viewsFromRoomWindow: ViewFromRoomWindowType[] | null;
+  transferVariants: TransferVariantType[] | null;
+  transferCars: TransferCarType[] | null;
+  paymentMethods: PaymentMethodType[] | null;
   isLoading: boolean;
 }
 
 export const BookingsTable = (props: Props) => {
-  const { data, isLoading, roomsCategories } = props;
+  const {
+    data,
+    isLoading,
+    roomsCategories,
+    bookingTariffs,
+    bookingServices,
+    roomBedVariants,
+    viewsFromRoomWindow,
+    transferVariants,
+    transferCars,
+    paymentMethods,
+  } = props;
 
   const [openBookingDetailsModal, setOpenBookingDetailsModal] = useState<{
     booking: CategoryRoomsBookingStatusType | undefined;
@@ -178,7 +206,7 @@ export const BookingsTable = (props: Props) => {
             icon={
               <Edit
                 htmlColor={theme.palette.text.primary}
-                sx={{ fontSize: "24px" }}
+                sx={{ fontSize: "16px" }}
               />
             }
             label=""
@@ -190,7 +218,7 @@ export const BookingsTable = (props: Props) => {
             icon={
               <Close
                 htmlColor={theme.palette.text.primary}
-                sx={{ fontSize: "24px" }}
+                sx={{ fontSize: "16px" }}
               />
             }
             label=""
@@ -201,7 +229,7 @@ export const BookingsTable = (props: Props) => {
             icon={
               <OpenInNew
                 htmlColor={theme.palette.text.primary}
-                sx={{ fontSize: "24px" }}
+                sx={{ fontSize: "16px" }}
               />
             }
             label=""
@@ -268,10 +296,47 @@ export const BookingsTable = (props: Props) => {
     const booking = row?.booking || null;
     const user = row?.bookingUser || null;
     const guests = row?.bookingGuests || null;
+    const date = row?.bookingDate || null;
 
-    if (booking && user && guests) {
+    if (booking && user && guests && date) {
       const roomCategory =
-        roomsCategories?.find((i) => i._id === booking.room_category_id) ||
+        (booking.room_category_id &&
+          roomsCategories?.find((i) => i._id === booking.room_category_id)) ||
+        null;
+
+      const bookingTariff =
+        (booking.tariff_id &&
+          bookingTariffs?.find((i) => i._id === booking.tariff_id)) ||
+        null;
+
+      const bookingServicesInfo = getBookingServicesInfo({
+        bookingServices,
+        roomCategory,
+        currentBooking: booking,
+      });
+
+      const bedTypeSpecialWish =
+        roomBedVariants?.find((i) => i._id === booking.bed_type_id) || null;
+
+      const viewsFromRoomWindowSpecialWish =
+        (booking.view_from_window_id &&
+          viewsFromRoomWindow?.find(
+            (i) => i._id === booking.view_from_window_id
+          )) ||
+        null;
+
+      const transfer =
+        (booking.transfer_id &&
+          transferVariants?.find((i) => i._id === booking.transfer_id)) ||
+        null;
+
+      const transferCar =
+        (transfer && transferCars?.find((i) => i._id === transfer.car_id)) ||
+        null;
+
+      const paymentMethod =
+        (booking.payment_method_id &&
+          paymentMethods?.find((i) => i._id === booking.payment_method_id)) ||
         null;
 
       return (
@@ -297,6 +362,87 @@ export const BookingsTable = (props: Props) => {
               adults_count: guests.adults_count,
               children_count: guests.children_count,
             })}
+          />
+
+          <CustomLabelAndDescription
+            label={"Дата заезда и выезда"}
+            description={`${moment(date.arrival_datetime).format(
+              dateTimeFormat
+            )} - ${moment(date.departure_datetime).format(dateTimeFormat)}`}
+          />
+
+          <CustomLabelAndDescription
+            label={"Услуги"}
+            description={
+              bookingServicesInfo?.map((i) => i.title).join(", ") || "-"
+            }
+          />
+          <CustomLabelAndDescription
+            label={"Специальные пожелания"}
+            description={`${
+              bedTypeSpecialWish
+                ? "Кровать: " + bedTypeSpecialWish.title + ", "
+                : ""
+            }${
+              viewsFromRoomWindowSpecialWish
+                ? "Вид из окна: " +
+                  viewsFromRoomWindowSpecialWish.title.toLowerCase()
+                : ""
+            }`}
+          />
+
+          <CustomLabelAndDescription
+            label={"Трансфер, время, автомобиль"}
+            description={
+              transfer && transferCar
+                ? `${
+                    transfer.from_hotel
+                      ? "В отель, "
+                      : transfer.to_hotel
+                      ? "Из отеля, "
+                      : "-"
+                  }, ${transfer.time_from + "-" + transfer.time_to}, ${
+                    transferCar
+                      ? transferCar.brand + " " + transferCar.model
+                      : "Не указано"
+                  }`
+                : "-"
+            }
+          />
+
+          {transfer && transferCar ? (
+            <CustomLabelAndDescription
+              label={"Трансфер, время, автомобиль"}
+              description={transfer.comment}
+            />
+          ) : (
+            ""
+          )}
+
+          <CustomLabelAndDescription
+            label={"Способ оплаты"}
+            description={paymentMethod?.title || "-"}
+          />
+
+          <CustomLabelAndDescription
+            label={"Комментарий"}
+            description={booking?.comment || "-"}
+          />
+
+          <CustomLabelAndDescription
+            label={"Бронирование для: "}
+            description={
+              booking?.booking_for_whom === "for_yourself"
+                ? "Себя"
+                : booking?.booking_for_whom === "for_another"
+                ? "Другого"
+                : "-"
+            }
+          />
+
+          <CustomLabelAndDescription
+            label={"Общая стоимость"}
+            description={`${booking.price} ₽`}
           />
         </Stack>
       );

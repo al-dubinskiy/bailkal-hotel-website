@@ -93,26 +93,6 @@ export const Content = (props: Props) => {
     TransferDirectionType[]
   >(transferDirectionData);
 
-  const GetTransferCarsList = useCallback(() => {
-    if (!transferCars) {
-      dispatch(GetTransferCars());
-    }
-  }, [transferCars]);
-
-  useEffect(() => {
-    GetTransferCarsList();
-  }, [GetTransferCarsList]);
-
-  const GetTransferVariantsList = useCallback(() => {
-    if (!transferVariants) {
-      dispatch(GetTransferVariants());
-    }
-  }, [transferVariants]);
-
-  useEffect(() => {
-    GetTransferVariantsList();
-  }, [GetTransferVariantsList]);
-
   const toStep = (step: TransferStepType) => {
     const stepIdx = steps.findIndex((i) => i.id === step.id);
     const currentStepIdx = steps.findIndex((i) => i.isCurrent);

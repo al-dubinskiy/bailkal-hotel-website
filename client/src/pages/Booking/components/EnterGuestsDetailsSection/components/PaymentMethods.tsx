@@ -9,7 +9,10 @@ import { CustomButton } from "../../../../components/shared/CustomButton";
 import { BookingContext } from "../../../BookingPage";
 import { paymentServices } from "../../../../../assets/images";
 import { FormikProps } from "formik";
-import { BookingGuestsDetailsType } from "../../../../../redux/slices/Bookings/types";
+import {
+  BookingGuestsDetailsPrimitiveType,
+  BookingGuestsDetailsType,
+} from "../../../../../redux/slices/Bookings/types";
 
 export type ItemType = {
   title: string;
@@ -21,28 +24,14 @@ export type ItemType = {
 
 interface Props {
   formik: FormikProps<BookingGuestsDetailsType>;
+  updatePaymentMethod: (paymentMethodId: string) => void;
 }
 
 export const PaymentMethods = (props: Props) => {
-  const { formik } = props;
+  const { formik, updatePaymentMethod } = props;
   const dispatch = useAppDispatch();
   const { paymentMethods } = useAppSelector((state) => state.paymentMethods);
-  const { currentBooking, currentRoomCategory } = useAppSelector(
-    (state) => state.bookings
-  );
-  const { updateBookingDraft, bookingProgressCurrentStep } =
-    useContext(BookingContext);
-
-  // Get data from API
-  const GetPaymentsList = useCallback(() => {
-    if (!paymentMethods) {
-      dispatch(GetPaymentMethods());
-    }
-  }, [paymentMethods]);
-
-  useEffect(() => {
-    GetPaymentsList();
-  }, [GetPaymentsList]);
+  const { currentBooking } = useAppSelector((state) => state.bookings);
 
   const roomPriceTotal = currentBooking
     ? currentBooking.roomPrice +
@@ -50,123 +39,114 @@ export const PaymentMethods = (props: Props) => {
       currentBooking.tariffPrice
     : 0;
 
-  const Card = useCallback(
-    ({ item }: { item: PaymentMethodType }) => {
-      const isSelected = formik.values.paymentMethodId === item._id;
+  const Card = ({ item }: { item: PaymentMethodType }) => {
+    const isSelected = formik.values.paymentMethodId === item._id;
 
-      const paymentSystems = item.paymentSystems?.length
-        ? item.paymentSystems.join(", ")
-        : "";
+    const paymentSystems = item.paymentSystems?.length
+      ? item.paymentSystems.join(", ")
+      : "";
 
-      return (
-        <Stack
+    return (
+      <Stack
+        sx={{
+          background: theme.palette.primary.lighter,
+          gap: "24px",
+          borderRadius: "16px",
+          padding: "24px",
+        }}
+      >
+        <Box
           sx={{
-            background: theme.palette.primary.lighter,
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "flex-start",
+            justifyContent: "space-between",
             gap: "24px",
-            borderRadius: "16px",
-            padding: "24px",
           }}
         >
-          <Box
-            sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "flex-start",
-              justifyContent: "space-between",
-              gap: "24px",
-            }}
-          >
-            <Box sx={{ display: "flex", flexDirection: "column" }}>
-              <Typography
-                variant="label"
-                sx={{ fontWeight: 600, marginBottom: "8px" }}
-              >
-                {item.title}
-              </Typography>
+          <Box sx={{ display: "flex", flexDirection: "column" }}>
+            <Typography
+              variant="label"
+              sx={{ fontWeight: 600, marginBottom: "8px" }}
+            >
+              {item.title}
+            </Typography>
 
-              {paymentSystems ? (
-                <Typography variant="small">{paymentSystems} </Typography>
-              ) : null}
-            </Box>
-
-            {!paymentSystems.length ? null : (
-              <img
-                src={
-                  paymentSystems.length < 30
-                    ? paymentServices.PaymentServices2
-                    : paymentServices.PaymentServices
-                }
-                style={{
-                  height: "35px",
-                  objectFit: "contain",
-                  borderRadius: "8px",
-                }}
-              />
-            )}
+            {paymentSystems ? (
+              <Typography variant="small">{paymentSystems} </Typography>
+            ) : null}
           </Box>
 
-          <Box
+          {!paymentSystems.length ? null : (
+            <img
+              src={
+                paymentSystems.length < 30
+                  ? paymentServices.PaymentServices2
+                  : paymentServices.PaymentServices
+              }
+              style={{
+                height: "35px",
+                objectFit: "contain",
+                borderRadius: "8px",
+              }}
+            />
+          )}
+        </Box>
+
+        <Box
+          sx={{
+            display: "flex",
+            flexDirection: "row",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: "48px",
+          }}
+        >
+          <Typography variant="body">{item.description}</Typography>
+
+          <Stack
             sx={{
-              display: "flex",
-              flexDirection: "row",
-              alignItems: "center",
-              justifyContent: "space-between",
-              gap: "48px",
+              alignItems: "flex-end",
+              gap: "10px",
             }}
           >
-            <Typography variant="body">{item.description}</Typography>
-
             <Stack
               sx={{
                 alignItems: "flex-end",
-                gap: "10px",
+                gap: "5px",
               }}
             >
-              <Stack
+              <Typography variant="label" sx={{ fontWeight: 600 }}>
+                Предоплата
+              </Typography>
+
+              <Typography
+                variant="label"
                 sx={{
-                  alignItems: "flex-end",
-                  gap: "5px",
+                  color: theme.palette.primary.dark,
+                  fontSize: "20.8px",
                 }}
               >
-                <Typography variant="label" sx={{ fontWeight: 600 }}>
-                  Предоплата
-                </Typography>
-
-                <Typography
-                  variant="label"
-                  sx={{
-                    color: theme.palette.primary.dark,
-                    fontSize: "20.8px",
-                  }}
-                >
-                  {roomPriceTotal} ₽
-                </Typography>
-              </Stack>
-
-              <CustomButton
-                label={!isSelected ? "Выбрать" : "Выбрано"}
-                onClick={() => {
-                  formik.setFieldValue("paymentMethodId", item._id);
-                  // const { step: currentStep } = bookingProgressCurrentStep;
-                  // if (currentStep && currentRoomCategory && currentBooking) {
-                  //   updateBookingDraft({
-                  //     currentStep,
-                  //     paymentMethodId: item._id,
-                  //   });
-                  // }
-                }}
-                containerVariant={!isSelected ? "contained" : "outlined"}
-                containerBackgroundColor={"buttonDark"}
-                containerStyle={{ padding: "0 40px" }}
-                withoutAnimation
-              />
+                {roomPriceTotal} ₽
+              </Typography>
             </Stack>
-          </Box>
-        </Stack>
-      );
-    },
-    [currentBooking, formik.values.paymentMethodId]
-  );
+
+            <CustomButton
+              label={!isSelected ? "Выбрать" : "Выбрано"}
+              onClick={() => {
+                formik.setFieldValue("paymentMethodId", item._id);
+                updatePaymentMethod(item._id);
+              }}
+              containerVariant={!isSelected ? "contained" : "outlined"}
+              containerBackgroundColor={"buttonDark"}
+              containerStyle={{ padding: "0 40px" }}
+              withoutAnimation
+            />
+          </Stack>
+        </Box>
+      </Stack>
+    );
+  };
 
   if (!paymentMethods || !currentBooking) return null;
 

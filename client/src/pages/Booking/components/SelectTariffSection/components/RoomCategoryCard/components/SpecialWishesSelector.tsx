@@ -52,37 +52,6 @@ export const SpecialWishesSelector = memo((props: Props) => {
     ToogleButtonModeType[]
   >([]);
 
-  // Get data from API
-  const GetRoomsCategoriesList = useCallback(() => {
-    if (!roomFeatures) {
-      dispatch(GetRoomFeatures());
-    }
-  }, [roomFeatures]);
-
-  useEffect(() => {
-    GetRoomsCategoriesList();
-  }, [GetRoomsCategoriesList]);
-
-  const GetRoomBedVariantsList = useCallback(() => {
-    if (!roomBedVariants) {
-      dispatch(GetRoomBedVariants());
-    }
-  }, [roomBedVariants]);
-
-  useEffect(() => {
-    GetRoomBedVariantsList();
-  }, [GetRoomBedVariantsList]);
-
-  const GetRoomViewsFromWindowList = useCallback(() => {
-    if (!viewsFromRoomWindow) {
-      dispatch(GetViewsFromRoomWindow());
-    }
-  }, [viewsFromRoomWindow]);
-
-  useEffect(() => {
-    GetRoomViewsFromWindowList();
-  }, [GetRoomViewsFromWindowList]);
-
   useEffect(() => {
     if (roomCategory && roomBedVariants && currentBooking) {
       if (

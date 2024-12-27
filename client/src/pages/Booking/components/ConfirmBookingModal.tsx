@@ -20,17 +20,10 @@ import { BookingContext } from "../BookingPage";
 interface Props {
   open: boolean;
   setOpen: (val: boolean) => void;
-  setIsOpenWishCreateNewBookingModal: (val: boolean) => void;
-  handleCloseModal: () => void;
 }
 
 export const ConfirmBookingModal = (props: Props) => {
-  const {
-    open,
-    setOpen,
-    setIsOpenWishCreateNewBookingModal,
-    handleCloseModal,
-  } = props;
+  const { open, setOpen } = props;
   const dispatch = useAppDispatch();
   const { newBookings, createBooking } = useAppSelector(
     (state) => state.bookings
@@ -42,7 +35,8 @@ export const ConfirmBookingModal = (props: Props) => {
   const { viewsFromRoomWindow } = useAppSelector(
     (state) => state.viewsFromRoomWindow
   );
-  const { bookingProgressCurrentStep } = useContext(BookingContext);
+  const { bookingProgressCurrentStep, setCompleteStep } =
+    useContext(BookingContext);
 
   const BookingShortInfoCard = ({
     index,
@@ -238,14 +232,6 @@ export const ConfirmBookingModal = (props: Props) => {
     );
   };
 
-  useEffect(() => {
-    if (createBooking.successMessage) {
-      setIsOpenWishCreateNewBookingModal(true);
-      setOpen(false);
-      dispatch(resetCreateBookingState());
-    }
-  }, [createBooking.successMessage]);
-
   if (!roomsCategories) return null;
 
   return (
@@ -275,7 +261,14 @@ export const ConfirmBookingModal = (props: Props) => {
       }
       actionButtonsVariants="yes_no"
       handleConfirm={createNewBooking}
-      handleCancel={handleCloseModal}
+      handleCancel={() => {
+        if (
+          bookingProgressCurrentStep.step?.name === "Enter guest details" &&
+          bookingProgressCurrentStep.step.isComplete
+        ) {
+          setCompleteStep("Enter guest details", false);
+        }
+      }}
       confirmLoading={createBooking.isLoading}
       open={open}
       setOpen={setOpen}

@@ -27,16 +27,6 @@ export const Features = (props: Props) => {
     (state) => state.paymentMethods.getPaymentMethods
   );
 
-  const GetPaymentMethodsList = useCallback(() => {
-    if (!paymentMethods) {
-      dispatch(GetPaymentMethods());
-    }
-  }, [paymentMethods]);
-
-  useEffect(() => {
-    GetPaymentMethodsList();
-  }, [GetPaymentMethodsList]);
-
   return (
     <Stack sx={{ gap: "10px" }}>
       <CustomIconLabel

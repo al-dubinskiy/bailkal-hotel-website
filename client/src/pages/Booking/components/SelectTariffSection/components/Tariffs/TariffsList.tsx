@@ -19,16 +19,6 @@ export const TariffsList = (props: Props) => {
     filterParams,
   } = useAppSelector((state) => state.bookings);
 
-  const GetBookingsTariffsList = useCallback(() => {
-    if (!bookingTariffs) {
-      dispatch(GetBookingTariffs());
-    }
-  }, [bookingTariffs]);
-
-  useEffect(() => {
-    GetBookingsTariffsList();
-  }, [GetBookingsTariffsList]);
-
   if (!bookingTariffs || !roomCategory) return null;
 
   return (

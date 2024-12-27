@@ -110,17 +110,6 @@ export const RoomCategoryCard = memo((props: Props) => {
 
   const [roomDetailsOpen, setRoomDetailsOpen] = useState<boolean>(false);
 
-  // Get data from API
-  const GetRoomsFeaturesList = useCallback(() => {
-    if (!roomFeatures) {
-      dispatch(GetRoomFeatures());
-    }
-  }, [roomFeatures]);
-
-  useEffect(() => {
-    GetRoomsFeaturesList();
-  }, [GetRoomsFeaturesList]);
-
   if (!roomCategory) return null;
 
   const roomPhotos =

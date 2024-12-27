@@ -13,16 +13,6 @@ export const ServicesList = (props: Props) => {
   const { bookingServices } = useAppSelector((state) => state.bookingServices);
   const { currentRoomCategory } = useAppSelector((state) => state.bookings);
 
-  const GetBookingsServicesList = useCallback(() => {
-    if (!bookingServices) {
-      dispatch(GetBookingServices());
-    }
-  }, [bookingServices]);
-
-  useEffect(() => {
-    GetBookingsServicesList();
-  }, [GetBookingsServicesList]);
-
   if (!bookingServices || !currentRoomCategory) return null;
 
   return (

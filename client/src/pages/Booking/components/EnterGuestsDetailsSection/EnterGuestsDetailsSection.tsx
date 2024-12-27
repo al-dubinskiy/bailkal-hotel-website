@@ -5,13 +5,15 @@ import { BookingInfoWidget } from "../BookingInfoWidget";
 import { ConfirmBookingModal } from "../ConfirmBookingModal";
 import { BookingContext } from "../../BookingPage";
 import { WishCreateNewBooking } from "../WishCreateNewBooking";
+import { useAppSelector } from "../../../../hooks/redux";
 
 interface Props {
   containerStyles?: SxProps;
 }
 
-export const EnterGuestsDetailsSection = (props: Props) => {
+export const EnterGuestsDetailsSection = memo((props: Props) => {
   const { containerStyles } = props;
+  const { createBooking } = useAppSelector((state) => state.bookings);
   const { bookingProgressCurrentStep, setCompleteStep } =
     useContext(BookingContext);
   const [isEnableContinueButton, setIsEnableContinueButton] =
@@ -19,29 +21,25 @@ export const EnterGuestsDetailsSection = (props: Props) => {
   const [isUpdateBookingsUserInfo, setIsUpdateBookingsUserInfo] =
     useState<boolean>(false);
   // Modals
-  const [isOpenConfirmBookingModal, setIsOpenConfirmBookingModal] =
-    useState<boolean>(false);
-  const [isOpenWishCreateNewBookingModal, setIsOpenWishCreateNewBookingModal] =
-    useState<boolean>(false);
+  const [openModal, setOpenModal] = useState<
+    "confirm_booking" | "wish_create_new_booking_modal" | ""
+  >("");
 
   useEffect(() => {
     if (
       bookingProgressCurrentStep.step?.name === "Enter guest details" &&
       bookingProgressCurrentStep.step.isComplete &&
-      !isOpenConfirmBookingModal
+      openModal === ""
     ) {
-      setIsOpenConfirmBookingModal(true);
+      setOpenModal("confirm_booking");
     }
-  }, [bookingProgressCurrentStep]);
+  }, []);
 
-  const handleCloseModal = () => {
-    if (
-      bookingProgressCurrentStep.step?.name === "Enter guest details" &&
-      bookingProgressCurrentStep.step.isComplete
-    ) {
-      setCompleteStep("Enter guest details", false);
+  useEffect(() => {
+    if (createBooking.successMessage) {
+      setOpenModal("wish_create_new_booking_modal");
     }
-  };
+  }, [createBooking.successMessage]);
 
   return (
     <>
@@ -77,17 +75,14 @@ export const EnterGuestsDetailsSection = (props: Props) => {
       </Stack>
 
       <ConfirmBookingModal
-        open={isOpenConfirmBookingModal}
-        setOpen={setIsOpenConfirmBookingModal}
-        handleCloseModal={handleCloseModal}
-        setIsOpenWishCreateNewBookingModal={setIsOpenWishCreateNewBookingModal}
+        open={openModal === "confirm_booking"}
+        setOpen={() => setOpenModal("")}
       />
 
       <WishCreateNewBooking
-        open={isOpenWishCreateNewBookingModal || true}
-        setOpen={setIsOpenWishCreateNewBookingModal}
-        handleCloseModal={handleCloseModal}
+        open={openModal === "wish_create_new_booking_modal"}
+        setOpen={() => setOpenModal("")}
       />
     </>
   );
-};
+});
