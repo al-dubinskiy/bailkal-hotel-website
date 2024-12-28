@@ -1,4 +1,4 @@
-import { Moment } from "moment";
+import moment, { Moment } from "moment";
 import {
   BookingType,
   CreateBookingLocalType,
@@ -10,6 +10,7 @@ import {
   deluxeTwinRooms,
   suiteRooms,
 } from "../../assets/images";
+import { dateFormat } from "../../constants";
 
 export const GroupObjectByKey = (key: string, array: Array<any>) => {
   return array.reduce((acc, obj) => {
@@ -79,3 +80,18 @@ export const getRoomCategoryPhotos = (roomCategory: RoomCategoryType) => {
     ? suiteRooms
     : [];
 };
+
+// Функция для получения массива дней года
+export function getDaysInYear(year: string): Moment[] {
+  const days = [];
+  let date = moment(`${year}-01-01`); // Первый день года
+  const endOfYear = moment(`${year}-12-31`); // Последний день года
+
+  while (date.isSameOrBefore(endOfYear)) {
+    days.push(date.format(dateFormat)); // Форматируем дату
+    date.add(1, "day"); // Переходим к следующему дню
+  }
+
+  console.log(days);
+  return days.map((i) => moment(i, dateFormat));
+}

@@ -1,5 +1,5 @@
 import { Box, Stack, Typography } from "@mui/material";
-import React, { useMemo, useState } from "react";
+import React, { useContext, useMemo, useState } from "react";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 
@@ -10,19 +10,17 @@ import moment, { Moment } from "moment";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import { setFilterParams } from "../../../../redux/slices/Bookings/bookingsSlice";
 import { times } from "../../../Booking/components/EnterGuestsDetailsSection/components/constants";
-import { CheckDateAvailableType } from "../../../Booking/BookingPage";
+import {
+  BookingContext,
+  CheckDateAvailableType,
+} from "../../../Booking/BookingPage";
 
-interface Props {
-  checkDateAvailable: ({
-    date,
-  }: {
-    date: Moment;
-  }) => CheckDateAvailableType | null;
-}
+interface Props {}
 
 export const CustomRangeDatepicker = (props: Props) => {
-  const { checkDateAvailable } = props;
+  const {} = props;
 
+  const { checkDateAvailable } = useContext(BookingContext);
   const dispatch = useAppDispatch();
   const { filterParams } = useAppSelector((state) => state.bookings);
   const date = useMemo(

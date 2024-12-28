@@ -47,7 +47,7 @@ interface Props {}
 export const AdminBookingsStatusesPage = (props: Props) => {
   const {} = props;
 
-  useGetApiData();
+  const { isLoading } = useGetApiData();
   const dispatch = useAppDispatch();
   const { bookings } = useAppSelector((state) => state.bookings);
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);

@@ -17,7 +17,7 @@ export type SelectItemType = {
 interface Props {
   id?: string;
   name?: string;
-  inputLabel: string;
+  inputLabel?: string;
   value: SelectItemType;
   setValue?: (val: SelectItemType) => void;
   data: SelectItemType[];

@@ -1,4 +1,4 @@
-import { useCallback, useEffect } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { GetBookingTariffs } from "../redux/slices/BookingTariffs/bookingTariffsSlice";
 import { GetViewsFromRoomWindow } from "../redux/slices/ViewsFromRoomWindow/viewsFromRoomWindow";
 import { GetRoomFeatures } from "../redux/slices/RoomFeatures/roomFeaturesSlice";
@@ -16,27 +16,42 @@ import { GetUnavailableBookingDates } from "../redux/slices/UnavailableBookingDa
 
 export const useGetApiData = () => {
   const dispatch = useAppDispatch();
-  const { bookings } = useAppSelector((state) => state.bookings);
-  const { unavailableBookingDates } = useAppSelector(
-    (state) => state.unavailableBookingDates
+  const [isLoading, setIsLoading] = useState<boolean>(false);
+
+  const { bookings, getBookings } = useAppSelector((state) => state.bookings);
+  const { unavailableBookingDates, getUnavailableBookingDates } =
+    useAppSelector((state) => state.unavailableBookingDates);
+  const { roomsCategories, getRoomsCategories } = useAppSelector(
+    (state) => state.roomsCategories
   );
-  const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
-  const { rooms } = useAppSelector((state) => state.rooms);
-  const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
-  const { bookingServices } = useAppSelector((state) => state.bookingServices);
-  const { roomFeatures } = useAppSelector((state) => state.roomFeatures);
-  const { roomFeaturesCategories } = useAppSelector(
+  const { rooms, getRooms } = useAppSelector((state) => state.rooms);
+  const { bookingTariffs, getBookingTariffs } = useAppSelector(
+    (state) => state.bookingTariffs
+  );
+  const { bookingServices, getBookingServices } = useAppSelector(
+    (state) => state.bookingServices
+  );
+  const { roomFeatures, getRoomFeatures } = useAppSelector(
+    (state) => state.roomFeatures
+  );
+  const { roomFeaturesCategories, getRoomFeaturesCategories } = useAppSelector(
     (state) => state.roomFeaturesCategories
   );
-  const { roomBedVariants } = useAppSelector((state) => state.roomBedVariants);
-  const { viewsFromRoomWindow } = useAppSelector(
+  const { roomBedVariants, getRoomRoomBedVariants } = useAppSelector(
+    (state) => state.roomBedVariants
+  );
+  const { viewsFromRoomWindow, getViewsFromRoomWindow } = useAppSelector(
     (state) => state.viewsFromRoomWindow
   );
-  const { paymentMethods } = useAppSelector((state) => state.paymentMethods);
-  const { transferVariants } = useAppSelector(
+  const { paymentMethods, getPaymentMethods } = useAppSelector(
+    (state) => state.paymentMethods
+  );
+  const { transferVariants, getTransferVariants } = useAppSelector(
     (state) => state.transfersVariants
   );
-  const { transferCars } = useAppSelector((state) => state.transfersCars);
+  const { transferCars, getTransferCars } = useAppSelector(
+    (state) => state.transfersCars
+  );
 
   // Get data from API
   // Bookings
@@ -181,4 +196,43 @@ export const useGetApiData = () => {
   useEffect(() => {
     GetFeaturesCategoriesList();
   }, [GetFeaturesCategoriesList]);
+
+  useEffect(() => {
+    const loadingStatus =
+      getBookings.isLoading ||
+      getUnavailableBookingDates.isLoading ||
+      getRoomsCategories.isLoading ||
+      getRooms.isLoading ||
+      getBookingTariffs.isLoading ||
+      getBookingServices.isLoading ||
+      getRoomFeatures.isLoading ||
+      getRoomFeaturesCategories.isLoading ||
+      getRoomRoomBedVariants.isLoading ||
+      getViewsFromRoomWindow.isLoading ||
+      getPaymentMethods.isLoading ||
+      getTransferVariants.isLoading ||
+      getTransferCars.isLoading;
+
+    if (isLoading !== loadingStatus) {
+      setIsLoading(loadingStatus);
+    }
+  }, [
+    getBookings.isLoading,
+    getUnavailableBookingDates.isLoading,
+    getRoomsCategories.isLoading,
+    getRooms.isLoading,
+    getBookingTariffs.isLoading,
+    getBookingServices.isLoading,
+    getRoomFeatures.isLoading,
+    getRoomFeaturesCategories.isLoading,
+    getRoomRoomBedVariants.isLoading,
+    getViewsFromRoomWindow.isLoading,
+    getPaymentMethods.isLoading,
+    getTransferVariants.isLoading,
+    getTransferCars.isLoading,
+  ]);
+
+  return {
+    isLoading,
+  };
 };
