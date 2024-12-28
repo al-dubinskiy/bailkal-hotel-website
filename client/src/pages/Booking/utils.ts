@@ -92,6 +92,5 @@ export function getDaysInYear(year: string): Moment[] {
     date.add(1, "day"); // Переходим к следующему дню
   }
 
-  console.log(days);
   return days.map((i) => moment(i, dateFormat));
 }
