@@ -6,6 +6,10 @@ import { Routes } from "./Routes";
 import { CssBaseline, StyledEngineProvider } from "@mui/material";
 import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "./theme";
+import moment from "moment";
+import "moment/locale/ru";
+
+moment.locale("ru");
 
 function App() {
   return (

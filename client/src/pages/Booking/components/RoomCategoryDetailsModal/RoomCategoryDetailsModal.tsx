@@ -7,19 +7,18 @@ import { RoomCategoryDetailsModalContent } from "./components/RoomCategoryDetail
 
 interface Props {
   roomCategory: RoomCategoryType;
+  roomGuestsCount: number;
   open: boolean;
   setOpen: (val: boolean) => void;
 }
 
 export const RoomCategoryDetailsModal = (props: Props) => {
-  const { roomCategory, open, setOpen } = props;
+  const { roomCategory, roomGuestsCount, open, setOpen } = props;
 
   return (
     <CustomModal
       modalTitle={roomCategory.title}
-      modalContent={
-        <RoomCategoryDetailsModalContent roomCategory={roomCategory} />
-      }
+      modalContent={<RoomCategoryDetailsModalContent />}
       open={open}
       setOpen={setOpen}
       modalStyle={{ width: "98%", maxHeight: "98%" }}

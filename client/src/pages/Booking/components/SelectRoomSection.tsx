@@ -1,5 +1,11 @@
-import React, { memo, useContext, useMemo, useState } from "react";
-import { Box, Stack, SxProps, Typography } from "@mui/material";
+import React, {
+  createContext,
+  memo,
+  useContext,
+  useMemo,
+  useState,
+} from "react";
+import { Box, Link, Stack, SxProps, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { BookingContext, RoomCategoryPriceType } from "../BookingPage";
 import { useAppSelector } from "../../../hooks/redux";
@@ -24,6 +30,20 @@ import { RoomsCountIcon } from "../../../assets/icons/RoomsCountIcon";
 import { CustomButton } from "../../components/shared/CustomButton";
 import { RoomCategoryType } from "../../../redux/slices/RoomsCategories/types";
 import { RoomCategoryDetailsModal } from "./RoomCategoryDetailsModal/RoomCategoryDetailsModal";
+
+type SelectRoomCategoryType =
+  | (RoomCategoryType & { isRoomCategoryAvailable: boolean })
+  | null;
+
+export const SelectRoomContext = createContext<{
+  selectedRoomCategoryId: string | null;
+  roomGuestsCount: number;
+  roomCategory: SelectRoomCategoryType;
+}>({
+  selectedRoomCategoryId: null,
+  roomGuestsCount: -1,
+  roomCategory: null,
+});
 
 interface Props {
   prevStepHandler: () => void;
@@ -50,7 +70,7 @@ export const SelectRoomSection = memo((props: Props) => {
     useContext(BookingContext);
 
   const [openRoomCategoryDetailsModal, setOpenRoomCategoryDetailsModal] =
-    useState<RoomCategoryType | null>(null);
+    useState<SelectRoomCategoryType>(null);
 
   const bookingGuests = useMemo(() => {
     if (currentBooking) {
@@ -70,7 +90,6 @@ export const SelectRoomSection = memo((props: Props) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "stretch",
-          gap: "24px",
           margin: "24px 0",
           flex: 1,
           ...containerStyles,
@@ -167,7 +186,12 @@ export const SelectRoomSection = memo((props: Props) => {
 
                           <CustomCircleIconButton
                             icon={<KeyboardArrowDownIcon />}
-                            onClick={() => null}
+                            onClick={() =>
+                              setOpenRoomCategoryDetailsModal({
+                                ...roomCategory,
+                                isRoomCategoryAvailable: isRoomExist,
+                              })
+                            }
                           />
                         </Stack>
 
@@ -345,7 +369,10 @@ export const SelectRoomSection = memo((props: Props) => {
                             <CustomButton
                               label={"Доступные даты для заезда"}
                               onClick={() =>
-                                setOpenRoomCategoryDetailsModal(roomCategory)
+                                setOpenRoomCategoryDetailsModal({
+                                  ...roomCategory,
+                                  isRoomCategoryAvailable: isRoomExist,
+                                })
                               }
                               containerVariant="outlined"
                               containerBackgroundColor="buttonLight"
@@ -362,11 +389,20 @@ export const SelectRoomSection = memo((props: Props) => {
         </Grid>
       </Box>
       {openRoomCategoryDetailsModal ? (
-        <RoomCategoryDetailsModal
-          roomCategory={openRoomCategoryDetailsModal}
-          open={openRoomCategoryDetailsModal !== null}
-          setOpen={(val) => setOpenRoomCategoryDetailsModal(null)}
-        />
+        <SelectRoomContext.Provider
+          value={{
+            selectedRoomCategoryId,
+            roomGuestsCount,
+            roomCategory: openRoomCategoryDetailsModal,
+          }}
+        >
+          <RoomCategoryDetailsModal
+            roomCategory={openRoomCategoryDetailsModal}
+            roomGuestsCount={roomGuestsCount}
+            open={openRoomCategoryDetailsModal !== null}
+            setOpen={(val) => setOpenRoomCategoryDetailsModal(null)}
+          />
+        </SelectRoomContext.Provider>
       ) : null}
     </>
   );
