@@ -8,6 +8,7 @@ import { PhoneIcon } from "../../../assets/icons/PhoneIcon";
 import { EmailIcon } from "../../../assets/icons/EmailIcon";
 import { ContactUsForm } from "./components/ContactUsForm/ContactUsForm";
 import { hotelLogo } from "../../../assets/images";
+import { theme } from "../../../theme";
 
 interface Props {}
 
@@ -68,7 +69,12 @@ export const Footer = (props: Props) => {
           />
 
           <CustomIconLabel
-            icon={<PhoneIcon sx={{ fontSize: "24px" }} />}
+            icon={
+              <PhoneIcon
+                htmlColor={theme.palette.primary.dark}
+                sx={{ fontSize: "24px" }}
+              />
+            }
             labelComponent={
               <Typography variant="label" fontWeight={400}>
                 <Link href="tel:+73952250100">+7 3952 250-100</Link> - отдел
@@ -90,7 +96,12 @@ export const Footer = (props: Props) => {
           />
 
           <CustomIconLabel
-            icon={<EmailIcon sx={{ fontSize: "24px" }} />}
+            icon={
+              <EmailIcon
+                htmlColor={theme.palette.primary.dark}
+                sx={{ fontSize: "24px" }}
+              />
+            }
             labelComponent={
               <Typography variant="label" fontWeight={400}>
                 <Link href="mailto:+79500650580">reservation@eastland.ru</Link>{" "}

@@ -16,7 +16,7 @@ import {
 } from "../../../../components/shared/FormElements/CustomSelect";
 import { CustomCircleIconButton } from "../../../../components/shared/CustomCircleIconButton";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
-import { getDaysInYear } from "../../../utils";
+import { getDaysInRange } from "../../../utils";
 import { RoomCategoryType } from "../../../../../redux/slices/RoomsCategories/types";
 import { dateFormat } from "../../../../../constants";
 import { SelectRoomContext } from "../../SelectRoomSection";
@@ -57,7 +57,18 @@ export const AvailableDaysList = (props: Props) => {
     if (roomCategory) {
       const year = selectedYear.value;
 
-      const yearDays = getDaysInYear(year);
+      const yearDays = getDaysInRange({
+        dateStart: {
+          year,
+          month: "01",
+          day: "01",
+        },
+        dateEnd: {
+          year,
+          month: "12",
+          day: "31",
+        },
+      });
       const a = yearDays.map((i) =>
         checkDateAvailable({
           date: i,

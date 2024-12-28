@@ -5,7 +5,7 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { Box, Stack, SxProps, Typography } from "@mui/material";
+import { Box, Link, Stack, SxProps, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
 import { BookingContext, RoomCategoryPriceType } from "../BookingPage";
 import { useAppSelector } from "../../../hooks/redux";
@@ -90,7 +90,6 @@ export const SelectRoomSection = memo((props: Props) => {
           display: "flex",
           flexDirection: "column",
           alignItems: "stretch",
-          gap: "24px",
           margin: "24px 0",
           flex: 1,
           ...containerStyles,

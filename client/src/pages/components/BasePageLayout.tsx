@@ -61,7 +61,12 @@ const BasePageLayout = (props: Props) => {
             }}
           >
             <CustomIconLabel
-              icon={<PhoneIcon sx={{ fontSize: "16px" }} />}
+              icon={
+                <PhoneIcon
+                  htmlColor={theme.palette.primary.dark}
+                  sx={{ fontSize: "16px" }}
+                />
+              }
               labelComponent={
                 <Link href="tel:+73952250100" sx={{ fontSize: "14px" }}>
                   +7 3952 250-100 - отдел бронирования
@@ -70,7 +75,12 @@ const BasePageLayout = (props: Props) => {
             />
 
             <CustomIconLabel
-              icon={<EmailIcon sx={{ fontSize: "16px" }} />}
+              icon={
+                <EmailIcon
+                  htmlColor={theme.palette.primary.dark}
+                  sx={{ fontSize: "16px" }}
+                />
+              }
               labelComponent={
                 <Link
                   href="mailto:reservation@eastland.ru"

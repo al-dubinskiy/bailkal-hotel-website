@@ -1,4 +1,4 @@
-import { Box, Stack, SxProps } from "@mui/material";
+import { Box, Button, Stack, SxProps, Typography } from "@mui/material";
 import React, { useCallback, useMemo, useState } from "react";
 import Lightbox from "yet-another-react-lightbox";
 import Counter from "yet-another-react-lightbox/plugins/counter";
@@ -8,6 +8,7 @@ import Zoom from "yet-another-react-lightbox/plugins/zoom";
 import "yet-another-react-lightbox/styles.css";
 import "yet-another-react-lightbox/plugins/counter.css";
 import "yet-another-react-lightbox/plugins/thumbnails.css";
+import { CustomCircleIconButton } from "../CustomCircleIconButton";
 
 interface Props {
   images: string[];
@@ -107,10 +108,14 @@ export const CustomMultiImagePreviewSlider = (props: Props) => {
     const sizes = gridItemSizes.find((i) =>
       total > 4 ? i.total === 4 : i.total === total
     );
+    const previewImagesMax = 4;
+    const otherImagesTotal = images.length - previewImagesMax;
+
     if (sizes) {
       return (
         <Stack
           sx={{
+            position: "relative",
             display: "grid",
             gridTemplateColumns: "repeat(12, 1fr)",
             gap: "5px",
@@ -122,7 +127,7 @@ export const CustomMultiImagePreviewSlider = (props: Props) => {
             ...containerStyle,
           }}
         >
-          {images.slice(0, 4).map((item, idx) => {
+          {images.slice(0, previewImagesMax).map((item, idx) => {
             return (
               <Box
                 key={idx}
@@ -150,6 +155,26 @@ export const CustomMultiImagePreviewSlider = (props: Props) => {
               </Box>
             );
           })}
+
+          {otherImagesTotal > 0 ? (
+            <CustomCircleIconButton
+              icon={<Typography variant="h7">+{otherImagesTotal}</Typography>}
+              sx={{
+                position: "absolute",
+                bottom: "24px",
+                right: "24px",
+                background: "rgba(255,255,255,0.8)",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                width: "60px",
+                height: "60px",
+              }}
+              onClick={() =>
+                openLightbox(null, { photoIndex: previewImagesMax })
+              }
+            />
+          ) : null}
         </Stack>
       );
     }

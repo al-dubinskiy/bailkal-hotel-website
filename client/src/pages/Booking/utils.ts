@@ -82,10 +82,32 @@ export const getRoomCategoryPhotos = (roomCategory: RoomCategoryType) => {
 };
 
 // Функция для получения массива дней года
-export function getDaysInYear(year: string): Moment[] {
+export function getDaysInRange({
+  dateStart,
+  dateEnd,
+}: {
+  dateStart: {
+    year: string;
+    month: string;
+    day: string;
+  };
+  dateEnd: {
+    year: string;
+    month: string;
+    day: string;
+  };
+}): Moment[] {
   const days = [];
-  let date = moment(`${year}-01-01`); // Первый день года
-  const endOfYear = moment(`${year}-12-31`); // Последний день года
+  let date = moment(
+    `${dateStart.year}-${dateStart.month ? dateStart.month : "01"}-${
+      dateStart.day ? dateStart.day : "01"
+    }`
+  ); // Первый день года
+  const endOfYear = moment(
+    `${dateEnd.year}-${dateEnd.month ? dateEnd.month : "01"}-${
+      dateEnd.day ? dateEnd.day : "01"
+    }`
+  ); // Последний день года
 
   while (date.isSameOrBefore(endOfYear)) {
     days.push(date.format(dateFormat)); // Форматируем дату

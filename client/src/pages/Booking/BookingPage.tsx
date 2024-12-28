@@ -20,7 +20,7 @@ import {
 import { RoomCategoryType } from "../../redux/slices/RoomsCategories/types";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import moment, { Moment } from "moment";
-import { Box, Button, Card, Stack, Typography } from "@mui/material";
+import { Box, Button, Card, Link, Stack, Typography } from "@mui/material";
 import { dateFormat, dateTimeFormat } from "../../constants";
 import { BookingInfoWidget } from "./components/BookingInfoWidget";
 import { GroupObjectByKey, isDateTimeRangeContained } from "./utils";
@@ -48,6 +48,10 @@ import { EnterGuestsDetailsSection } from "./components/EnterGuestsDetailsSectio
 import { SelectGuestsDropdown } from "./components/FiltersBar/SelectGuestsDropdown";
 import { useGetApiData } from "../../hooks/getApiData";
 import { CustomCircleProgressIndicator } from "../components/shared/CustomCircleProgressIndicator";
+import { CustomIconLabel } from "../components/shared/CustomIconLabel";
+import { PhoneIcon } from "../../assets/icons/PhoneIcon";
+import { ErrorOutlined } from "@mui/icons-material";
+import { EmailIcon } from "../../assets/icons/EmailIcon";
 
 // Типы
 export type RoomCategoryPriceType = {
@@ -197,6 +201,21 @@ export const BookingPage = () => {
     arrival_datetime,
     departure_datetime,
   }: BookingDateTimeType): RoomCategoryPriceType[] | null => {
+    // Если в диапазоне выбранной даты заезда и выезда есть хотя бы одна из "недоступных дат"
+    if (unavailableBookingDates) {
+      if (
+        unavailableBookingDates.find(
+          (i) =>
+            moment(i.date).isBetween(
+              moment(arrival_datetime),
+              moment(departure_datetime)
+            ),
+          "[]"
+        )
+      ) {
+        return [];
+      }
+    }
     if (roomsCategories && sortedBookingsByRoomCategories) {
       const availableRoomCategories: RoomCategoryPriceType[] = [];
 
@@ -325,7 +344,6 @@ export const BookingPage = () => {
     },
     [unavailableBookingDates]
   );
-
   const updateBookingDraft = useCallback(
     ({
       tempBookingId,
@@ -1308,9 +1326,85 @@ export const BookingPage = () => {
     );
   };
 
+  const NotFoundRoomCategoriesBanner = () => {
+    const { arrival_datetime, departure_datetime } = filterParams;
+    return (
+      <Box
+        sx={{
+          padding: "24px",
+          borderRadius: "16px",
+          background: theme.palette.secondary.lighter,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "stretch",
+          gap: "15px",
+          margin: "24px 0",
+        }}
+      >
+        <Stack sx={{ flexDirection: "row", gap: "24px", alignItems: "center" }}>
+          <ErrorOutlined
+            htmlColor={theme.palette.secondary.dark}
+            sx={{ fontSize: "40px" }}
+          />
+          <Typography
+            variant="h7"
+            sx={{ color: theme.palette.secondary.dark, fontWeight: "600" }}
+          >
+            {`На ${arrival_datetime.format(
+              "DD MMMM"
+            )} - ${departure_datetime.format(
+              "DD MMMM, YYYY"
+            )} нет доступных номеров`}
+          </Typography>
+        </Stack>
+
+        <Typography variant="label">
+          Выберите другие даты или свяжитесь с отделом бронирования.
+        </Typography>
+        <Stack sx={{ flexDirection: "row", gap: "24px", alignItems: "center" }}>
+          <CustomIconLabel
+            icon={
+              <PhoneIcon
+                htmlColor={theme.palette.secondary.dark}
+                sx={{ fontSize: "24px" }}
+              />
+            }
+            labelComponent={
+              <Link
+                href="tel:+73952250100"
+                sx={{ fontSize: "16px", fontWeight: 500 }}
+              >
+                +7 3952 250-100
+              </Link>
+            }
+          />
+
+          <CustomIconLabel
+            icon={
+              <EmailIcon
+                htmlColor={theme.palette.secondary.dark}
+                sx={{ fontSize: "24px" }}
+              />
+            }
+            labelComponent={
+              <Link
+                href="mailto:reservation@eastland.ru"
+                sx={{ fontSize: "16px", fontWeight: 500 }}
+              >
+                reservation@eastland.ru
+              </Link>
+            }
+          />
+        </Stack>
+      </Box>
+    );
+  };
+
   const StepContent = () => {
     if (roomsCategories && roomsCategories?.length) {
-      return (
+      return availableRoomCategories && !availableRoomCategories.length ? (
+        <NotFoundRoomCategoriesBanner />
+      ) : (
         <Stack
           sx={{
             alignItems: "stretch",
@@ -1442,8 +1536,6 @@ export const BookingPage = () => {
 
   return (
     <BasePageLayout isShowPageTitleBanner>
-      <FiltersBar />
-
       <BookingContext.Provider
         value={{
           checkDateAvailable,
@@ -1455,6 +1547,8 @@ export const BookingPage = () => {
           setCompleteStep,
         }}
       >
+        <FiltersBar />
+
         <StepContent />
       </BookingContext.Provider>
     </BasePageLayout>
