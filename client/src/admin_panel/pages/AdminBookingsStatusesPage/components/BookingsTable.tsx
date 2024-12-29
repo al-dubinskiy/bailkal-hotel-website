@@ -372,11 +372,17 @@ export const BookingsTable = (props: Props) => {
           />
 
           <CustomLabelAndDescription
+            label={"Тариф"}
+            description={bookingTariff?.title || "-"}
+          />
+
+          <CustomLabelAndDescription
             label={"Услуги"}
             description={
               bookingServicesInfo?.map((i) => i.title).join(", ") || "-"
             }
           />
+
           <CustomLabelAndDescription
             label={"Специальные пожелания"}
             description={`${
@@ -593,6 +599,20 @@ export const BookingsTable = (props: Props) => {
         open={openBookingDetailsModal.status}
         setOpen={() =>
           setOpenBookingDetailsModal({ booking: undefined, status: false })
+        }
+        modalStyle={{ width: "500px" }}
+      />
+
+      <CustomModal
+        modalTitle="Редактировать бронирование"
+        modalContent={
+          <Stack sx={{ alignItems: "stretch", gap: "15px" }}>
+            <EditBookingModalContent />
+          </Stack>
+        }
+        open={openBookingDetailsModal.status}
+        setOpen={() =>
+          setEditBookingDetailsModal({ booking: undefined, status: false })
         }
         modalStyle={{ width: "500px" }}
       />
