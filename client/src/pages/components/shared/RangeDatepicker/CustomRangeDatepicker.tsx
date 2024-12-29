@@ -1,4 +1,4 @@
-import { Box, Stack, Typography } from "@mui/material";
+import { Box, LinearProgress, Stack, Typography } from "@mui/material";
 import React, {
   useCallback,
   useContext,
@@ -31,6 +31,8 @@ export const CustomRangeDatepicker = (props: Props) => {
   const { unavailableBookingDates } = useAppSelector(
     (state) => state.unavailableBookingDates
   );
+  const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
+  const { bookings } = useAppSelector((state) => state.bookings);
   const minDate = moment();
   const maxDate = moment().add(1, "year");
   const { checkDateAvailable } = useContext(BookingContext);
@@ -63,24 +65,6 @@ export const CustomRangeDatepicker = (props: Props) => {
     }
   };
 
-  const CustomDay = useCallback(({ date }: { date: Date }) => {
-    // console.log(date);
-    const price =
-      datesStates?.find((i) => i.date.toDate().getTime() === date.getTime())
-        ?.roomMinPrice || 0;
-    return (
-      <Stack flexDirection={"column"} gap={"15px"}>
-        {date.getDate()}
-
-        <span className="react-datepicker__day-cost">
-          {moment(moment(date).add(1, "day")).isSameOrAfter(minDate)
-            ? price + "₽"
-            : "x"}
-        </span>
-      </Stack>
-    );
-  }, []);
-
   const datesInRange = useMemo((): Moment[] => {
     return getDaysInRange({
       dateStart: {
@@ -97,7 +81,8 @@ export const CustomRangeDatepicker = (props: Props) => {
   }, [minDate, maxDate, getDaysInRange]);
 
   const datesStates = useMemo(() => {
-    if (unavailableBookingDates) {
+    // Вызов ф-ции checkDateAvailable только тогда, когда загрузятся необходимые данные
+    if (unavailableBookingDates && roomsCategories && bookings) {
       const a: CheckDateAvailableType[] = [];
       datesInRange.map((i) => {
         const b = checkDateAvailable({ date: i });
@@ -107,7 +92,7 @@ export const CustomRangeDatepicker = (props: Props) => {
       });
       return a;
     }
-  }, [datesInRange, unavailableBookingDates]);
+  }, [datesInRange, unavailableBookingDates, roomsCategories, bookings]);
 
   const excludeDates = useMemo((): Date[] => {
     return datesStates
@@ -117,6 +102,31 @@ export const CustomRangeDatepicker = (props: Props) => {
         ).map((i) => i.toDate())
       : [];
   }, [datesStates]);
+
+  const CustomDay = useCallback(
+    ({ date }: { date: Date }) => {
+      // console.log(date);
+      const price =
+        datesStates?.find((i) => i.date.toDate().getTime() === date.getTime())
+          ?.roomMinPrice || -1;
+      return (
+        <Stack flexDirection={"column"} gap={"15px"}>
+          {date.getDate()}
+
+          {price !== -1 ? (
+            <span className="react-datepicker__day-cost">
+              {moment(moment(date).add(1, "day")).isSameOrAfter(minDate)
+                ? price + "₽"
+                : "x"}
+            </span>
+          ) : (
+            <LinearProgress />
+          )}
+        </Stack>
+      );
+    },
+    [datesStates]
+  );
 
   const DatePickerFooter = ({ dateType }: { dateType: string }) => {
     return (
