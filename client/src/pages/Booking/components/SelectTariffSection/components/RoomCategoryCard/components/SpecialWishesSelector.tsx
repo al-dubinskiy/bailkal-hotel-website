@@ -54,26 +54,20 @@ export const SpecialWishesSelector = memo((props: Props) => {
 
   useEffect(() => {
     if (roomCategory && roomBedVariants && currentBooking) {
-      if (
-        !bedSpecialWish.length ||
-        bedSpecialWish.findIndex((i) => i.id === currentBooking.bed_type_id) ===
-          -1
-      ) {
-        const a = roomBedVariants.filter((i) =>
-          roomCategory.available_bed_variant_id.includes(i._id)
-        );
-        setBedSpecialWish(
-          a.map((i) => {
-            return {
-              id: i._id,
-              label: i.title,
-              value: i._id,
-              icon: <TwoPersonsBedIcon sx={{ fontSize: "16px" }} />,
-              isSelected: currentBooking.bed_type_id === i._id ? true : false,
-            };
-          })
-        );
-      }
+      const a = roomBedVariants.filter((i) =>
+        roomCategory.available_bed_variant_id.includes(i._id)
+      );
+      setBedSpecialWish(
+        a.map((i) => {
+          return {
+            id: i._id,
+            label: i.title,
+            value: i._id,
+            icon: <TwoPersonsBedIcon sx={{ fontSize: "16px" }} />,
+            isSelected: currentBooking.bed_type_id === i._id ? true : false,
+          };
+        })
+      );
     }
   }, [roomCategory, roomBedVariants, currentBooking]);
 
