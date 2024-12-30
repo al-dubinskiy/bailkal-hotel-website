@@ -1,5 +1,4 @@
 import React, { useMemo, useState } from "react";
-import { v4 as uuidv4 } from "uuid";
 import {
   Box,
   Button,
@@ -10,12 +9,7 @@ import {
   Stack,
   Typography,
 } from "@mui/material";
-import ArrowDropDownIcon from "@mui/icons-material/ArrowDropDown";
-import { InfoOutlined, RemoveCircleOutline } from "@mui/icons-material";
-import { theme } from "../../../../../../../../theme";
 import { useButtonDropdownCardStyles } from "../../../../../../../components/shared/styles";
-import { BookingDateType } from "../../../../SelectTariffSection";
-import moment from "moment";
 import { UndoIcon } from "../../../../../../../../assets/icons/UndoIcon";
 
 interface Props {

@@ -13,8 +13,6 @@ export type BookingGuestsDetailsType = {
   wantToKnowAboutSpecialOffersAndNews: boolean;
   arrivalTime: SelectItemType;
   departureTime: SelectItemType;
-  bedTypeSpecialWish: SelectItemType;
-  viewFromWindowSpecialWish: SelectItemType;
   comment: string;
   bookingForWhom: "for_yourself" | "for_another";
   paymentMethodId: string;
@@ -31,8 +29,6 @@ export type BookingGuestsDetailsPrimitiveType = {
   wantToKnowAboutSpecialOffersAndNews: boolean;
   arrivalTime: string;
   departureTime: string;
-  bedTypeId: string;
-  viewFromWindowId: string;
   comment: string;
   bookingForWhom: "for_yourself" | "for_another";
   paymentMethodId: string;

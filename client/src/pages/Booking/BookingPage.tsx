@@ -5,15 +5,12 @@ import React, {
   useMemo,
   useState,
 } from "react";
-import { v4 as uuidv4 } from "uuid";
 import {
-  BookingGuestsDetailsType,
   BookingStepNameType,
   BookingStepType,
   BookingType,
   BookingGuestsDetailsPrimitiveType,
   CreateBookingLocalType,
-  CreateBookingType,
   RoomGuestsCountType,
   BookingDateTimeType,
   NewBookingsType,
@@ -21,39 +18,19 @@ import {
 import { RoomCategoryType } from "../../redux/slices/RoomsCategories/types";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import moment, { Moment } from "moment";
-import { Box, Button, Card, Link, Stack, Typography } from "@mui/material";
 import { dateFormat, dateTimeFormat } from "../../constants";
-import { BookingInfoWidget } from "./components/BookingInfoWidget";
 import { GroupObjectByKey, isDateTimeRangeContained } from "./utils";
-import { GetRoomsCategories } from "../../redux/slices/RoomsCategories/roomsCategoriesSlice";
 import {
-  GetBookings,
   setBookingSteps,
   setCurrentBooking,
   setCurrentRoomCategory,
   setNewBookings,
 } from "../../redux/slices/Bookings/bookingsSlice";
 import BasePageLayout from "../components/BasePageLayout";
-import { GetUnavailableBookingDates } from "../../redux/slices/UnavailableBookingDates/unavailableBookingDates";
-import { theme } from "../../theme";
-import { CustomRangeDatepicker } from "../components/shared/RangeDatepicker/CustomRangeDatepicker";
-import { CustomSelect } from "../components/shared/FormElements/CustomSelect";
 import { findLastIndex, isEqual } from "lodash";
-import { SelectRoomSection } from "./components/SelectRoomSection";
-import { BookingProgressIndicatorBaner } from "./components/BookingProgressIndicatorBaner";
-import { SelectTariffSection } from "./components/SelectTariffSection/SelectTariffSection";
-import { OrderServicesSection } from "./components/OrderServicesSection/OrderServicesSection";
 import { BookingTariffType } from "../../redux/slices/BookingTariffs/types";
 import { BookingServiceType } from "../../redux/slices/BookingServices/types";
-import { EnterGuestsDetailsSection } from "./components/EnterGuestsDetailsSection/EnterGuestsDetailsSection";
-import { SelectGuestsDropdown } from "./components/FiltersBar/SelectGuestsDropdown";
 import { useGetApiData } from "../../hooks/getApiData";
-import { CustomCircleProgressIndicator } from "../components/shared/CustomCircleProgressIndicator";
-import { CustomIconLabel } from "../components/shared/CustomIconLabel";
-import { PhoneIcon } from "../../assets/icons/PhoneIcon";
-import { ErrorOutlined } from "@mui/icons-material";
-import { EmailIcon } from "../../assets/icons/EmailIcon";
-import { NotFoundRoomCategoriesBanner } from "./components/NotFoundRoomCategoriesBanner";
 import { StepContent } from "./components/StepContent";
 import { FiltersBar } from "./components/FiltersBar";
 
@@ -342,6 +319,84 @@ export const BookingPage = () => {
     [unavailableBookingDates]
   );
 
+  const toSpecificStep = (
+    stepName: BookingStepNameType,
+    tempBookingId: string
+  ) => {
+    const nextStepIdx = bookingSteps.findIndex(
+      (i) => i.name === stepName && i.roomId === tempBookingId
+    );
+    if (nextStepIdx) {
+      dispatch(
+        setBookingSteps(
+          bookingSteps.map((item, idx) => ({
+            ...item,
+            isCurrent: idx === nextStepIdx ? true : false,
+          }))
+        )
+      );
+    }
+  };
+
+  const toPrevStep = useCallback(() => {
+    const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
+
+    if (curIdx) {
+      const prevCurIdx = curIdx > 0 ? curIdx - 1 : 0;
+      if (prevCurIdx !== curIdx) {
+        dispatch(
+          setBookingSteps(
+            bookingSteps.map((item, idx) => ({
+              ...item,
+              isCurrent: idx === prevCurIdx ? true : false,
+              isComplete:
+                item.name === "Enter guest details" && item.isComplete
+                  ? false
+                  : item.isComplete, // убрать статус isComplete=true (чтобы модалка на "Подтверждение бронирования" не реагировал каждый раз на значение true). Значение true можно будет вернуть после повторного нажатия на кнопку "Продолжить" на шаге "Введите данные гостей"
+            }))
+          )
+        );
+      }
+    }
+  }, [bookingSteps]);
+
+  const toNextStep = useCallback(
+    (isSetPrevComplete?: boolean) => {
+      const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
+
+      if (curIdx >= 0) {
+        const nextCurIdx = curIdx < bookingSteps.length - 1 ? curIdx + 1 : null;
+
+        if (nextCurIdx && nextCurIdx !== curIdx) {
+          dispatch(
+            setBookingSteps(
+              bookingSteps.map((item, idx) => ({
+                ...item,
+                isCurrent: idx === nextCurIdx ? true : false,
+                isComplete:
+                  isSetPrevComplete && idx === curIdx ? true : item.isComplete,
+              }))
+            )
+          );
+        }
+      }
+    },
+    [bookingSteps]
+  );
+
+  const setCompleteStep = useCallback(
+    (stepName: BookingStepNameType, status: boolean) => {
+      dispatch(
+        setBookingSteps(
+          bookingSteps.map((item, idx) =>
+            item.name === stepName ? { ...item, isComplete: status } : item
+          )
+        )
+      );
+    },
+    [bookingSteps]
+  );
+
   const updateBookingDraft = useCallback(
     ({
       tempBookingId,
@@ -424,7 +479,9 @@ export const BookingPage = () => {
               })
             );
 
-            toSpecificStep("Select a tariff");
+            if (tempBookingId) {
+              toSpecificStep("Select a tariff", tempBookingId);
+            }
           } else if (bedTypeId !== undefined) {
             dispatch(
               setNewBookings({
@@ -457,8 +514,11 @@ export const BookingPage = () => {
             );
           }
         }
-        // Для одиночного режима бронирования
-        if (currentStep.name === "Select a room" && roomCategory) {
+        if (
+          currentStep.name === "Select a room" &&
+          roomCategory &&
+          tempBookingId
+        ) {
           // Получить id всех комнат, которые забронированы на данную категорию
           const currentBookedRoomsOnCategory = Array.from(
             newBookings.bookings.filter(
@@ -487,7 +547,7 @@ export const BookingPage = () => {
               setNewBookings({
                 ...newBookings,
                 bookings: newBookings.bookings.map((i, index) => {
-                  if (index === 0) {
+                  if (i.tempId === tempBookingId) {
                     return {
                       ...i,
                       room_category_id: roomCategory._id,
@@ -581,31 +641,6 @@ export const BookingPage = () => {
                 }),
               })
             );
-          } else if (transferId !== undefined) {
-            dispatch(
-              setNewBookings({
-                ...newBookings,
-                bookings: newBookings.bookings.map((i) => {
-                  const transferPrice =
-                    (transferVariants &&
-                      transferVariants.find((j) => j._id === transferId)
-                        ?.price) ||
-                    0;
-
-                  return {
-                    ...i,
-                    transfer_id: transferId,
-                    transfer_comment: transferComment ? transferComment : "",
-                    transferPrice,
-                    price:
-                      i.roomPrice +
-                      i.tariffPrice +
-                      i.servicePriceTotal +
-                      transferPrice,
-                  };
-                }),
-              })
-            );
           }
         } else if (currentStep.name === "Enter guest details") {
           if (guestsDetails) {
@@ -620,8 +655,6 @@ export const BookingPage = () => {
               wantToKnowAboutSpecialOffersAndNews,
               arrivalTime,
               departureTime,
-              bedTypeId,
-              viewFromWindowId,
               comment,
               bookingForWhom,
               paymentMethodId,
@@ -648,8 +681,6 @@ export const BookingPage = () => {
                 bookingInfo.departure_datetime,
                 dateTimeFormat
               ).format("HH:mm"),
-              bedTypeId: bookingInfo.bed_type_id,
-              viewFromWindowId: bookingInfo.view_from_window_id,
               comment: bookingInfo.comment,
               bookingForWhom: bookingInfo.booking_for_whom,
             };
@@ -706,12 +737,6 @@ export const BookingPage = () => {
                             .set("minutes", Number(departureTime.split(":")[1]))
                             .format(dateTimeFormat)
                         : i.departure_datetime,
-                      bed_type_id:
-                        bedTypeId !== undefined ? bedTypeId : i.bed_type_id,
-                      view_from_window_id:
-                        viewFromWindowId !== undefined
-                          ? viewFromWindowId
-                          : i.view_from_window_id,
                       comment,
                       booking_for_whom: bookingForWhom,
                       payment_method_id: paymentMethodId,
@@ -724,11 +749,43 @@ export const BookingPage = () => {
             if (!currentStep.isComplete && isSetCompleteStep) {
               setCompleteStep("Enter guest details", true);
             }
+          } else if (transferId !== undefined) {
+            dispatch(
+              setNewBookings({
+                ...newBookings,
+                bookings: newBookings.bookings.map((i) => {
+                  const transferPrice =
+                    (transferVariants &&
+                      transferVariants.find((j) => j._id === transferId)
+                        ?.price) ||
+                    0;
+
+                  return {
+                    ...i,
+                    transfer_id: transferId,
+                    transfer_comment: transferComment ? transferComment : "",
+                    transferPrice,
+                    price:
+                      i.roomPrice +
+                      i.tariffPrice +
+                      i.servicePriceTotal +
+                      transferPrice,
+                  };
+                }),
+              })
+            );
           }
         }
       }
     },
-    [bookings, roomsCategories, newBookings, transferVariants]
+    [
+      bookings,
+      roomsCategories,
+      newBookings,
+      transferVariants,
+      toPrevStep,
+      toNextStep,
+    ]
   );
 
   const createNewBookingDraft = ({
@@ -789,16 +846,15 @@ export const BookingPage = () => {
       if (actionType === "addRooms") {
         // Если список шагов еще пустой
         if (!steps.length) {
-          if (roomsCount === 1) {
-            rooms.map((item, index) =>
-              steps.push({
-                roomId: item.id,
-                name: "Select a room",
-                isCurrent: index === 0 ? true : false, // Делаем активным первый шаг
-                isComplete: false,
-              })
-            );
-          }
+          rooms.map((item, index) =>
+            steps.push({
+              roomId: item.id,
+              name: "Select a room",
+              isCurrent: index === 0 ? true : false, // Делаем активным первый шаг
+              isComplete: false,
+            })
+          );
+
           rooms.map((item, index) =>
             steps.push({
               roomId: item.id,
@@ -824,12 +880,6 @@ export const BookingPage = () => {
         }
         // Если список шагов не пустой тогда делаем дозапись
         else {
-          // Заменяем имя шага "Select a room" (для одиночного бронирования) на "Select a tariff"
-          // (для множественного бронирования)
-          if (roomsCount > 1) {
-            // Если есть название шага с таким именем, то...
-            steps = steps.filter((i) => i.name !== "Select a room");
-          }
           // Подсчет количества комнат на которые расчитаны шаги по "Select a tariff"
           let prevRoomsCount = steps.reduce(
             (acc, i) => (acc = i.name === "Select a tariff" ? acc + 1 : acc),
@@ -841,20 +891,36 @@ export const BookingPage = () => {
           const a: BookingStepType[] = newRooms.map((i) => {
             return {
               roomId: i.id,
+              name: "Select a room",
+              isCurrent: false,
+              isComplete: false,
+            };
+          });
+          // Получаем индекс последнего вхождения шага "Select a room"
+          let lastSelectRoomStepIdx = findLastIndex(
+            steps,
+            (step) => step.name === "Select a room"
+          );
+          // Вставляем дополнительный шаг "Select a room" и делаем его "текущим шагом"
+          steps.splice(lastSelectRoomStepIdx, 0, ...a);
+
+          const b: BookingStepType[] = newRooms.map((i) => {
+            return {
+              roomId: i.id,
               name: "Select a tariff",
               isCurrent: false,
               isComplete: false,
             };
           });
-          // Получаем индекс последнего вхождения шага "select a tariff"
+          // Получаем индекс последнего вхождения шага "Select a room"
           let lastSelectTariffStepIdx = findLastIndex(
             steps,
             (step) => step.name === "Select a tariff"
           );
-          // Вставляем дополнительный шаг "select a tariff" и делаем его "текущим шагом"
-          steps.splice(lastSelectTariffStepIdx, 0, ...a);
+          // Вставляем дополнительный шаг "Select a room" и делаем его "текущим шагом"
+          steps.splice(lastSelectTariffStepIdx, 0, ...b);
 
-          const b: BookingStepType[] = newRooms.map((i) => {
+          const c: BookingStepType[] = newRooms.map((i) => {
             return {
               roomId: i.id,
               name: "Order services",
@@ -869,15 +935,15 @@ export const BookingPage = () => {
           );
 
           // Вставляем дополнительный шаг "order services"
-          steps.splice(lastOrderServicesStepIdx, 0, ...b);
+          steps.splice(lastOrderServicesStepIdx, 0, ...c);
         }
-        // Если для всех предыдущих комнат тарифы уже были выбраны,
+        // Если для всех предыдущих новых букингов "категории комнат" уже были выбраны,
         // то убираем для текущего шага статус "текущий шаг"...
         steps = steps.map((i) =>
           i.isCurrent ? { ...i, isCurrent: false } : i
         );
         // ... и ставим его для нового шага
-        const idx = bookings.findIndex((item, i) => !item.tariff_id);
+        const idx = bookings.findIndex((item, i) => !item.room_category_id);
         steps = steps.map((item, i) => {
           if (i === idx) {
             return { ...item, isCurrent: true };
@@ -977,20 +1043,6 @@ export const BookingPage = () => {
         steps = steps.map((item, i) =>
           i === newCurrentStepIdx ? { ...item, isCurrent: true } : item
         );
-
-        // Заменяем имя шага "Select a tariff" (для множественного бронирования) на "Select a room"
-        // (для одиночного бронирования)
-        if (roomsCount === 1) {
-          // Если есть название шага с таким именем, то...
-          steps = steps.map((i) =>
-            i.isCurrent ? { ...i, isCurrent: false } : i
-          );
-          steps.splice(0, 0, {
-            ...steps[0],
-            name: "Select a room",
-            isCurrent: true,
-          });
-        }
       }
       dispatch(setBookingSteps(steps));
     }
@@ -1126,14 +1178,22 @@ export const BookingPage = () => {
       const curName = cur.name;
       let curStepLabel = "";
       if (curName === "Select a room") {
-        curStepLabel = "Выберите номер";
+        const elements = bookingSteps.filter((i) => i.name === "Select a room");
+        const idx = elements.findIndex((i) => i.isCurrent);
+
+        if (idx !== -1) {
+          curStepLabel =
+            elements.length > 1
+              ? `Выберите ${idx + 1}-й номер`
+              : "Выберите номер";
+        }
       } else if (curName === "Select a tariff") {
         const elements = bookingSteps.filter(
           (i) => i.name === "Select a tariff"
         );
         const idx = elements.findIndex((i) => i.isCurrent);
 
-        if (idx >= 0) {
+        if (idx !== -1) {
           curStepLabel =
             elements.length > 1
               ? `Выберите тариф для ${idx + 1}-го номера`
@@ -1145,7 +1205,7 @@ export const BookingPage = () => {
         );
         const idx = elements.findIndex((i) => i.isCurrent);
 
-        if (idx >= 0) {
+        if (idx !== -1) {
           curStepLabel =
             elements.length > 1
               ? `Закажите услуги для ${idx + 1}-го номера`
@@ -1160,34 +1220,48 @@ export const BookingPage = () => {
       };
     }
     // Определение предыдущего шага
-    if (curIdx >= 0) {
+    if (curIdx !== -1) {
       const prevCurIdx = curIdx > 0 ? curIdx - 1 : null;
       if (prevCurIdx !== null && prevCurIdx >= 0) {
         const prevCur = bookingSteps.find((_, idx) => idx === prevCurIdx);
         if (prevCur) {
           let prevStepLabel = "";
           if (prevCur.name === "Select a room") {
-            prevStepLabel = "К номерам";
+            const elements = bookingSteps.filter(
+              (i) => i.name === "Select a room"
+            );
+            const idx = elements.findIndex((i) => i.roomId === prevCur.roomId);
+
+            if (idx !== -1) {
+              prevStepLabel =
+                elements.length > 1
+                  ? `К выбору ${idx + 1}-ого номера`
+                  : "К выбору номера";
+            }
           } else if (prevCur.name === "Select a tariff") {
             const elements = bookingSteps.filter(
               (i) => i.name === "Select a tariff"
             );
             const idx = elements.findIndex((i) => i.roomId === prevCur.roomId);
             // Если индекс не равен последнем элементу данного типа шага
-            prevStepLabel =
-              idx && idx < elements.length - 1
-                ? `К тарифам ${idx + 1}-го номера`
-                : "К тарифам";
+            if (idx !== -1) {
+              prevStepLabel =
+                elements.length > 1
+                  ? `К выбору тарифа для ${idx + 1}-го номера`
+                  : "К выбору тарифа";
+            }
           } else if (prevCur.name === "Order services") {
             const elements = bookingSteps.filter(
               (i) => i.name === "Order services"
             );
             const idx = elements.findIndex((i) => i.roomId === prevCur.roomId);
             // Если индекс не равен последнем элементу данного типа шага
-            prevStepLabel =
-              idx && idx < elements.length - 1
-                ? `К услугам ${idx + 1}-го номера`
-                : "К услугам";
+            if (idx !== -1) {
+              prevStepLabel =
+                elements.length > 1
+                  ? `К выбору услуг для ${idx + 1}-го номера`
+                  : "К выбору услуг";
+            }
           }
           prevStep = {
             step: prevCur,
@@ -1222,79 +1296,6 @@ export const BookingPage = () => {
       nextStep,
     };
   }, [bookingSteps]);
-
-  const toSpecificStep = (stepName: BookingStepNameType) => {
-    const nextStepIdx = bookingSteps.findIndex((i) => i.name === stepName);
-    if (nextStepIdx) {
-      dispatch(
-        setBookingSteps(
-          bookingSteps.map((item, idx) => ({
-            ...item,
-            isCurrent: idx === nextStepIdx ? true : false,
-          }))
-        )
-      );
-    }
-  };
-
-  const toPrevStep = useCallback(() => {
-    const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
-
-    if (curIdx) {
-      const prevCurIdx = curIdx > 0 ? curIdx - 1 : 0;
-      if (prevCurIdx !== curIdx) {
-        dispatch(
-          setBookingSteps(
-            bookingSteps.map((item, idx) => ({
-              ...item,
-              isCurrent: idx === prevCurIdx ? true : false,
-              isComplete:
-                item.name === "Enter guest details" && item.isComplete
-                  ? false
-                  : item.isComplete, // убрать статус isComplete=true (чтобы модалка на "Подтверждение бронирования" не реагировал каждый раз на значение true). Значение true можно будет вернуть после повторного нажатия на кнопку "Продолжить" на шаге "Введите данные гостей"
-            }))
-          )
-        );
-      }
-    }
-  }, [bookingSteps]);
-
-  const toNextStep = useCallback(
-    (isSetPrevComplete?: boolean) => {
-      const curIdx = bookingSteps.findIndex((i) => i.isCurrent);
-
-      if (curIdx >= 0) {
-        const nextCurIdx = curIdx < bookingSteps.length - 1 ? curIdx + 1 : null;
-
-        if (nextCurIdx && nextCurIdx !== curIdx) {
-          dispatch(
-            setBookingSteps(
-              bookingSteps.map((item, idx) => ({
-                ...item,
-                isCurrent: idx === nextCurIdx ? true : false,
-                isComplete:
-                  isSetPrevComplete && idx === curIdx ? true : item.isComplete,
-              }))
-            )
-          );
-        }
-      }
-    },
-    [bookingSteps]
-  );
-
-  const setCompleteStep = useCallback(
-    (stepName: BookingStepNameType, status: boolean) => {
-      dispatch(
-        setBookingSteps(
-          bookingSteps.map((item, idx) =>
-            item.name === stepName ? { ...item, isComplete: status } : item
-          )
-        )
-      );
-    },
-    []
-  );
 
   // Установить текущий букинг
   useEffect(() => {

@@ -2,16 +2,12 @@ import { Box, Stack, Typography } from "@mui/material";
 import React, { useContext, useMemo, useState } from "react";
 import { CustomCircleIconButton } from "../../../../../../components/shared/CustomCircleIconButton";
 import KeyboardArrowDownIcon from "@mui/icons-material/KeyboardArrowDown";
-import InfoOutlinedIcon from "@mui/icons-material/InfoOutlined";
 import { BookingTariffType } from "../../../../../../../redux/slices/BookingTariffs/types";
-import { TariffsList } from "../TariffsList";
 import { Features } from "./components/Features";
 import { theme } from "../../../../../../../theme";
 import { CustomButton } from "../../../../../../components/shared/CustomButton";
-import { InfoOutlined } from "@mui/icons-material";
 import { PersonIcon } from "../../../../../../../assets/icons/PersonIcon";
 import { PriceDetailsPopup } from "./components/PriceDetailsPopup";
-import { BookingDateType } from "../../../SelectTariffSection";
 import { TariffDetails } from "./components/TariffDetails";
 import { RoomCategoryType } from "../../../../../../../redux/slices/RoomsCategories/types";
 import {
@@ -23,11 +19,10 @@ import { useAppSelector } from "../../../../../../../hooks/redux";
 interface Props {
   tariff: BookingTariffType;
   roomCategory: RoomCategoryType;
-  bookingDate: BookingDateType;
 }
 
 export const TariffItem = (props: Props) => {
-  const { tariff, roomCategory, bookingDate } = props;
+  const { tariff, roomCategory } = props;
   const { currentBooking, filterParams } = useAppSelector(
     (state) => state.bookings
   );
@@ -202,7 +197,7 @@ export const TariffItem = (props: Props) => {
                 + {tariff.cost}₽
               </Typography>
 
-              <PriceDetailsPopup bookingDate={bookingDate} />
+              <PriceDetailsPopup />
             </Box>
             <Typography variant="body">стоимость за 1 ночь</Typography>
           </Stack>

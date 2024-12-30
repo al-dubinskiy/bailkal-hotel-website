@@ -33,7 +33,7 @@ export const EnterGuestsDetailsSection = memo((props: Props) => {
     ) {
       setOpenModal("confirm_booking");
     }
-  }, []);
+  }, [bookingProgressCurrentStep]);
 
   useEffect(() => {
     if (createBooking.successMessage) {

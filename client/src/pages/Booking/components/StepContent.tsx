@@ -10,6 +10,7 @@ import { SelectRoomSection } from "./SelectRoomSection";
 import { SelectTariffSection } from "./SelectTariffSection/SelectTariffSection";
 import { OrderServicesSection } from "./OrderServicesSection/OrderServicesSection";
 import { EnterGuestsDetailsSection } from "./EnterGuestsDetailsSection/EnterGuestsDetailsSection";
+import { BookingInfoWidget } from "./BookingInfoWidget";
 
 interface Props {
   bookingProgress: BookingProgressType;
@@ -52,57 +53,25 @@ export const StepContent = memo((props: Props) => {
           <CustomCircleProgressIndicator />
         ) : (
           <Stack sx={{ flex: 1, padding: "24px" }}>
-            {/* Тип интерфейса для множественного выбора номеров (со списком номеров и тарифов) */}
-            {filterParams.rooms.length > 1 ? (
-              <Box>
-                {roomsCategories && roomsCategories?.length
-                  ? roomsCategories.map((roomCategory, index) => {
-                      return (
-                        <Button key={index} onClick={() => null}>
-                          Выбрать
-                        </Button>
-                      );
-                    })
-                  : null}
-
-                {/* <BookingInfoWidget
-              currentBookingStepIdx={currentBookingStepIdx}
-              setCurrentBookingStepIdx={(idx: number) =>
-                setCurrentBookingStepIdx(idx)
-              }
-            /> */}
-              </Box>
-            ) : //  Тип интерфейса для выбора одного номера (со списком номеров)
-            filterParams.rooms.length === 1 ? (
-              bookingProgress.currentStep.step?.name === "Select a room" ? (
-                <SelectRoomSection
-                  selectedRoomCategoryId={
-                    newBookings.bookings.find(
-                      (i) =>
-                        i.tempId === bookingProgress.currentStep.step?.roomId
-                    )?.room_category_id || null
-                  }
-                  availableRoomCategories={availableRoomCategories}
-                  nextStepHandler={toNextStep}
-                  prevStepHandler={toPrevStep}
-                  containerStyles={{}}
-                />
-              ) : bookingProgress.currentStep.step?.name ===
-                "Select a tariff" ? (
-                <SelectTariffSection
-                  bookingDate={{
-                    arrival: filterParams.arrival_datetime,
-                    departure: filterParams.departure_datetime,
-                  }}
-                  containerStyles={{}}
-                />
-              ) : bookingProgress.currentStep.step?.name ===
-                "Order services" ? (
-                <OrderServicesSection containerStyles={{}} />
-              ) : bookingProgress.currentStep.step?.name ===
-                "Enter guest details" ? (
-                <EnterGuestsDetailsSection containerStyles={{}} />
-              ) : null
+            {bookingProgress.currentStep.step?.name === "Select a room" ? (
+              <SelectRoomSection
+                selectedRoomCategoryId={
+                  newBookings.bookings.find(
+                    (i) => i.tempId === bookingProgress.currentStep.step?.roomId
+                  )?.room_category_id || null
+                }
+                availableRoomCategories={availableRoomCategories}
+                nextStepHandler={toNextStep}
+                prevStepHandler={toPrevStep}
+                containerStyles={{}}
+              />
+            ) : bookingProgress.currentStep.step?.name === "Select a tariff" ? (
+              <SelectTariffSection containerStyles={{}} />
+            ) : bookingProgress.currentStep.step?.name === "Order services" ? (
+              <OrderServicesSection containerStyles={{}} />
+            ) : bookingProgress.currentStep.step?.name ===
+              "Enter guest details" ? (
+              <EnterGuestsDetailsSection containerStyles={{}} />
             ) : null}
           </Stack>
         )}

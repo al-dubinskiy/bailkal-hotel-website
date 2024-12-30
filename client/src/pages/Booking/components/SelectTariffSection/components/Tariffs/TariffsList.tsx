@@ -3,21 +3,16 @@ import { TariffItem } from "./TariffItem/TariffItem";
 import { useAppDispatch, useAppSelector } from "../../../../../../hooks/redux";
 import { GetBookingTariffs } from "../../../../../../redux/slices/BookingTariffs/bookingTariffsSlice";
 import { Stack } from "@mui/material";
-import { BookingDateType } from "../../SelectTariffSection";
 
-interface Props {
-  bookingDate: BookingDateType;
-}
+interface Props {}
 
 export const TariffsList = (props: Props) => {
-  const { bookingDate } = props;
+  const {} = props;
   const dispatch = useAppDispatch();
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
-  const {
-    currentRoomCategory: roomCategory,
-    currentBooking,
-    filterParams,
-  } = useAppSelector((state) => state.bookings);
+  const { currentRoomCategory: roomCategory } = useAppSelector(
+    (state) => state.bookings
+  );
 
   if (!bookingTariffs || !roomCategory) return null;
 
@@ -32,7 +27,6 @@ export const TariffsList = (props: Props) => {
                   key={index}
                   tariff={item}
                   roomCategory={roomCategory}
-                  bookingDate={bookingDate}
                 />
               );
             })

@@ -63,8 +63,6 @@ export const OrderServicesSection = memo(
             </Typography>
 
             <ServicesList />
-
-            <Transfer />
           </Stack>
 
           <BookingInfoWidget />

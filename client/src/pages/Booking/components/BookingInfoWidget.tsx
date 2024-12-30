@@ -212,6 +212,7 @@ export const BookingInfoWidget = (props: Props) => {
                     aria-controls={`panel-${index + 1}-content`}
                     id={`panel-${index + 1}-header`}
                     sx={{
+                      background: theme.palette.primary.light,
                       "&.MuiAccordionSummary-root": {
                         "& .MuiAccordionSummary-content": {
                           margin: 0,
