@@ -10,7 +10,6 @@ import { SelectRoomSection } from "./SelectRoomSection";
 import { SelectTariffSection } from "./SelectTariffSection/SelectTariffSection";
 import { OrderServicesSection } from "./OrderServicesSection/OrderServicesSection";
 import { EnterGuestsDetailsSection } from "./EnterGuestsDetailsSection/EnterGuestsDetailsSection";
-import { BookingInfoWidget } from "./BookingInfoWidget";
 
 interface Props {
   bookingProgress: BookingProgressType;
@@ -20,7 +19,7 @@ interface Props {
 export const StepContent = memo((props: Props) => {
   const { bookingProgress, isLoadingApiData } = props;
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
-  const { bookingSteps, filterParams, newBookings } = useAppSelector(
+  const { bookingSteps, newBookings } = useAppSelector(
     (state) => state.bookings
   );
   const { availableRoomCategories, toPrevStep, toNextStep } =
@@ -61,17 +60,15 @@ export const StepContent = memo((props: Props) => {
                   )?.room_category_id || null
                 }
                 availableRoomCategories={availableRoomCategories}
-                nextStepHandler={toNextStep}
-                prevStepHandler={toPrevStep}
                 containerStyles={{}}
               />
             ) : bookingProgress.currentStep.step?.name === "Select a tariff" ? (
-              <SelectTariffSection containerStyles={{}} />
+              <SelectTariffSection />
             ) : bookingProgress.currentStep.step?.name === "Order services" ? (
-              <OrderServicesSection containerStyles={{}} />
+              <OrderServicesSection />
             ) : bookingProgress.currentStep.step?.name ===
               "Enter guest details" ? (
-              <EnterGuestsDetailsSection containerStyles={{}} />
+              <EnterGuestsDetailsSection />
             ) : null}
           </Stack>
         )}

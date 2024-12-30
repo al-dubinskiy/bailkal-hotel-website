@@ -111,9 +111,9 @@ const themeOptions: ThemeOptions = {
             display: "flex",
 
             "&.Mui-disabled": {
-              background: "#2F70D9",
+              background: "#606060",
               color: "#ffffff",
-              opacity: 0.7,
+              opacity: 0.6,
             },
 
             "& .MuiButton-startIcon": {
@@ -175,6 +175,12 @@ const themeOptions: ThemeOptions = {
               boxShadow: "none",
               cursor: "pointer",
               "&:after": { opacity: 1, marginLeft: "7.5px" },
+            },
+
+            "&.Mui-disabled": {
+              background: "#606060",
+              color: "#ffffff",
+              opacity: 0.6,
             },
           },
         },

@@ -395,7 +395,7 @@ export const Content = (props: Props) => {
         });
       }
     },
-    [formik.values]
+    [formik.values, updateBookingDraft]
   );
 
   return (

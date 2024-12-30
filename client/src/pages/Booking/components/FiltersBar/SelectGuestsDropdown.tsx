@@ -90,6 +90,7 @@ export const SelectGuestsDropdown = (props: Props) => {
         })
       );
     }
+    handleClose(null);
   };
 
   const isChanged = useMemo(() => {
@@ -282,6 +283,7 @@ export const SelectGuestsDropdown = (props: Props) => {
                         onClick={save}
                         containerBackgroundColor="buttonLight"
                         withoutAnimation
+                        disabled={!isChanged}
                       />
                     </Stack>
                   </Stack>

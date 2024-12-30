@@ -227,7 +227,7 @@ export const ConfirmBookingModal = (props: Props) => {
             booking = { ...booking, comment: i.comment };
           }
           return booking;
-        })[0],
+        }),
       })
     );
   };

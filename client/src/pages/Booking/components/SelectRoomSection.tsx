@@ -46,21 +46,14 @@ export const SelectRoomContext = createContext<{
 });
 
 interface Props {
-  prevStepHandler: () => void;
-  nextStepHandler: () => void;
   availableRoomCategories: RoomCategoryPriceType[] | null;
   selectedRoomCategoryId: string | null;
   containerStyles: SxProps;
 }
 
 export const SelectRoomSection = memo((props: Props) => {
-  const {
-    prevStepHandler,
-    nextStepHandler,
-    availableRoomCategories,
-    selectedRoomCategoryId,
-    containerStyles,
-  } = props;
+  const { availableRoomCategories, selectedRoomCategoryId, containerStyles } =
+    props;
   const { currentBooking, filterParams } = useAppSelector(
     (state) => state.bookings
   );

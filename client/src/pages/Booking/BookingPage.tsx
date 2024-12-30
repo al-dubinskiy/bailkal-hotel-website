@@ -712,6 +712,7 @@ export const BookingPage = () => {
                 setNewBookings({
                   ...newBookings,
                   bookings: newBookings.bookings.map((i) => {
+                    console.log("dfdf", i.transfer_id);
                     return {
                       ...i,
                       user: {
@@ -902,7 +903,7 @@ export const BookingPage = () => {
             (step) => step.name === "Select a room"
           );
           // Вставляем дополнительный шаг "Select a room" и делаем его "текущим шагом"
-          steps.splice(lastSelectRoomStepIdx, 0, ...a);
+          steps.splice(lastSelectRoomStepIdx + 1, 0, ...a);
 
           const b: BookingStepType[] = newRooms.map((i) => {
             return {
@@ -918,7 +919,7 @@ export const BookingPage = () => {
             (step) => step.name === "Select a tariff"
           );
           // Вставляем дополнительный шаг "Select a room" и делаем его "текущим шагом"
-          steps.splice(lastSelectTariffStepIdx, 0, ...b);
+          steps.splice(lastSelectTariffStepIdx + 1, 0, ...b);
 
           const c: BookingStepType[] = newRooms.map((i) => {
             return {
@@ -935,21 +936,17 @@ export const BookingPage = () => {
           );
 
           // Вставляем дополнительный шаг "order services"
-          steps.splice(lastOrderServicesStepIdx, 0, ...c);
+          steps.splice(lastOrderServicesStepIdx + 1, 0, ...c);
         }
         // Если для всех предыдущих новых букингов "категории комнат" уже были выбраны,
-        // то убираем для текущего шага статус "текущий шаг"...
-        steps = steps.map((i) =>
-          i.isCurrent ? { ...i, isCurrent: false } : i
-        );
-        // ... и ставим его для нового шага
+        // то убираем для текущего шага статус "текущий шаг"
+        // и ставим его для нового шага
         const idx = bookings.findIndex((item, i) => !item.room_category_id);
-        steps = steps.map((item, i) => {
-          if (i === idx) {
-            return { ...item, isCurrent: true };
-          }
-          return item;
-        });
+        if (idx !== -1) {
+          steps = steps.map((item, i) => {
+            return { ...item, isCurrent: i === idx ? true : false };
+          });
+        }
       } else if (actionType === "removeRooms") {
         // Получаем индексы комнат после удаления в фильтре "Гости"
         const roomsIds = Array.from(rooms, (i) => i.id);

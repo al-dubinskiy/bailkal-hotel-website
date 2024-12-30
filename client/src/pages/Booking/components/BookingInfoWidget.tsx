@@ -46,6 +46,23 @@ export const BookingInfoWidget = (props: Props) => {
     (state) => state.bookings
   );
 
+  const transfer = transferVariants
+    ? transferVariants.find(
+        (i) => i._id === newBookings.bookings[0].transfer_id
+      ) || null
+    : null;
+
+  const transferCar =
+    transfer && transferCars
+      ? transferCars.find((i) => i._id === transfer.car_id) || null
+      : null;
+
+  const paymentMethod = paymentMethods
+    ? paymentMethods.find(
+        (i) => i._id === newBookings.bookings[0].payment_method_id
+      ) || null
+    : null;
+
   const BookingDateInfo = ({
     dayNumber,
     month,
@@ -184,22 +201,6 @@ export const BookingInfoWidget = (props: Props) => {
                 ) || null
               : null;
 
-            const transfer = transferVariants
-              ? transferVariants.find((i) => i._id === booking.transfer_id) ||
-                null
-              : null;
-
-            const transferCar =
-              transfer && transferCars
-                ? transferCars.find((i) => i._id === transfer.car_id) || null
-                : null;
-
-            const paymentMethod = paymentMethods
-              ? paymentMethods.find(
-                  (i) => i._id === booking.payment_method_id
-                ) || null
-              : null;
-
             if (roomCategory && currentBooking) {
               return (
                 <Accordion
@@ -231,6 +232,7 @@ export const BookingInfoWidget = (props: Props) => {
                   <AccordionDetails
                     sx={{
                       padding: 0,
+                      paddingTop: "10px",
                       display: "flex",
                       flexDirection: "column",
                       alignItems: "stretch",
@@ -354,95 +356,6 @@ export const BookingInfoWidget = (props: Props) => {
                         </ValueContainer>
                       </>
                     ) : null}
-
-                    {transfer ? (
-                      <>
-                        <Typography
-                          variant="body"
-                          sx={{
-                            textAlign: "center",
-                            margin: "10px 0px",
-                            fontWeight: 600,
-                          }}
-                        >
-                          Трансфер
-                        </Typography>
-
-                        <ValueContainer
-                          containerStyles={{ flexDirection: "column" }}
-                        >
-                          <Typography
-                            variant="body"
-                            sx={{ textAlign: "center" }}
-                          >
-                            Направление:{" "}
-                            <span style={{ fontWeight: 600 }}>
-                              {transfer.from_hotel
-                                ? "В отель"
-                                : transfer.to_hotel
-                                ? "Из отеля"
-                                : ""}
-                            </span>
-                          </Typography>
-
-                          <Typography
-                            variant="body"
-                            sx={{ textAlign: "center" }}
-                          >
-                            Время:{" "}
-                            <span style={{ fontWeight: 600 }}>
-                              {transfer.time_from + "-" + transfer.time_to}
-                            </span>
-                          </Typography>
-
-                          <Typography
-                            variant="body"
-                            sx={{ textAlign: "center" }}
-                          >
-                            Тип транспорта:{" "}
-                            <span style={{ fontWeight: 600 }}>
-                              {transferCar
-                                ? transferCar.brand + " " + transferCar.model
-                                : "Не указано"}
-                            </span>
-                          </Typography>
-
-                          <Typography
-                            variant="body"
-                            sx={{ textAlign: "center" }}
-                          >
-                            Цена:{" "}
-                            <span style={{ fontWeight: 600 }}>
-                              {transfer.price} ₽
-                            </span>
-                          </Typography>
-                        </ValueContainer>
-                      </>
-                    ) : null}
-
-                    {paymentMethod ? (
-                      <>
-                        <Typography
-                          variant="body"
-                          sx={{
-                            textAlign: "center",
-                            margin: "10px 0px",
-                            fontWeight: 600,
-                          }}
-                        >
-                          Способ оплаты
-                        </Typography>
-
-                        <ValueContainer>
-                          <Typography
-                            variant="body"
-                            sx={{ textAlign: "center" }}
-                          >
-                            {paymentMethod.title}
-                          </Typography>
-                        </ValueContainer>
-                      </>
-                    ) : null}
                   </AccordionDetails>
                 </Accordion>
               );
@@ -450,6 +363,75 @@ export const BookingInfoWidget = (props: Props) => {
             return null;
           })
         : null}
+
+      {transfer ? (
+        <>
+          <Typography
+            variant="body"
+            sx={{
+              textAlign: "center",
+              margin: "10px 0px",
+              fontWeight: 600,
+            }}
+          >
+            Трансфер
+          </Typography>
+
+          <ValueContainer containerStyles={{ flexDirection: "column" }}>
+            <Typography variant="body" sx={{ textAlign: "center" }}>
+              Направление:{" "}
+              <span style={{ fontWeight: 600 }}>
+                {transfer.from_hotel
+                  ? "В отель"
+                  : transfer.to_hotel
+                  ? "Из отеля"
+                  : ""}
+              </span>
+            </Typography>
+
+            <Typography variant="body" sx={{ textAlign: "center" }}>
+              Время:{" "}
+              <span style={{ fontWeight: 600 }}>
+                {transfer.time_from + "-" + transfer.time_to}
+              </span>
+            </Typography>
+
+            <Typography variant="body" sx={{ textAlign: "center" }}>
+              Тип транспорта:{" "}
+              <span style={{ fontWeight: 600 }}>
+                {transferCar
+                  ? transferCar.brand + " " + transferCar.model
+                  : "Не указано"}
+              </span>
+            </Typography>
+
+            <Typography variant="body" sx={{ textAlign: "center" }}>
+              Цена: <span style={{ fontWeight: 600 }}>{transfer.price} ₽</span>
+            </Typography>
+          </ValueContainer>
+        </>
+      ) : null}
+
+      {paymentMethod ? (
+        <>
+          <Typography
+            variant="body"
+            sx={{
+              textAlign: "center",
+              margin: "10px 0px",
+              fontWeight: 600,
+            }}
+          >
+            Способ оплаты
+          </Typography>
+
+          <ValueContainer>
+            <Typography variant="body" sx={{ textAlign: "center" }}>
+              {paymentMethod.title}
+            </Typography>
+          </ValueContainer>
+        </>
+      ) : null}
 
       <Stack
         sx={{

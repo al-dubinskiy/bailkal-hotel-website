@@ -56,7 +56,7 @@ export const CreateBooking = createAsyncThunk(
   "bookings/create",
   async (
     payload: {
-      bookings: CreateBookingType;
+      bookings: CreateBookingType[];
     },
     thunkAPI
   ) => {
