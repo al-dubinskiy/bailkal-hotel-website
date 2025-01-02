@@ -409,11 +409,9 @@ export const Content = (props: Props) => {
             setTransfer={(comment) => {
               const transfer = getTransferVariant();
               const { step: currentStep } = bookingProgressCurrentStep;
-              if (currentStep && transfer && roomCategory) {
+              if (currentStep && transfer) {
                 updateBookingDraft({
                   currentStep,
-                  roomCategory,
-                  tempBookingId: currentStep.roomId,
                   transferId: transfer._id,
                   transferComment: comment,
                 });

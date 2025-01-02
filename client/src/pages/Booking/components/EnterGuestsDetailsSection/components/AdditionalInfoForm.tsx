@@ -12,20 +12,12 @@ import { CustomButton } from "../../../../components/shared/CustomButton";
 
 interface Props {
   formik: FormikProps<BookingGuestsDetailsType>;
-  bedSpecialWish: SelectItemType[];
-  viewsFromWindowSpecialWish: SelectItemType[];
   isEnableSaveButton: boolean;
   updateAdditionalInfoData: () => void;
 }
 
 export const AdditionalInfoForm = (props: Props) => {
-  const {
-    formik,
-    bedSpecialWish,
-    viewsFromWindowSpecialWish,
-    isEnableSaveButton,
-    updateAdditionalInfoData,
-  } = props;
+  const { formik, isEnableSaveButton, updateAdditionalInfoData } = props;
 
   return (
     <div>
@@ -69,50 +61,6 @@ export const AdditionalInfoForm = (props: Props) => {
               error={
                 formik.touched.departureTime &&
                 Boolean(formik.errors.departureTime)
-              }
-            />
-          </Stack>
-
-          <Stack
-            sx={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              gap: "24px",
-            }}
-          >
-            <CustomSelect
-              id="bedTypeSpecialWish"
-              name="bedTypeSpecialWish"
-              inputLabel="Кровати"
-              data={bedSpecialWish}
-              value={formik.values.bedTypeSpecialWish}
-              setValue={(val) =>
-                formik.setFieldValue("bedTypeSpecialWish", val)
-              }
-              labelPosition={"left"}
-              containerStyles={{ flex: 0.5 }}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.bedTypeSpecialWish &&
-                Boolean(formik.errors.bedTypeSpecialWish)
-              }
-            />
-
-            <CustomSelect
-              id="viewFromWindowSpecialWish"
-              name="viewFromWindowSpecialWish"
-              inputLabel="Вид из окна"
-              data={viewsFromWindowSpecialWish}
-              value={formik.values.viewFromWindowSpecialWish}
-              setValue={(val) =>
-                formik.setFieldValue("viewFromWindowSpecialWish", val)
-              }
-              labelPosition={"left"}
-              containerStyles={{ flex: 0.5 }}
-              onBlur={formik.handleBlur}
-              error={
-                formik.touched.viewFromWindowSpecialWish &&
-                Boolean(formik.errors.viewFromWindowSpecialWish)
               }
             />
           </Stack>

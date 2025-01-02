@@ -1,4 +1,4 @@
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import { v4 as uuidv4 } from "uuid";
 import {
   Box,
@@ -90,6 +90,7 @@ export const SelectGuestsDropdown = (props: Props) => {
         })
       );
     }
+    handleClose(null);
   };
 
   const isChanged = useMemo(() => {
@@ -98,6 +99,12 @@ export const SelectGuestsDropdown = (props: Props) => {
     }
     return true;
   }, [rooms, roomsGuestsCountLocal]);
+
+  useEffect(() => {
+    if (JSON.stringify(roomsGuestsCountLocal) !== JSON.stringify(rooms)) {
+      setRoomsGuestsCountLocal(rooms);
+    }
+  }, [rooms]);
 
   return (
     <Box sx={{ display: "flex", flexDirection: "column", gap: "10px" }}>
@@ -282,6 +289,7 @@ export const SelectGuestsDropdown = (props: Props) => {
                         onClick={save}
                         containerBackgroundColor="buttonLight"
                         withoutAnimation
+                        disabled={!isChanged}
                       />
                     </Stack>
                   </Stack>

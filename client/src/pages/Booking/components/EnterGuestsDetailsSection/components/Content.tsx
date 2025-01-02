@@ -38,6 +38,7 @@ import * as yup from "yup";
 import { dateTimeFormat } from "../../../../../constants";
 import { isEqual } from "lodash";
 import { BookingContext } from "../../../BookingPage";
+import { Transfer } from "../../OrderServicesSection/components/Transfer/Transfer";
 
 interface Props {
   isUpdateBookingsUserInfo: boolean;
@@ -222,8 +223,6 @@ export const Content = (props: Props) => {
         bookingUserInfo.want_to_know_about_special_offers_and_news,
       arrivalTime: getPrevArrivalTime(),
       departureTime: getPrevDepartureTime(),
-      bedTypeSpecialWish: bedSpecialWish[0],
-      viewFromWindowSpecialWish: viewsFromWindowSpecialWish[0],
       comment: bookingInfo.comment ? bookingInfo.comment : "",
       bookingForWhom: "for_yourself",
       paymentMethodId: bookingInfo.payment_method_id,
@@ -248,27 +247,11 @@ export const Content = (props: Props) => {
         a.wantToKnowAboutSpecialOffersAndNews,
       arrivalTime: a.arrivalTime.value,
       departureTime: a.departureTime.value,
-      bedTypeId: a.bedTypeSpecialWish.id.toString(),
-      viewFromWindowId: a.viewFromWindowSpecialWish.id.toString(),
       comment: a.comment,
       bookingForWhom: a.bookingForWhom,
       paymentMethodId: a.paymentMethodId,
     };
   }, [formik.values]);
-
-  useEffect(() => {
-    formik.setValues({
-      ...formik.values,
-      bedTypeSpecialWish:
-        bedSpecialWish.find(
-          (i) => i.id === newBookings.bookings[0].bed_type_id
-        ) || bedSpecialWish[0],
-      viewFromWindowSpecialWish:
-        viewsFromWindowSpecialWish.find(
-          (i) => i.id === newBookings.bookings[0].view_from_window_id
-        ) || viewsFromWindowSpecialWish[0],
-    });
-  }, [bedSpecialWish.length, viewsFromWindowSpecialWish.length]);
 
   useEffect(() => {
     if (isUpdateBookingsUserInfo) {
@@ -365,24 +348,16 @@ export const Content = (props: Props) => {
     const {
       arrivalTime: curArrivalTime,
       departureTime: curDepartureTime,
-      bedTypeId: curBedTypeId,
-      viewFromWindowId: curViewFromWindowId,
       comment: curComment,
     } = formValues;
 
     const prevArrivalTime = getPrevArrivalTime().value;
     const prevDepartureTime = getPrevDepartureTime().value;
-    const {
-      bed_type_id: prevBedTypeId,
-      view_from_window_id: prevViewFromWindowId,
-      comment: prevComment,
-    } = bookingInfo;
+    const { comment: prevComment } = bookingInfo;
 
     if (
       curArrivalTime !== prevArrivalTime ||
       curDepartureTime !== prevDepartureTime ||
-      curBedTypeId !== prevBedTypeId ||
-      curViewFromWindowId !== prevViewFromWindowId ||
       curComment !== prevComment
     ) {
       return true;
@@ -406,8 +381,6 @@ export const Content = (props: Props) => {
           a.wantToKnowAboutSpecialOffersAndNews,
         arrivalTime: a.arrivalTime.value,
         departureTime: a.departureTime.value,
-        bedTypeId: a.bedTypeSpecialWish.id.toString(),
-        viewFromWindowId: a.viewFromWindowSpecialWish.id.toString(),
         comment: a.comment,
         bookingForWhom: a.bookingForWhom,
         paymentMethodId: a.paymentMethodId,
@@ -422,7 +395,7 @@ export const Content = (props: Props) => {
         });
       }
     },
-    [formik.values]
+    [formik.values, updateBookingDraft]
   );
 
   return (
@@ -470,8 +443,6 @@ export const Content = (props: Props) => {
 
       <AdditionalInfoForm
         formik={formik}
-        bedSpecialWish={bedSpecialWish}
-        viewsFromWindowSpecialWish={viewsFromWindowSpecialWish}
         updateAdditionalInfoData={() => {
           const { step: currentStep } = bookingProgressCurrentStep;
           if (currentStep) {
@@ -484,6 +455,8 @@ export const Content = (props: Props) => {
         }}
         isEnableSaveButton={isEnableSaveAdditionalInfoButton}
       />
+
+      <Transfer />
 
       <Stack sx={{ gap: "24px" }}>
         <Typography

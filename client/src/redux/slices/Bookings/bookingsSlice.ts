@@ -9,6 +9,7 @@ import {
   FiltersParamsType,
   GetBookingsApiResponseType,
   NewBookingsType,
+  RoomCategoryPriceType,
   UpdateBookingApiResponseType,
   UpdateBookingType,
 } from "./types";
@@ -56,7 +57,7 @@ export const CreateBooking = createAsyncThunk(
   "bookings/create",
   async (
     payload: {
-      bookings: CreateBookingType;
+      bookings: CreateBookingType[];
     },
     thunkAPI
   ) => {
@@ -182,6 +183,7 @@ interface IBookingState {
   currentRoomCategory: RoomCategoryType | null;
   bookingSteps: BookingStepType[];
   filterParams: FiltersParamsType;
+  categoriesAvailableRoomsCount: RoomCategoryPriceType[] | null;
 }
 
 const initialState: IBookingState = {
@@ -227,6 +229,7 @@ const initialState: IBookingState = {
       .set("minutes", Number(times[8].value.split(":")[1])),
     rooms: [{ id: uuidv4(), adults: 1, children: 0 }],
   },
+  categoriesAvailableRoomsCount: null,
 };
 
 export const bookingsSlice = createSlice({
@@ -254,6 +257,12 @@ export const bookingsSlice = createSlice({
     },
     setFilterParams: (state, { payload }: { payload: FiltersParamsType }) => {
       state.filterParams = payload;
+    },
+    setCategoriesAvailableRoomsCount: (
+      state,
+      { payload }: { payload: RoomCategoryPriceType[] | null }
+    ) => {
+      state.categoriesAvailableRoomsCount = payload;
     },
     resetCreateBookingState: (state) => {
       state.createBooking.successMessage = null;
@@ -285,13 +294,12 @@ export const bookingsSlice = createSlice({
       (state, { payload }: { payload: CreateBookingApiResponseType }) => {
         state.createBooking.successMessage = "CreateBooking (API): success";
         state.createBooking.isLoading = false;
-        const booking = payload.data;
-        console.log("ffff", booking);
-        console.log("ffffff", state.bookings);
+        const bookings = payload.data;
+
         if (state.bookings) {
-          state.bookings.push(booking);
+          state.bookings.push(...bookings);
         } else {
-          state.bookings = [booking];
+          state.bookings = bookings;
         }
         if (DEBUG) console.log("CreateBooking (API): booking was created.");
       }
@@ -360,5 +368,6 @@ export const {
   setCurrentRoomCategory,
   setBookingSteps,
   setFilterParams,
+  setCategoriesAvailableRoomsCount,
   resetCreateBookingState,
 } = bookingsSlice.actions;

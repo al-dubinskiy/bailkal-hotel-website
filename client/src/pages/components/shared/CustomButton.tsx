@@ -47,7 +47,7 @@ export const CustomButton = (props: Props) => {
       endIcon={endIcon}
       sx={{
         "& .MuiButton-startIcon": {
-          marginRight: "5px",
+          marginRight: label ? "5px" : "0px",
         },
         "& .MuiButton-endIcon": {
           marginLeft: "5px",

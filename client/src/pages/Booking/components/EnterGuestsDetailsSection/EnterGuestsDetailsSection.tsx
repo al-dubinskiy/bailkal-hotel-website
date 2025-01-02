@@ -11,7 +11,7 @@ interface Props {
   containerStyles?: SxProps;
 }
 
-export const EnterGuestsDetailsSection = memo((props: Props) => {
+export const EnterGuestsDetailsSection = (props: Props) => {
   const { containerStyles } = props;
   const { createBooking } = useAppSelector((state) => state.bookings);
   const { bookingProgressCurrentStep, setCompleteStep } =
@@ -33,7 +33,7 @@ export const EnterGuestsDetailsSection = memo((props: Props) => {
     ) {
       setOpenModal("confirm_booking");
     }
-  }, []);
+  }, [bookingProgressCurrentStep]);
 
   useEffect(() => {
     if (createBooking.successMessage) {
@@ -85,4 +85,4 @@ export const EnterGuestsDetailsSection = memo((props: Props) => {
       />
     </>
   );
-});
+};

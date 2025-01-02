@@ -11,68 +11,61 @@ import { ServicesList } from "./components/Services/ServicesList";
 import { Transfer } from "./components/Transfer/Transfer";
 
 interface Props {
-  containerStyles: SxProps;
+  containerStyles?: SxProps;
 }
 
-export const OrderServicesSection = memo(
-  (props: Props) => {
-    const { containerStyles } = props;
+export const OrderServicesSection = (props: Props) => {
+  const { containerStyles } = props;
 
-    const { currentRoomCategory } = useAppSelector((state) => state.bookings);
+  const { currentRoomCategory } = useAppSelector((state) => state.bookings);
 
-    if (!currentRoomCategory) return null;
+  if (!currentRoomCategory) return null;
 
-    return (
-      <Stack sx={{ alignItems: "stretch", gap: "24px", ...containerStyles }}>
-        <RoomCategoryCard />
+  return (
+    <Stack sx={{ alignItems: "stretch", gap: "24px", ...containerStyles }}>
+      <RoomCategoryCard />
 
+      <Stack
+        sx={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "flex-start",
+          gap: "24px",
+        }}
+      >
         <Stack
           sx={{
-            flexDirection: "row",
-            justifyContent: "space-between",
-            alignItems: "flex-start",
+            alignItems: "stretch",
             gap: "24px",
+            flex: 0.7,
           }}
         >
-          <Stack
-            sx={{
-              alignItems: "stretch",
-              gap: "24px",
-              flex: 0.7,
-            }}
+          {/* Если еще не выбран Suite */}
+          {currentRoomCategory._id !== "672cd65af65cf0e5caff9686" &&
+          currentRoomCategory._id !== "6757519407763b1fc5c07e72" ? (
+            <>
+              <Typography
+                variant="label"
+                sx={{ fontWeight: 600, alignSelf: "center" }}
+              >
+                Повысить комфорт
+              </Typography>
+              <MoreAdvantageousRoomCategoryCard />
+            </>
+          ) : null}
+
+          <Typography
+            variant="label"
+            sx={{ fontWeight: 600, alignSelf: "center" }}
           >
-            {/* Если еще не выбран Suite */}
-            {currentRoomCategory._id !== "672cd65af65cf0e5caff9686" &&
-            currentRoomCategory._id !== "6757519407763b1fc5c07e72" ? (
-              <>
-                <Typography
-                  variant="label"
-                  sx={{ fontWeight: 600, alignSelf: "center" }}
-                >
-                  Повысить комфорт
-                </Typography>
-                <MoreAdvantageousRoomCategoryCard />
-              </>
-            ) : null}
+            Выберите дополнительные услуги
+          </Typography>
 
-            <Typography
-              variant="label"
-              sx={{ fontWeight: 600, alignSelf: "center" }}
-            >
-              Выберите дополнительные услуги
-            </Typography>
-
-            <ServicesList />
-
-            <Transfer />
-          </Stack>
-
-          <BookingInfoWidget />
+          <ServicesList />
         </Stack>
+
+        <BookingInfoWidget />
       </Stack>
-    );
-  },
-  (prevProps, nextProps) =>
-    shallowEqual(prevProps, nextProps) ||
-    JSON.stringify(prevProps) === JSON.stringify(nextProps)
-);
+    </Stack>
+  );
+};
