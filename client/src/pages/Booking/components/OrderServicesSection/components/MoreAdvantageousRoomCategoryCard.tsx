@@ -88,7 +88,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
 
   const roomPhotos = useMemo(() => {
     if (moreAdvantageousRoomCategory) {
-      getRoomCategoryPhotos(moreAdvantageousRoomCategory);
+      return getRoomCategoryPhotos(moreAdvantageousRoomCategory);
     }
     return [];
   }, [moreAdvantageousRoomCategory]);

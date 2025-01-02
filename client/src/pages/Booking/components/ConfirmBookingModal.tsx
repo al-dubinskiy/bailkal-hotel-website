@@ -35,6 +35,21 @@ export const ConfirmBookingModal = (props: Props) => {
   const { viewsFromRoomWindow } = useAppSelector(
     (state) => state.viewsFromRoomWindow
   );
+  const { transferVariants } = useAppSelector(
+    (state) => state.transfersVariants
+  );
+  const { transferCars } = useAppSelector((state) => state.transfersCars);
+
+  const transfer = transferVariants
+    ? transferVariants.find(
+        (i) => i._id === newBookings.bookings[0].transfer_id
+      ) || null
+    : null;
+
+  const transferCar =
+    transfer && transferCars
+      ? transferCars.find((i) => i._id === transfer.car_id) || null
+      : null;
   const { bookingProgressCurrentStep, setCompleteStep } =
     useContext(BookingContext);
 
@@ -256,6 +271,57 @@ export const ConfirmBookingModal = (props: Props) => {
               }
               return null;
             })}
+
+            {transfer ? (
+              <Stack sx={{ gap: "10px", marginBottom: "24px" }}>
+                <Typography
+                  variant="label"
+                  sx={{ textAlign: "center", fontWeight: 600 }}
+                >
+                  Трансфер
+                </Typography>
+
+                <Grid container spacing={"24px"}>
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <CustomLabelAndDescription
+                      label={"Направление"}
+                      description={
+                        transfer.from_hotel
+                          ? "В отель"
+                          : transfer.to_hotel
+                          ? "Из отеля"
+                          : ""
+                      }
+                    />
+                  </Grid>
+
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <CustomLabelAndDescription
+                      label={"Время"}
+                      description={transfer.time_from + "-" + transfer.time_to}
+                    />
+                  </Grid>
+
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <CustomLabelAndDescription
+                      label={"Тип транспорта"}
+                      description={
+                        transferCar
+                          ? transferCar.brand + " " + transferCar.model
+                          : "Не указано"
+                      }
+                    />
+                  </Grid>
+
+                  <Grid size={{ xs: 12, md: 6 }}>
+                    <CustomLabelAndDescription
+                      label={"Цена"}
+                      description={transfer.price + "₽"}
+                    />
+                  </Grid>
+                </Grid>
+              </Stack>
+            ) : null}
           </Stack>
         </Stack>
       }
