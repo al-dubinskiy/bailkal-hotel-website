@@ -7,7 +7,7 @@ import React, {
 } from "react";
 import { Box, Link, Stack, SxProps, Typography } from "@mui/material";
 import Grid from "@mui/material/Grid2";
-import { BookingContext, RoomCategoryPriceType } from "../BookingPage";
+import { BookingContext } from "../BookingPage";
 import { useAppSelector } from "../../../hooks/redux";
 import {
   deluxeKingRooms,
@@ -46,17 +46,14 @@ export const SelectRoomContext = createContext<{
 });
 
 interface Props {
-  availableRoomCategories: RoomCategoryPriceType[] | null;
   selectedRoomCategoryId: string | null;
   containerStyles: SxProps;
 }
 
 export const SelectRoomSection = memo((props: Props) => {
-  const { availableRoomCategories, selectedRoomCategoryId, containerStyles } =
-    props;
-  const { currentBooking, filterParams } = useAppSelector(
-    (state) => state.bookings
-  );
+  const { selectedRoomCategoryId, containerStyles } = props;
+  const { currentBooking, filterParams, categoriesAvailableRoomsCount } =
+    useAppSelector((state) => state.bookings);
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
 
   const { updateBookingDraft, bookingProgressCurrentStep } =
@@ -89,14 +86,21 @@ export const SelectRoomSection = memo((props: Props) => {
         }}
       >
         <Grid container spacing={2}>
-          {availableRoomCategories &&
+          {categoriesAvailableRoomsCount &&
             roomsCategories &&
             roomsCategories.map(
               (roomCategory: RoomCategoryType, index: number) => {
+                const categoryRooms = categoriesAvailableRoomsCount.find(
+                  (i) => i.id === roomCategory._id
+                );
+
+                if (!categoryRooms) return null;
+
                 const isRoomExist =
-                  availableRoomCategories.findIndex(
-                    (i) => i.id === roomCategory._id
-                  ) !== -1;
+                  categoryRooms.earlyBookingsCount +
+                    categoryRooms.newBookingsIds.length <
+                  categoryRooms.roomsTotal;
+
                 const roomPhotos =
                   roomCategory._id === "672cd21f0ae43935e03a79dd" ||
                   roomCategory._id === "672cd2a790ef8a2d0cdfcac3"

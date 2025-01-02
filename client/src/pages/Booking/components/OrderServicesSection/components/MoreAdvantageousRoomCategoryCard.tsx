@@ -31,12 +31,10 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
     currentRoomCategory: prevRoomCategory,
     currentBooking,
     filterParams,
+    categoriesAvailableRoomsCount,
   } = useAppSelector((state) => state.bookings);
-  const {
-    availableRoomCategories,
-    updateBookingDraft,
-    bookingProgressCurrentStep,
-  } = useContext(BookingContext);
+  const { updateBookingDraft, bookingProgressCurrentStep } =
+    useContext(BookingContext);
 
   const bookingGuestsTotal = useMemo(() => {
     if (currentBooking) {
@@ -51,9 +49,9 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
   }, [filterParams, currentBooking]);
 
   const moreAdvantageousRoomCategory = useMemo((): RoomCategoryType | null => {
-    if (availableRoomCategories && roomsCategories && prevRoomCategory) {
+    if (categoriesAvailableRoomsCount && roomsCategories && prevRoomCategory) {
       // Получаем id доступных категорий комнат
-      const ids = Array.from(availableRoomCategories, (i) => i.id);
+      const ids = Array.from(categoriesAvailableRoomsCount, (i) => i.id);
       // Получаем перечень доступных категорий категорий
       const list = roomsCategories
         .filter((i) => ids.includes(i._id))
@@ -77,7 +75,7 @@ export const MoreAdvantageousRoomCategoryCard = (props: Props) => {
       }
     }
     return null;
-  }, [availableRoomCategories, prevRoomCategory, bookingGuestsTotal]);
+  }, [categoriesAvailableRoomsCount, prevRoomCategory, bookingGuestsTotal]);
 
   const roomPrice = useMemo(() => {
     if (moreAdvantageousRoomCategory && bookingGuestsTotal) {

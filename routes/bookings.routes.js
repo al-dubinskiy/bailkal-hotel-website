@@ -55,6 +55,7 @@ router.post("/", async (req, res) => {
 
     const bookings = req.body;
     const errors = [];
+    const data = [];
     await Promise.all(
       bookings.map(async (booking) => {
         const existingRecordByArrivalDatetime = await Booking.findOne({
@@ -76,11 +77,12 @@ router.post("/", async (req, res) => {
           );
         }
         const newBooking = new Booking({
-          ...data,
+          ...booking,
           created_at: moment().format("YYYY-MM-DD HH:mm"),
           updated_at: moment().format("YYYY-MM-DD HH:mm"),
         });
-        return await newBooking.save();
+        await newBooking.save();
+        return data.push(newBooking);
       })
     );
     if (errors.length === bookings.length) {
@@ -95,11 +97,13 @@ router.post("/", async (req, res) => {
         message: `
         Create booking: статус 201. Некоторые бронирования успешно созданы.
         Ошибки: ${errors.join("\n")}`,
+        data,
       });
     } else if (!errors.length) {
       // Если все бронирования успешно созданы
       return res.status(201).json({
         message: `Create booking: статус 201. Все бронирования успешно созданы.`,
+        data,
       });
     }
   } catch (e) {

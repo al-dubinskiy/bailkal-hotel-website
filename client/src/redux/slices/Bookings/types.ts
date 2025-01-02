@@ -122,6 +122,14 @@ export type BookingStepType = {
   isComplete: boolean;
 };
 
+export type RoomCategoryPriceType = {
+  id: string;
+  roomsTotal: number;
+  earlyBookingsCount: number;
+  newBookingsIds: string[];
+  price: number;
+};
+
 // API
 export type GetBookingsApiResponseType = {
   success: boolean;
@@ -130,7 +138,7 @@ export type GetBookingsApiResponseType = {
 
 export type CreateBookingApiResponseType = {
   success: boolean;
-  data: BookingType;
+  data: BookingType[];
 };
 
 export type UpdateBookingApiResponseType = {

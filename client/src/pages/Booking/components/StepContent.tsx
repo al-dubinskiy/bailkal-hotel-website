@@ -19,14 +19,13 @@ interface Props {
 export const StepContent = memo((props: Props) => {
   const { bookingProgress, isLoadingApiData } = props;
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
-  const { bookingSteps, newBookings } = useAppSelector(
-    (state) => state.bookings
-  );
-  const { availableRoomCategories, toPrevStep, toNextStep } =
-    useContext(BookingContext);
+  const { bookingSteps, newBookings, categoriesAvailableRoomsCount } =
+    useAppSelector((state) => state.bookings);
+  const { toPrevStep, toNextStep } = useContext(BookingContext);
 
   if (roomsCategories && roomsCategories?.length) {
-    return availableRoomCategories && !availableRoomCategories.length ? (
+    return categoriesAvailableRoomsCount &&
+      !categoriesAvailableRoomsCount.length ? (
       <NotFoundRoomCategoriesBanner />
     ) : (
       <Stack
@@ -59,7 +58,6 @@ export const StepContent = memo((props: Props) => {
                     (i) => i.tempId === bookingProgress.currentStep.step?.roomId
                   )?.room_category_id || null
                 }
-                availableRoomCategories={availableRoomCategories}
                 containerStyles={{}}
               />
             ) : bookingProgress.currentStep.step?.name === "Select a tariff" ? (
