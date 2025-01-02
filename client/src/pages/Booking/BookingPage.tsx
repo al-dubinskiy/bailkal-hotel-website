@@ -286,7 +286,6 @@ export const BookingPage = () => {
         ...categoriesAvailableRoomsCount,
       ];
 
-      console.log(sortedByRoomCategories);
       Object.entries(sortedByRoomCategories).map((item: any, index) => {
         const categoryId: string = item[0];
         const bookingsOnCategory = item[1].map(

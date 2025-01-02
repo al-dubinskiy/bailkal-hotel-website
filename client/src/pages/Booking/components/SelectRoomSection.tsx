@@ -227,15 +227,20 @@ export const SelectRoomSection = memo((props: Props) => {
 
                         <Stack
                           sx={{
-                            flexDirection: isRoomExist ? "row" : "column",
-                            alignItems: isRoomExist ? "flex-end" : "stretch",
-                            justifyContent: isRoomExist
-                              ? "space-between"
-                              : "center",
+                            flexDirection:
+                              isRoomExist || isSelected ? "row" : "column",
+                            alignItems:
+                              isRoomExist || isSelected
+                                ? "flex-end"
+                                : "stretch",
+                            justifyContent:
+                              isRoomExist || isSelected
+                                ? "space-between"
+                                : "center",
                             gap: "24px",
                           }}
                         >
-                          {isRoomExist ? (
+                          {isRoomExist || isSelected ? (
                             <Stack
                               sx={{
                                 flexDirection: "column",
@@ -341,7 +346,7 @@ export const SelectRoomSection = memo((props: Props) => {
                           )}
 
                           {/* Проверка нет ли уже забронированого номера на выбранную дату "заезда" и "выезда" */}
-                          {isRoomExist ? (
+                          {isRoomExist || isSelected ? (
                             <CustomButton
                               label={!isSelected ? "Выбрать" : "Выбрано"}
                               onClick={() => {
