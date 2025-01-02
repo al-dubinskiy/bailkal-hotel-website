@@ -11,7 +11,6 @@ const schema = new Schema({
     required: true,
     ref: "TransferCar",
   },
-  comment: { type: String },
   created_at: { type: Date, required: true, default: Date.now() },
   updated_at: { type: Date, required: true, default: Date.now() },
 });

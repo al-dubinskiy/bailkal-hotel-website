@@ -31,6 +31,8 @@ import { ViewFromRoomWindowType } from "../../../../redux/slices/ViewsFromRoomWi
 import { TransferVariantType } from "../../../../redux/slices/TransferVariants/types";
 import { TransferCarType } from "../../../../redux/slices/TransferCars/types";
 import { PaymentMethodType } from "../../../../redux/slices/PaymentMethods/types";
+import { EditBookingModalContent } from "./EditBookingModalContent";
+import { BookingDetailsModalContent } from "./BookingDetailsModalContent";
 
 type BookingDateType = { arrival_datetime: string; departure_datetime: string };
 type BookingGuestsCountType = { adults_count: number; children_count: number };
@@ -38,7 +40,7 @@ type BookingGuestsCountType = { adults_count: number; children_count: number };
 export type CategoryRoomsBookingStatusType = {
   id: string;
   isBooked: boolean;
-  number: number;
+  roomNumber: number;
   bookingUser: BookingUserInfoType | undefined;
   bookingGuests: BookingGuestsCountType | undefined;
   bookingDate: BookingDateType | undefined;
@@ -46,57 +48,45 @@ export type CategoryRoomsBookingStatusType = {
 
 interface Props {
   data: CategoryRoomsBookingStatusType[];
-  roomsCategories: RoomCategoryType[] | null;
-  bookingTariffs: BookingTariffType[] | null;
-  bookingServices: BookingServiceType[] | null;
-  roomBedVariants: RoomBedVariantType[] | null;
-  viewsFromRoomWindow: ViewFromRoomWindowType[] | null;
-  transferVariants: TransferVariantType[] | null;
-  transferCars: TransferCarType[] | null;
-  paymentMethods: PaymentMethodType[] | null;
   isLoading: boolean;
 }
 
+export const getGuestsCount = (guests: BookingGuestsCountType): string => {
+  const { adults_count, children_count } = guests;
+
+  return `
+     ${
+       adults_count > 0
+         ? `${adults_count} взрослы${adults_count === 1 ? "й" : "x"}`
+         : ""
+     }
+      ${children_count > 0 ? ", " : ""}
+      ${
+        children_count >= 5
+          ? `${children_count} детей`
+          : children_count > 0
+          ? `${children_count} ребен${children_count === 1 ? "ок" : "ка"}`
+          : ""
+      }
+    `;
+};
+
 export const BookingsTable = (props: Props) => {
-  const {
-    data,
-    isLoading,
-    roomsCategories,
-    bookingTariffs,
-    bookingServices,
-    roomBedVariants,
-    viewsFromRoomWindow,
-    transferVariants,
-    transferCars,
-    paymentMethods,
-  } = props;
+  const { data, isLoading } = props;
 
   const [openBookingDetailsModal, setOpenBookingDetailsModal] = useState<{
-    booking: CategoryRoomsBookingStatusType | undefined;
+    booking: BookingType | undefined;
     status: boolean;
   }>({ booking: undefined, status: false });
+
+  const [openEditBookingModal, setOpenEditBookingModal] = useState<{
+    booking: BookingType | undefined;
+    status: boolean;
+  }>({ booking: undefined, status: false });
+
   const classes = useStyles();
   const theme = useTheme();
 
-  const getGuestsCount = (guests: BookingGuestsCountType): string => {
-    const { adults_count, children_count } = guests;
-
-    return `
-       ${
-         adults_count > 0
-           ? `${adults_count} взрослы${adults_count === 1 ? "й" : "x"}`
-           : ""
-       }
-        ${children_count > 0 ? ", " : ""}
-        ${
-          children_count >= 5
-            ? `${children_count} детей`
-            : children_count > 0
-            ? `${children_count} ребен${children_count === 1 ? "ок" : "ка"}`
-            : ""
-        }
-      `;
-  };
   const columns: GridColDef<CategoryRoomsBookingStatusType>[] = [
     {
       field: "isBooked",
@@ -210,7 +200,12 @@ export const BookingsTable = (props: Props) => {
               />
             }
             label=""
-            onClick={() => null}
+            onClick={() =>
+              setOpenEditBookingModal({
+                booking: row.booking,
+                status: true,
+              })
+            }
             className={classes.openDetailsActionButton}
           />,
 
@@ -235,7 +230,7 @@ export const BookingsTable = (props: Props) => {
             label=""
             onClick={() =>
               setOpenBookingDetailsModal({
-                booking: row,
+                booking: row.booking,
                 status: true,
               })
             }
@@ -291,168 +286,6 @@ export const BookingsTable = (props: Props) => {
     );
   };
 
-  const BookingDetailsModalContent = () => {
-    const row = openBookingDetailsModal.booking;
-    const booking = row?.booking || null;
-    const user = row?.bookingUser || null;
-    const guests = row?.bookingGuests || null;
-    const date = row?.bookingDate || null;
-
-    if (booking && user && guests && date) {
-      const roomCategory =
-        (booking.room_category_id &&
-          roomsCategories?.find((i) => i._id === booking.room_category_id)) ||
-        null;
-
-      const bookingTariff =
-        (booking.tariff_id &&
-          bookingTariffs?.find((i) => i._id === booking.tariff_id)) ||
-        null;
-
-      const bookingServicesInfo = getBookingServicesInfo({
-        bookingServices,
-        roomCategory,
-        currentBooking: booking,
-      });
-
-      const bedTypeSpecialWish =
-        roomBedVariants?.find((i) => i._id === booking.bed_type_id) || null;
-
-      const viewsFromRoomWindowSpecialWish =
-        (booking.view_from_window_id &&
-          viewsFromRoomWindow?.find(
-            (i) => i._id === booking.view_from_window_id
-          )) ||
-        null;
-
-      const transfer =
-        (booking.transfer_id &&
-          transferVariants?.find((i) => i._id === booking.transfer_id)) ||
-        null;
-
-      const transferCar =
-        (transfer && transferCars?.find((i) => i._id === transfer.car_id)) ||
-        null;
-
-      const paymentMethod =
-        (booking.payment_method_id &&
-          paymentMethods?.find((i) => i._id === booking.payment_method_id)) ||
-        null;
-
-      return (
-        <Stack sx={{ alignItems: "stretch", gap: "15px" }}>
-          <CustomLabelAndDescription
-            label={"Номер"}
-            description={row?.number.toString() || "-"}
-          />
-
-          <CustomLabelAndDescription
-            label={"Категория комнаты"}
-            description={roomCategory?.title || "-"}
-          />
-
-          <CustomLabelAndDescription
-            label={"ФИО"}
-            description={`${user.lastname} ${user.name} ${user.surname}`}
-          />
-
-          <CustomLabelAndDescription
-            label={"Количество гостей"}
-            description={getGuestsCount({
-              adults_count: guests.adults_count,
-              children_count: guests.children_count,
-            })}
-          />
-
-          <CustomLabelAndDescription
-            label={"Дата заезда и выезда"}
-            description={`${moment(date.arrival_datetime).format(
-              dateTimeFormat
-            )} - ${moment(date.departure_datetime).format(dateTimeFormat)}`}
-          />
-
-          <CustomLabelAndDescription
-            label={"Тариф"}
-            description={bookingTariff?.title || "-"}
-          />
-
-          <CustomLabelAndDescription
-            label={"Услуги"}
-            description={
-              bookingServicesInfo?.map((i) => i.title).join(", ") || "-"
-            }
-          />
-
-          <CustomLabelAndDescription
-            label={"Специальные пожелания"}
-            description={`${
-              bedTypeSpecialWish
-                ? "Кровать: " + bedTypeSpecialWish.title + ", "
-                : ""
-            }${
-              viewsFromRoomWindowSpecialWish
-                ? "Вид из окна: " +
-                  viewsFromRoomWindowSpecialWish.title.toLowerCase()
-                : ""
-            }`}
-          />
-
-          <CustomLabelAndDescription
-            label={"Трансфер, время, автомобиль"}
-            description={
-              transfer && transferCar
-                ? `${
-                    transfer.from_hotel
-                      ? "В отель, "
-                      : transfer.to_hotel
-                      ? "Из отеля, "
-                      : "-"
-                  }${transfer.time_from + "-" + transfer.time_to}, ${
-                    transferCar
-                      ? transferCar.brand + " " + transferCar.model
-                      : "Не указано"
-                  }`
-                : "-"
-            }
-          />
-
-          {transfer && transferCar ? (
-            <CustomLabelAndDescription
-              label={"Комментарий трансферу"}
-              description={transfer.comment || "-"}
-            />
-          ) : null}
-
-          <CustomLabelAndDescription
-            label={"Способ оплаты"}
-            description={paymentMethod?.title || "-"}
-          />
-
-          <CustomLabelAndDescription
-            label={"Комментарий"}
-            description={booking?.comment || "-"}
-          />
-
-          <CustomLabelAndDescription
-            label={"Бронирование для: "}
-            description={
-              booking?.booking_for_whom === "for_yourself"
-                ? "Себя"
-                : booking?.booking_for_whom === "for_another"
-                ? "Другого"
-                : "-"
-            }
-          />
-
-          <CustomLabelAndDescription
-            label={"Общая стоимость"}
-            description={`${booking.price} ₽`}
-          />
-        </Stack>
-      );
-    }
-    return null;
-  };
   return (
     <>
       <div className={classes.root}>
@@ -592,8 +425,10 @@ export const BookingsTable = (props: Props) => {
       <CustomModal
         modalTitle="Информация о бронировании"
         modalContent={
-          <Stack sx={{ alignItems: "stretch", gap: "15px" }}>
-            <BookingDetailsModalContent />
+          <Stack sx={{ alignItems: "stretch" }}>
+            <BookingDetailsModalContent
+              booking={openBookingDetailsModal.booking}
+            />
           </Stack>
         }
         open={openBookingDetailsModal.status}
@@ -601,20 +436,22 @@ export const BookingsTable = (props: Props) => {
           setOpenBookingDetailsModal({ booking: undefined, status: false })
         }
         modalStyle={{ width: "500px" }}
+        actionButtonsVariants="save_cancel"
       />
 
       <CustomModal
         modalTitle="Редактировать бронирование"
         modalContent={
-          <Stack sx={{ alignItems: "stretch", gap: "15px" }}>
-            <EditBookingModalContent />
+          <Stack sx={{ alignItems: "stretch" }}>
+            <EditBookingModalContent booking={openEditBookingModal.booking} />
           </Stack>
         }
-        open={openBookingDetailsModal.status}
+        open={openEditBookingModal.status}
         setOpen={() =>
-          setEditBookingDetailsModal({ booking: undefined, status: false })
+          setOpenEditBookingModal({ booking: undefined, status: false })
         }
         modalStyle={{ width: "500px" }}
+        handleConfirm={() => null}
       />
     </>
   );

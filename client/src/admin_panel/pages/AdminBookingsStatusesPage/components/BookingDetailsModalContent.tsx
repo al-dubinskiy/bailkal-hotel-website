@@ -1,15 +1,37 @@
 import React from "react";
+import {
+  CategoryRoomsBookingStatusType,
+  getGuestsCount,
+} from "./BookingsTable";
+import { useAppSelector } from "../../../../hooks/redux";
+import { getBookingServicesInfo } from "../../../../pages/Booking/utils";
+import { CustomLabelAndDescription } from "../../../../pages/components/shared/CustomLabelAndDescription";
+import { Stack, Typography } from "@mui/material";
+import moment from "moment";
+import { dateTimeFormat } from "../../../../constants";
+import { BookingType } from "../../../../redux/slices/Bookings/types";
 
-interface Props {}
+interface Props {
+  booking: BookingType | undefined;
+}
 
 export const BookingDetailsModalContent = (props: Props) => {
-  const row = openBookingDetailsModal.booking;
-  const booking = row?.booking || null;
-  const user = row?.bookingUser || null;
-  const guests = row?.bookingGuests || null;
-  const date = row?.bookingDate || null;
+  const { booking } = props;
+  const { rooms } = useAppSelector((state) => state.rooms);
+  const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
+  const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
+  const { bookingServices } = useAppSelector((state) => state.bookingServices);
+  const { roomBedVariants } = useAppSelector((state) => state.roomBedVariants);
+  const { viewsFromRoomWindow } = useAppSelector(
+    (state) => state.viewsFromRoomWindow
+  );
+  const { transferVariants } = useAppSelector(
+    (state) => state.transfersVariants
+  );
+  const { transferCars } = useAppSelector((state) => state.transfersCars);
+  const { paymentMethods } = useAppSelector((state) => state.paymentMethods);
 
-  if (booking && user && guests && date) {
+  if (booking) {
     const roomCategory =
       (booking.room_category_id &&
         roomsCategories?.find((i) => i._id === booking.room_category_id)) ||
@@ -53,8 +75,14 @@ export const BookingDetailsModalContent = (props: Props) => {
     return (
       <Stack sx={{ alignItems: "stretch", gap: "15px" }}>
         <CustomLabelAndDescription
-          label={"Номер"}
-          description={row?.number.toString() || "-"}
+          label={"Номер комнаты"}
+          description={
+            (rooms &&
+              rooms
+                .find((p) => p._id === booking.room_id)
+                ?.number.toString()) ||
+            "-"
+          }
         />
 
         <CustomLabelAndDescription
@@ -64,22 +92,32 @@ export const BookingDetailsModalContent = (props: Props) => {
 
         <CustomLabelAndDescription
           label={"ФИО"}
-          description={`${user.lastname} ${user.name} ${user.surname}`}
+          description={`${booking.user.lastname} ${booking.user.name} ${booking.user.surname}`}
+        />
+
+        <CustomLabelAndDescription
+          label={"Электронная почта"}
+          description={booking.user.email}
+        />
+
+        <CustomLabelAndDescription
+          label={"Номер телефона"}
+          description={booking.user.phone}
         />
 
         <CustomLabelAndDescription
           label={"Количество гостей"}
           description={getGuestsCount({
-            adults_count: guests.adults_count,
-            children_count: guests.children_count,
+            adults_count: booking.adults_count,
+            children_count: booking.children_count,
           })}
         />
 
         <CustomLabelAndDescription
           label={"Дата заезда и выезда"}
-          description={`${moment(date.arrival_datetime).format(
+          description={`${moment(booking.arrival_datetime).format(
             dateTimeFormat
-          )} - ${moment(date.departure_datetime).format(dateTimeFormat)}`}
+          )} - ${moment(booking.departure_datetime).format(dateTimeFormat)}`}
         />
 
         <CustomLabelAndDescription
@@ -130,7 +168,7 @@ export const BookingDetailsModalContent = (props: Props) => {
         {transfer && transferCar ? (
           <CustomLabelAndDescription
             label={"Комментарий трансферу"}
-            description={transfer.comment || "-"}
+            description={booking.transfer_comment || "-"}
           />
         ) : null}
 
@@ -145,13 +183,31 @@ export const BookingDetailsModalContent = (props: Props) => {
         />
 
         <CustomLabelAndDescription
-          label={"Бронирование для: "}
+          label={"Бронирование для "}
           description={
             booking?.booking_for_whom === "for_yourself"
               ? "Себя"
               : booking?.booking_for_whom === "for_another"
               ? "Другого"
               : "-"
+          }
+        />
+
+        <Typography variant="label">Обратная связь</Typography>
+
+        <CustomLabelAndDescription
+          label={"Разрешена ли отправка подтверждения на телефон"}
+          description={booking.user.send_confirm_on_phone ? "Да" : "Нет"}
+        />
+
+        <CustomLabelAndDescription
+          label={
+            "Разрешена ли email-рассылка специальных предложений и новостей"
+          }
+          description={
+            booking.user.want_to_know_about_special_offers_and_news
+              ? "Да"
+              : "Нет"
           }
         />
 

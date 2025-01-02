@@ -11,7 +11,6 @@ import {
   ToogleButtonModeType,
   ToogleModeButton,
 } from "../../../../components/shared/ToogleModeButton";
-import { authMethods } from "../../../../../assets/images";
 import { UserDataForm } from "./UserDataForm";
 import { AuthMethodButtons } from "./AuthMethodButtons";
 import { AdditionalInfoForm } from "./AdditionalInfoForm";
@@ -23,20 +22,9 @@ import {
   BookingGuestsDetailsPrimitiveType,
   BookingGuestsDetailsType,
 } from "../../../../../redux/slices/Bookings/types";
-import {
-  LandscapeOutlined,
-  WaterOutlined,
-  WavesOutlined,
-} from "@mui/icons-material";
-import { CourtyardViewIcon } from "../../../../../assets/icons/CourtyardViewIcon";
-import { ForestViewIcon } from "../../../../../assets/icons/ForestViewIcon";
-import { SelectItemType } from "../../../../components/shared/FormElements/CustomSelect";
-import { TwoPersonsBedIcon } from "../../../../../assets/icons/TwoPersonsBedIcon";
-import { theme } from "../../../../../theme";
 import moment from "moment";
 import * as yup from "yup";
 import { dateTimeFormat } from "../../../../../constants";
-import { isEqual } from "lodash";
 import { BookingContext } from "../../../BookingPage";
 import { Transfer } from "../../OrderServicesSection/components/Transfer/Transfer";
 
@@ -47,44 +35,14 @@ interface Props {
   setIsEnableContinueButton: (val: boolean) => void;
 }
 
-const defaultSelectItem: SelectItemType = {
-  id: "",
-  label: "Не важно",
-  value: "not-important",
-  icon: null,
-};
 const validationSchema = yup.object({
-  arrivalTime: yup
-    .object({
-      id: yup.number(),
-      label: yup.string(),
-      value: yup.string(),
-    })
-    .required("Поле обязательно для заполнения"),
-  departureTime: yup
-    .object({
-      id: yup.number(),
-      label: yup.string(),
-      value: yup.string(),
-    })
-    .required("Поле обязательно для заполнения"),
-  bedTypeSpecialWish: yup
-    .object({
-      id: yup.number(),
-      label: yup.string(),
-      value: yup.string(),
-      icon: yup.mixed(),
-    })
-    .required("Поле обязательно для заполнения"),
-  viewFromWindowSpecialWish: yup
-    .object({
-      id: yup.number(),
-      label: yup.string(),
-      value: yup.string(),
-      icon: yup.mixed(),
-    })
-    .required("Поле обязательно для заполнения"),
-  comment: yup.string(),
+  name: yup.string().required("Поле обязательно для заполнения"),
+  lastname: yup.string().required("Поле обязательно для заполнения"),
+  surname: yup.string().required("Поле обязательно для заполнения"),
+  phone: yup
+    .string()
+    .matches(/^\+?[1-9][0-9]{7,14}$/, "Введите корректный номер телефона"),
+  email: yup.string().email().required("Поле обязательно для заполнения"),
 });
 
 export const Content = (props: Props) => {
@@ -94,13 +52,7 @@ export const Content = (props: Props) => {
     isEnableContinueButton,
     setIsEnableContinueButton,
   } = props;
-  const { roomBedVariants } = useAppSelector((state) => state.roomBedVariants);
-  const { viewsFromRoomWindow } = useAppSelector(
-    (state) => state.viewsFromRoomWindow
-  );
-  const { currentRoomCategory: roomCategory, newBookings } = useAppSelector(
-    (state) => state.bookings
-  );
+  const { newBookings } = useAppSelector((state) => state.bookings);
 
   const { updateBookingDraft, bookingProgressCurrentStep } =
     useContext(BookingContext);
@@ -123,73 +75,6 @@ export const Content = (props: Props) => {
       isSelected: bookingInfo.booking_for_whom === "for_another" ? true : false,
     },
   ]);
-
-  const [bedSpecialWish, setBedSpecialWish] = useState<SelectItemType[]>([
-    defaultSelectItem,
-  ]);
-
-  const [viewsFromWindowSpecialWish, setViewsFromWindowSpecialWish] = useState<
-    SelectItemType[]
-  >([defaultSelectItem]);
-
-  // Подготовка массива для выпадающего списка "кровать" (спец. предложения)
-  useEffect(() => {
-    if (roomCategory && roomBedVariants) {
-      const a = roomBedVariants.filter((i) =>
-        roomCategory.available_bed_variant_id.includes(i._id)
-      );
-      setBedSpecialWish((prev) => [
-        defaultSelectItem,
-        ...a.map((i, idx) => {
-          return {
-            id: i._id,
-            label: i.title,
-            value: i.title,
-            icon: <TwoPersonsBedIcon sx={{ fontSize: "16px" }} />,
-          };
-        }),
-      ]);
-    }
-  }, []);
-
-  // Подготовка массива для выпадающего списка "вид из окна" (спец. предложения)
-  useEffect(() => {
-    if (roomCategory && viewsFromRoomWindow) {
-      const a = viewsFromRoomWindow.filter((i) =>
-        roomCategory.additional_view_from_room_window_id.includes(i._id)
-      );
-      setViewsFromWindowSpecialWish((prev) => [
-        defaultSelectItem,
-        ...a.map((i, idx) => {
-          return {
-            id: i._id,
-            label: i.title,
-            value: i.title,
-            icon:
-              i.value === "courtyard" ? (
-                <CourtyardViewIcon sx={{ fontSize: "16px" }} />
-              ) : i.value === "forest" ? (
-                <ForestViewIcon sx={{ fontSize: "16px" }} />
-              ) : i.value === "mountains" ? (
-                <LandscapeOutlined
-                  sx={{ color: theme.palette.primary.dark, fontSize: "16px" }}
-                />
-              ) : i.value === "lake" ? (
-                <WavesOutlined
-                  sx={{ color: theme.palette.primary.dark, fontSize: "16px" }}
-                />
-              ) : i.value === "river" ? (
-                <WaterOutlined
-                  sx={{ color: theme.palette.primary.dark, fontSize: "16px" }}
-                />
-              ) : (
-                <div></div>
-              ),
-          };
-        }),
-      ]);
-    }
-  }, []);
 
   // Получить ранее установленное "время заезда"
   const getPrevArrivalTime = () => {

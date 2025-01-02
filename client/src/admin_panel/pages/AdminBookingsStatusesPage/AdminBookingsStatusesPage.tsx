@@ -9,28 +9,15 @@ import {
 } from "@mui/material";
 import { theme } from "../../../theme";
 import { CustomCircleIconButton } from "../../../pages/components/shared/CustomCircleIconButton";
-import { ExpandMore, KeyboardArrowDown } from "@mui/icons-material";
-import { GetRoomsCategories } from "../../../redux/slices/RoomsCategories/roomsCategoriesSlice";
-import { useDispatch, useSelector } from "react-redux";
+import { KeyboardArrowDown } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
 import { GroupObjectByKey } from "../../../pages/Booking/utils";
-import { GetBookings } from "../../../redux/slices/Bookings/bookingsSlice";
 import { RoomCategoryType } from "../../../redux/slices/RoomsCategories/types";
 import { BookingType } from "../../../redux/slices/Bookings/types";
 import {
   BookingsTable,
   CategoryRoomsBookingStatusType,
 } from "./components/BookingsTable";
-import { GetRooms } from "../../../redux/slices/Rooms/roomsSlice";
-import { GetBookingTariffs } from "../../../redux/slices/BookingTariffs/bookingTariffsSlice";
-import { GetBookingServices } from "../../../redux/slices/BookingServices/bookingServicesSlice";
-import { GetRoomBedVariants } from "../../../redux/slices/RoomBedVariants/roomBedVariantsSlice";
-import { GetViewsFromRoomWindow } from "../../../redux/slices/ViewsFromRoomWindow/viewsFromRoomWindow";
-import { GetPaymentMethods } from "../../../redux/slices/PaymentMethods/paymentMethodsSlice";
-import { GetTransferVariants } from "../../../redux/slices/TransferVariants/transferVariantsSlice";
-import { GetTransferCars } from "../../../redux/slices/TransferCars/transferCarsSlice";
-import { GetRoomFeatures } from "../../../redux/slices/RoomFeatures/roomFeaturesSlice";
-import { GetRoomFeaturesCategories } from "../../../redux/slices/RoomFeaturesCategories/roomFeaturesSlice";
 import { useGetApiData } from "../../../hooks/getApiData";
 
 type DataListType = {
@@ -52,17 +39,6 @@ export const AdminBookingsStatusesPage = (props: Props) => {
   const { bookings } = useAppSelector((state) => state.bookings);
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
   const { rooms } = useAppSelector((state) => state.rooms);
-  const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
-  const { bookingServices } = useAppSelector((state) => state.bookingServices);
-  const { roomBedVariants } = useAppSelector((state) => state.roomBedVariants);
-  const { viewsFromRoomWindow } = useAppSelector(
-    (state) => state.viewsFromRoomWindow
-  );
-  const { paymentMethods } = useAppSelector((state) => state.paymentMethods);
-  const { transferVariants } = useAppSelector(
-    (state) => state.transfersVariants
-  );
-  const { transferCars } = useAppSelector((state) => state.transfersCars);
 
   const sortedBookingsByRoomCategories =
     useMemo((): SortedBookingType | null => {
@@ -92,7 +68,7 @@ export const AdminBookingsStatusesPage = (props: Props) => {
             return {
               id: k,
               isBooked: booking ? true : false, // если есть букинг на эту комнату
-              number: rooms.find((p) => p._id === k)?.number || -1,
+              roomNumber: rooms.find((p) => p._id === k)?.number || -1,
               booking,
               bookingDate: booking
                 ? {
@@ -188,18 +164,13 @@ export const AdminBookingsStatusesPage = (props: Props) => {
                   <Typography
                     variant="label"
                     sx={{ alignSelf: "flex-start" }}
-                  >{`Номера (${item.roomCategory.room_id.length})`}</Typography>
+                  >{`Номера (${
+                    item.categoryRoomsBookingStatuses.filter((i) => i.isBooked)
+                      .length
+                  } из ${item.roomCategory.room_id.length})`}</Typography>
 
                   <BookingsTable
                     data={item.categoryRoomsBookingStatuses}
-                    roomsCategories={roomsCategories}
-                    bookingTariffs={bookingTariffs}
-                    bookingServices={bookingServices}
-                    roomBedVariants={roomBedVariants}
-                    viewsFromRoomWindow={viewsFromRoomWindow}
-                    transferVariants={transferVariants}
-                    transferCars={transferCars}
-                    paymentMethods={paymentMethods}
                     isLoading={false}
                   />
                 </Stack>

@@ -20,7 +20,12 @@ import { RoomCategoryType } from "../../redux/slices/RoomsCategories/types";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import moment, { Moment } from "moment";
 import { dateFormat, dateTimeFormat } from "../../constants";
-import { GroupObjectByKey, isDateTimeRangeContained } from "./utils";
+import {
+  getFreeRoomId,
+  getRoomCategoryPrice,
+  GroupObjectByKey,
+  isDateTimeRangeContained,
+} from "./utils";
 import {
   setBookingSteps,
   setCategoriesAvailableRoomsCount,
@@ -485,21 +490,6 @@ export const BookingPage = () => {
       guestsDetails?: BookingGuestsDetailsPrimitiveType;
       isSetCompleteStep?: boolean;
     }) => {
-      const getRoomCategoryPrice = ({
-        room,
-        roomCategory,
-      }: {
-        room: RoomGuestsCountType;
-        roomCategory: RoomCategoryType;
-      }) => {
-        // Подсчитываем количество гостей комнаты
-        const roomGuestsCount = room.adults + room.children;
-        // Получаем стоимость категории комнаты
-        return roomGuestsCount > 1
-          ? roomCategory.price_per_night_for_two_quest
-          : roomCategory.price_per_night_for_one_quest;
-      };
-
       // Проверяем правильно ли переданы данные (соответствуют ли id черновика букинга id текущего шага)
       if (
         ((tempBookingId && currentStep.roomId === tempBookingId) ||
@@ -513,29 +503,39 @@ export const BookingPage = () => {
           currentStep.name === "Order services"
         ) {
           if (newRoomCategory) {
-            dispatch(
-              setNewBookings({
-                ...newBookings,
-                bookings: newBookings.bookings.map((i) => {
-                  if (i.tempId === tempBookingId) {
-                    return {
-                      ...i,
-                      room_category_id: newRoomCategory._id,
-                      roomPrice:
-                        i.roomPrice + newRoomCategory.additionalPayment,
-                      tariffPrice: 0,
-                      servicePriceTotal: 0,
-                      tariff_id: "",
-                      service_id: [],
-                      view_from_window_id: "",
-                      bed_type_id: "",
-                      isRoomCategoryWasChanged: true,
-                    };
-                  }
-                  return i;
-                }),
-              })
-            );
+            // Поиск id доступной комнаты для данной категории
+            const freeRoomId = getFreeRoomId({
+              roomCategory: newRoomCategory,
+              bookings,
+              newBookings: newBookings.bookings,
+            });
+
+            if (freeRoomId) {
+              dispatch(
+                setNewBookings({
+                  ...newBookings,
+                  bookings: newBookings.bookings.map((i) => {
+                    if (i.tempId === tempBookingId) {
+                      return {
+                        ...i,
+                        room_category_id: newRoomCategory._id,
+                        room_id: freeRoomId,
+                        roomPrice:
+                          i.roomPrice + newRoomCategory.additionalPayment,
+                        tariffPrice: 0,
+                        servicePriceTotal: 0,
+                        tariff_id: "",
+                        service_id: [],
+                        view_from_window_id: "",
+                        bed_type_id: "",
+                        isRoomCategoryWasChanged: true,
+                      };
+                    }
+                    return i;
+                  }),
+                })
+              );
+            }
 
             if (tempBookingId) {
               toSpecificStep("Select a tariff", tempBookingId);
@@ -577,23 +577,12 @@ export const BookingPage = () => {
           roomCategory &&
           tempBookingId
         ) {
-          // Получить id всех комнат, которые забронированы на данную категорию
-          const currentBookedRoomsOnCategory = Array.from(
-            newBookings.bookings.filter(
-              (i) => i.room_category_id === roomCategory._id
-            ),
-            (i) => i.room_id
-          );
-          // Поиск id забронированных на данную категорию
-          const prevBookedRoomOnCategory = bookings
-            .filter((i) => i.room_category_id === roomCategory._id)
-            .map((i) => i.room_id);
-          // Найти id доступной комнаты для бронирования
-          const freeRoomId = roomCategory.room_id.find(
-            (i) =>
-              !currentBookedRoomsOnCategory.includes(i) &&
-              !prevBookedRoomOnCategory.includes(i)
-          );
+          // Поиск id доступной комнаты для данной категории
+          const freeRoomId = getFreeRoomId({
+            roomCategory,
+            bookings,
+            newBookings: newBookings.bookings,
+          });
 
           if (freeRoomId) {
             const roomPrice = getRoomCategoryPrice({
@@ -1126,12 +1115,18 @@ export const BookingPage = () => {
     }
     // 2. Если в фильтре "Гости" добавили одну или несколько комнат
     else if (rooms.length > bookings.length) {
+      const prevRooms = rooms.slice(0, bookings.length);
       const newRooms = rooms.slice(bookings.length);
       // Обновить перечень букингов и установить тип действия для формирования списка шагов
       dispatch(
         setNewBookings({
           bookings: [
-            ...newBookings.bookings,
+            // если во время добавления новой комнаты, было изменено количество гостей для предыдущей комнаты, то обновить значения
+            ...newBookings.bookings.map((item, index) => ({
+              ...item,
+              adults_count: prevRooms[index].adults,
+              children_count: prevRooms[index].children,
+            })),
             ...newRooms.map((i) => {
               return createNewBookingDraft({
                 tempId: i.id,

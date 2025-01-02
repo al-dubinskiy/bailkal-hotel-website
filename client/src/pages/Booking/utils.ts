@@ -2,6 +2,7 @@ import moment, { Moment } from "moment";
 import {
   BookingType,
   CreateBookingLocalType,
+  RoomGuestsCountType,
 } from "../../redux/slices/Bookings/types";
 import { BookingServiceType } from "../../redux/slices/BookingServices/types";
 import { RoomCategoryType } from "../../redux/slices/RoomsCategories/types";
@@ -116,3 +117,46 @@ export function getDaysInRange({
 
   return days.map((i) => moment(i, dateFormat));
 }
+
+// Для функции updateBokingDraft()
+export const getRoomCategoryPrice = ({
+  room,
+  roomCategory,
+}: {
+  room: RoomGuestsCountType;
+  roomCategory: RoomCategoryType;
+}) => {
+  // Подсчитываем количество гостей комнаты
+  const roomGuestsCount = room.adults + room.children;
+  // Получаем стоимость категории комнаты
+  return roomGuestsCount > 1
+    ? roomCategory.price_per_night_for_two_quest
+    : roomCategory.price_per_night_for_one_quest;
+};
+
+export const getFreeRoomId = ({
+  roomCategory,
+  bookings,
+  newBookings,
+}: {
+  roomCategory: RoomCategoryType;
+  bookings: BookingType[];
+  newBookings: CreateBookingLocalType[];
+}) => {
+  // Получить id всех комнат, которые забронированы на данную категорию
+  const newBookedRoomsOnCategory = Array.from(
+    newBookings.filter((i) => i.room_category_id === roomCategory._id),
+    (i) => i.room_id
+  );
+  // Поиск id ранее забронированных на данную категорию
+  const prevBookedRoomOnCategory = bookings
+    .filter((i) => i.room_category_id === roomCategory._id)
+    .map((i) => i.room_id);
+  // Найти id доступной комнаты для бронирования
+  const freeRoomId = roomCategory.room_id.find(
+    (i) =>
+      !newBookedRoomsOnCategory.includes(i) &&
+      !prevBookedRoomOnCategory.includes(i)
+  );
+  return freeRoomId;
+};
