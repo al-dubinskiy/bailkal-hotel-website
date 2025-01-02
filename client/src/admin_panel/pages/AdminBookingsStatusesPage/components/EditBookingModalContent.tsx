@@ -1,18 +1,22 @@
 import { Stack, Typography } from "@mui/material";
 import { useFormik } from "formik";
-import React from "react";
+import React, { useMemo } from "react";
 import * as yup from "yup";
 import { BookingType } from "../../../../redux/slices/Bookings/types";
-import { defaultFormValues } from "./default";
 import { CustomInput } from "../../../../pages/components/shared/FormElements/CustomInput";
 import { PhoneOutlined } from "@mui/icons-material";
 import { theme } from "../../../../theme";
-import { CustomSelect } from "../../../../pages/components/shared/FormElements/CustomSelect";
+import {
+  CustomSelect,
+  SelectItemType,
+} from "../../../../pages/components/shared/FormElements/CustomSelect";
 import { EmailIcon } from "../../../../assets/icons/EmailIcon";
 import { countries } from "../../../../pages/Booking/components/EnterGuestsDetailsSection/components/constants";
+import { useAppSelector } from "../../../../hooks/redux";
+import { CustomCounterButton } from "../../../../pages/components/shared/CustomCounterButton";
 
 interface Props {
-  booking: BookingType | undefined;
+  booking: BookingType;
 }
 
 const validationSchema = yup.object({
@@ -35,8 +39,59 @@ const validationSchema = yup.object({
 
 export const EditBookingModalContent = (props: Props) => {
   const { booking } = props;
+  const { rooms } = useAppSelector((state) => state.rooms);
+  const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
+  const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
+  const { roomGuestsMax } = useAppSelector((state) => state.bookings);
+
+  const roomsList = useMemo((): SelectItemType[] => {
+    if (rooms && roomsCategories) {
+      const roomsOfCategory = roomsCategories.find(
+        (i) => i._id === booking.room_category_id
+      );
+      if (roomsOfCategory) {
+        return rooms
+          .filter((i) => roomsOfCategory.room_id.includes(i._id))
+          .map((item, index) => {
+            return {
+              id: index + 1,
+              label: item.number.toString(),
+              value: item._id,
+            };
+          });
+      }
+    }
+    return [];
+  }, [rooms, roomsCategories]);
+
+  const bookingTariffsList = useMemo((): SelectItemType[] => {
+    if (bookingTariffs) {
+      return bookingTariffs.map((item, index) => {
+        return {
+          id: index + 1,
+          label: item.title + " - " + item.cost + "₽",
+          value: item._id,
+        };
+      });
+    }
+    return [];
+  }, [bookingTariffs]);
+
+  const roomCategoriesList = useMemo((): SelectItemType[] => {
+    if (roomsCategories) {
+      return roomsCategories.map((item, index) => {
+        return {
+          id: index + 1,
+          label: item.title,
+          value: item._id,
+        };
+      });
+    }
+    return [];
+  }, [roomsCategories]);
+
   const formik = useFormik<BookingType>({
-    initialValues: defaultFormValues,
+    initialValues: booking,
     validationSchema: validationSchema,
     onSubmit: (values) => {
       alert(JSON.stringify(values, null, 2));
@@ -44,6 +99,8 @@ export const EditBookingModalContent = (props: Props) => {
   });
 
   console.log(formik.values);
+  if (!roomsCategories) return null;
+
   return (
     <div>
       <form
@@ -54,14 +111,14 @@ export const EditBookingModalContent = (props: Props) => {
           <Typography
             variant="label"
             fontWeight={600}
-            sx={{ textAlign: "center" }}
+            sx={{ marginTop: "15px", textAlign: "center" }}
           >
             Личные данные
           </Typography>
 
           <CustomInput
-            id="name"
-            name="name"
+            id="user.name"
+            name="user.name"
             label="Имя"
             value={formik.values.user.name}
             onChange={(val) =>
@@ -75,8 +132,8 @@ export const EditBookingModalContent = (props: Props) => {
           />
 
           <CustomInput
-            id="lastname"
-            name="lastname"
+            id="user.lastname"
+            name="user.lastname"
             label="Фамилия"
             value={formik.values.user.lastname}
             onChange={(val) =>
@@ -93,8 +150,8 @@ export const EditBookingModalContent = (props: Props) => {
           />
 
           <CustomInput
-            id="surname"
-            name="surname"
+            id="user.surname"
+            name="user.surname"
             label="Отчество"
             value={formik.values.user.surname}
             onChange={(val) =>
@@ -111,8 +168,8 @@ export const EditBookingModalContent = (props: Props) => {
           />
 
           <CustomInput
-            id="phone"
-            name="phone"
+            id="user.phone"
+            name="user.phone"
             label="Номер телефона"
             value={formik.values.user.phone}
             onChange={(val) =>
@@ -136,8 +193,8 @@ export const EditBookingModalContent = (props: Props) => {
           />
 
           <CustomInput
-            id="email"
-            name="email"
+            id="user.email"
+            name="user.email"
             label="Электронная почта"
             value={formik.values.user?.email}
             onChange={(val) =>
@@ -162,8 +219,8 @@ export const EditBookingModalContent = (props: Props) => {
           />
 
           <CustomSelect
-            id="nationality"
-            name="nationality"
+            id="user.nationality"
+            name="user.nationality"
             inputLabel="Гражданство"
             data={countries}
             value={
@@ -177,7 +234,6 @@ export const EditBookingModalContent = (props: Props) => {
               formik.setFieldValue("user.nationality", val.value)
             }
             labelPosition={"left"}
-            containerStyles={{ flex: 0.5 }}
             onBlur={formik.handleBlur}
             error={
               formik.touched.user?.nationality &&
@@ -192,10 +248,109 @@ export const EditBookingModalContent = (props: Props) => {
           <Typography
             variant="label"
             fontWeight={600}
-            sx={{ textAlign: "center" }}
+            sx={{ marginTop: "15px", textAlign: "center" }}
           >
             Данные комнаты
           </Typography>
+
+          <CustomSelect
+            id="room_category_id"
+            name="room_category_id"
+            inputLabel="Категория комнаты"
+            data={roomCategoriesList}
+            value={
+              roomCategoriesList.find(
+                (i) => i.value === formik.values.room_category_id
+              ) || roomCategoriesList[0]
+            }
+            setValue={(val) =>
+              formik.setFieldValue("room_category_id", val.value)
+            }
+            labelPosition={"left"}
+            containerStyles={{ flex: 0.5 }}
+            onBlur={formik.handleBlur}
+            error={
+              formik.touched.room_category_id &&
+              Boolean(formik.errors.room_category_id)
+            }
+            helperText={
+              formik.touched.room_category_id && formik.errors.room_category_id
+            }
+          />
+
+          <CustomSelect
+            id="room_id"
+            name="room_id"
+            inputLabel="Номер комнаты"
+            data={roomsList}
+            value={
+              roomsList.find((i) => i.value === formik.values.room_id) ||
+              roomsList[0]
+            }
+            setValue={(val) => formik.setFieldValue("room_id", val.value)}
+            labelPosition={"left"}
+            onBlur={formik.handleBlur}
+            error={formik.touched.room_id && Boolean(formik.errors.room_id)}
+            helperText={formik.touched.room_id && formik.errors.room_id}
+          />
+
+          <Typography
+            variant="label"
+            fontWeight={600}
+            sx={{ marginTop: "15px", textAlign: "center" }}
+          >
+            Количество гостей
+          </Typography>
+
+          <Stack
+            sx={{
+              flexDirection: "row",
+              gap: "24px",
+              justifyContent: "space-between",
+            }}
+          >
+            <CustomCounterButton
+              label={"Взрослые"}
+              minValue={1}
+              maxValue={roomGuestsMax - formik.values.children_count}
+              value={formik.values.adults_count}
+              setValue={(val) => formik.setFieldValue("adults_count", val)}
+            />
+
+            <CustomCounterButton
+              label={"Дети (до 12 лет)"}
+              minValue={0}
+              maxValue={roomGuestsMax - formik.values.adults_count}
+              value={formik.values.children_count}
+              setValue={(val) => formik.setFieldValue("children_count", val)}
+            />
+          </Stack>
+
+          <Typography
+            variant="label"
+            fontWeight={600}
+            sx={{ marginTop: "15px", textAlign: "center" }}
+          >
+            Тариф
+          </Typography>
+
+          <CustomSelect
+            id="tariff_id"
+            name="tariff_id"
+            inputLabel="Тариф"
+            data={bookingTariffsList}
+            value={
+              bookingTariffsList.find(
+                (i) => i.value === formik.values.tariff_id
+              ) || bookingTariffsList[0]
+            }
+            setValue={(val) => formik.setFieldValue("tariff_id", val.value)}
+            labelPosition={"left"}
+            containerStyles={{ flex: 0.5 }}
+            onBlur={formik.handleBlur}
+            error={formik.touched.tariff_id && Boolean(formik.errors.tariff_id)}
+            helperText={formik.touched.tariff_id && formik.errors.tariff_id}
+          />
         </Stack>
       </form>
     </div>

@@ -6,6 +6,8 @@ import { CustomButton } from "./CustomButton";
 import { theme } from "../../../theme";
 
 interface Props {
+  id?: string;
+  name?: string;
   label?: string;
   value: number;
   setValue: (val: number) => void;

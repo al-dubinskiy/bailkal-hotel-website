@@ -117,8 +117,8 @@ export const BookingsTable = (props: Props) => {
       },
     },
     {
-      field: "number",
-      headerName: "Номер",
+      field: "roomNumber",
+      headerName: "Номер комнаты",
       width: 100,
       renderCell: (params: any) => {
         const { value }: { value: string } = params;
@@ -439,20 +439,22 @@ export const BookingsTable = (props: Props) => {
         actionButtonsVariants="save_cancel"
       />
 
-      <CustomModal
-        modalTitle="Редактировать бронирование"
-        modalContent={
-          <Stack sx={{ alignItems: "stretch" }}>
-            <EditBookingModalContent booking={openEditBookingModal.booking} />
-          </Stack>
-        }
-        open={openEditBookingModal.status}
-        setOpen={() =>
-          setOpenEditBookingModal({ booking: undefined, status: false })
-        }
-        modalStyle={{ width: "500px" }}
-        handleConfirm={() => null}
-      />
+      {openEditBookingModal.booking ? (
+        <CustomModal
+          modalTitle="Редактировать бронирование"
+          modalContent={
+            <Stack sx={{ alignItems: "stretch" }}>
+              <EditBookingModalContent booking={openEditBookingModal.booking} />
+            </Stack>
+          }
+          open={openEditBookingModal.status}
+          setOpen={() =>
+            setOpenEditBookingModal({ booking: undefined, status: false })
+          }
+          modalStyle={{ width: "500px" }}
+          handleConfirm={() => null}
+        />
+      ) : null}
     </>
   );
 };

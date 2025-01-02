@@ -119,8 +119,14 @@ export const CustomSelect = (props: Props) => {
               borderWidth: 1,
               borderColor: theme.palette.gray.extraLight,
             },
+
+            "& .MuiTypography-root": {
+              whiteSpace: "normal",
+            },
             ...customSelectStyle,
           }}
+          onBlur={onBlur}
+          error={error}
         >
           {data.map((item) => {
             return (
