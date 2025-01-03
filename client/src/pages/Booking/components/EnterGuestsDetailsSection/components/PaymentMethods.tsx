@@ -1,18 +1,13 @@
 import { Box, Stack, Typography } from "@mui/material";
-import React, { useCallback, useContext, useEffect, useState } from "react";
+import React from "react";
 import { theme } from "../../../../../theme";
 import { InfoOutlined } from "@mui/icons-material";
 import { useAppDispatch, useAppSelector } from "../../../../../hooks/redux";
-import { GetPaymentMethods } from "../../../../../redux/slices/PaymentMethods/paymentMethodsSlice";
 import { PaymentMethodType } from "../../../../../redux/slices/PaymentMethods/types";
 import { CustomButton } from "../../../../components/shared/CustomButton";
-import { BookingContext } from "../../../BookingPage";
 import { paymentServices } from "../../../../../assets/images";
 import { FormikProps } from "formik";
-import {
-  BookingGuestsDetailsPrimitiveType,
-  BookingGuestsDetailsType,
-} from "../../../../../redux/slices/Bookings/types";
+import { BookingGuestsDetailsType } from "../../../../../redux/slices/Bookings/types";
 
 export type ItemType = {
   title: string;

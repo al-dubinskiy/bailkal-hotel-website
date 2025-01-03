@@ -38,7 +38,7 @@ export const AdditionalInfoForm = (props: Props) => {
               name="arrivalTime"
               inputLabel="Время заезда"
               data={times}
-              value={formik.values.arrivalTime}
+              value={[formik.values.arrivalTime]}
               setValue={(val) => formik.setFieldValue("arrivalTime", val)}
               labelPosition={"left"}
               containerStyles={{ flex: 0.5 }}
@@ -53,7 +53,7 @@ export const AdditionalInfoForm = (props: Props) => {
               name="departureTime"
               inputLabel="Время выезда"
               data={times}
-              value={formik.values.departureTime}
+              value={[formik.values.departureTime]}
               setValue={(val) => formik.setFieldValue("departureTime", val)}
               labelPosition={"left"}
               containerStyles={{ flex: 0.5 }}

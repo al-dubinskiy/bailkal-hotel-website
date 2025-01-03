@@ -8,22 +8,6 @@ export type BookingGuestsDetailsType = {
   surname: string;
   phone: string;
   email: string;
-  nationality: SelectItemType;
-  sendConfirmOnPhone: boolean;
-  wantToKnowAboutSpecialOffersAndNews: boolean;
-  arrivalTime: SelectItemType;
-  departureTime: SelectItemType;
-  comment: string;
-  bookingForWhom: "for_yourself" | "for_another";
-  paymentMethodId: string;
-};
-
-export type BookingGuestsDetailsPrimitiveType = {
-  name: string;
-  lastname: string;
-  surname: string;
-  phone: string;
-  email: string;
   nationality: string;
   sendConfirmOnPhone: boolean;
   wantToKnowAboutSpecialOffersAndNews: boolean;

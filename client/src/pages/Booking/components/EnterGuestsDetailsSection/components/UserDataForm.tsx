@@ -130,7 +130,10 @@ export const UserDataForm = (props: Props) => {
               name="nationality"
               inputLabel="Гражданство"
               data={countries}
-              value={formik.values.nationality}
+              value={[
+                countries.find((i) => i.value === formik.values.nationality)
+                  ?.value || countries[0].value,
+              ]}
               setValue={(val) => formik.setFieldValue("nationality", val)}
               labelPosition={"left"}
               containerStyles={{ flex: 0.5 }}
@@ -139,8 +142,7 @@ export const UserDataForm = (props: Props) => {
                 formik.touched.nationality && Boolean(formik.errors.nationality)
               }
               helperText={
-                formik.touched.nationality?.value &&
-                formik.errors.nationality?.value
+                formik.touched.nationality && formik.errors.nationality
               }
             />
           </Stack>

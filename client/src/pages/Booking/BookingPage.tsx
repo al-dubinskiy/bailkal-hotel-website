@@ -1,30 +1,21 @@
-import React, {
-  createContext,
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-} from "react";
+import React, { createContext, useCallback, useEffect, useMemo } from "react";
 import {
   BookingStepNameType,
   BookingStepType,
-  BookingType,
-  BookingGuestsDetailsPrimitiveType,
   CreateBookingLocalType,
-  RoomGuestsCountType,
-  BookingDateTimeType,
+  BookingGuestsDetailsType,
   NewBookingsType,
-  RoomCategoryPriceType,
 } from "../../redux/slices/Bookings/types";
 import { RoomCategoryType } from "../../redux/slices/RoomsCategories/types";
 import { useAppDispatch, useAppSelector } from "../../hooks/redux";
 import moment, { Moment } from "moment";
-import { dateFormat, dateTimeFormat } from "../../constants";
+import { dateTimeFormat } from "../../constants";
 import {
+  getCategoriesAvailableRoomsCount,
   getFreeRoomId,
   getRoomCategoryPrice,
   GroupObjectByKey,
-  isDateTimeRangeContained,
+  SortedBookingType,
 } from "./utils";
 import {
   setBookingSteps,
@@ -42,10 +33,6 @@ import { StepContent } from "./components/StepContent";
 import { FiltersBar } from "./components/FiltersBar";
 
 // Типы
-export type SortedBookingType = {
-  [key: string]: BookingType[];
-};
-
 export type BookingProgressStepType = {
   step: BookingStepType | null;
   label: string;
@@ -58,13 +45,6 @@ export type BookingProgressType = {
 };
 
 export const BookingContext = createContext<{
-  checkDateAvailable: ({
-    date,
-    specificRoomCategoryId,
-  }: {
-    date: Moment;
-    specificRoomCategoryId?: string;
-  }) => CheckDateAvailableType | null;
   updateBookingDraft: ({
     tempBookingId,
     currentStep,
@@ -93,7 +73,7 @@ export const BookingContext = createContext<{
     bedTypeId?: string;
     viewFromWindowId?: string;
     newRoomCategory?: RoomCategoryType & { additionalPayment: number };
-    guestsDetails?: BookingGuestsDetailsPrimitiveType;
+    guestsDetails?: BookingGuestsDetailsType;
     isSetCompleteStep?: boolean;
   }) => void;
   bookingProgressCurrentStep: BookingProgressStepType;
@@ -101,7 +81,6 @@ export const BookingContext = createContext<{
   toNextStep: (isSetPrevComplete?: boolean) => void;
   setCompleteStep: (stepName: BookingStepNameType, status: boolean) => void;
 }>({
-  checkDateAvailable: () => null,
   updateBookingDraft: () => null,
   bookingProgressCurrentStep: {
     step: null,
@@ -111,12 +90,6 @@ export const BookingContext = createContext<{
   toNextStep: () => null,
   setCompleteStep: () => null,
 });
-
-export type CheckDateAvailableType = {
-  date: Moment;
-  isAvailable: boolean;
-  roomMinPrice: number | null;
-};
 
 interface Props {}
 
@@ -139,133 +112,15 @@ export const BookingPage = () => {
     categoriesAvailableRoomsCount,
   } = useAppSelector((state) => state.bookings);
 
-  const sortedBookingsByRoomCategories = useMemo(():
-    | SortedBookingType[]
-    | null => {
-    if (roomsCategories && bookings) {
-      /* Сортировка бронирований по категориям комнат, где
-          "ключ" - id категории комнаты, а
-          "value" - массив дат "заезда" и "выезда" каждого бронирования на эту категорию:
-          {"room_category_id": {
-              arrival_datetime: string;
-              departure_datetime: string;
-            }[]
-          }
-        */
-      const sortedBookings: SortedBookingType[] = GroupObjectByKey(
-        "room_category_id",
-        bookings
-      );
-
-      return sortedBookings;
-    } else {
-      return null;
-    }
-  }, [bookings, roomsCategories]);
-
-  const getCategoriesAvailableRoomsCount = useCallback(
-    ({
-      arrival_datetime,
-      departure_datetime,
-    }: BookingDateTimeType): RoomCategoryPriceType[] | null => {
-      // Если в диапазоне выбранной даты заезда и выезда есть хотя бы одна из "недоступных дат"
-      if (unavailableBookingDates) {
-        if (
-          unavailableBookingDates.find(
-            (i) =>
-              moment(i.date).isBetween(
-                moment(arrival_datetime),
-                moment(departure_datetime)
-              ),
-            "[]"
-          )
-        ) {
-          return [];
-        }
-      }
-
-      if (roomsCategories && sortedBookingsByRoomCategories) {
-        const categoriesAvailableRoomsCount: RoomCategoryPriceType[] = [];
-
-        Object.entries(sortedBookingsByRoomCategories).map(
-          (item: any, index) => {
-            const bookingCategoryId: string = item[0];
-            const bookingsOnCategory = item[1];
-
-            // Поиск "категории комнат" по id
-            const categoryRoom = roomsCategories.find(
-              (roomCategory) => roomCategory._id === bookingCategoryId
-            );
-
-            if (categoryRoom) {
-              // Получение общего количество комнат на "категорию комнат"
-              const categoryRoomCount = categoryRoom.room_id.length;
-
-              let bookedOnDateCount = 0;
-
-              bookingsOnCategory.map((i: BookingType) => {
-                // Подсчет ранее забронированных комнат, диапазону ("дата заезда/выезда")
-                // которых принадлежит дата (с фильтра), переданная в ф-цию
-                // (а значит на эту дату можно забронировать меньше комнат или вообще ни одной)
-                if (
-                  isDateTimeRangeContained({
-                    start1: moment(
-                      moment(i.arrival_datetime).format(dateFormat)
-                    ),
-                    end1: moment(
-                      moment(i.departure_datetime).format(dateFormat)
-                    ),
-                    start2: moment(arrival_datetime.format(dateFormat)),
-                    end2: moment(departure_datetime.format(dateFormat)),
-                  })
-                ) {
-                  bookedOnDateCount += 1;
-                }
-              });
-
-              // Подсчет новых букингов с "датой заезда/выезда", которая входит в диапазон дат ранее забронированных
-
-              // console.log(categoryRoom.title, bookedOnDateCount, categoryRoomCount);
-              // Записываем количество забронированных комнат в данной "категории комнаты"
-              categoriesAvailableRoomsCount.push({
-                id: categoryRoom._id,
-                roomsTotal: categoryRoomCount,
-                price: categoryRoom.price_per_night_for_one_quest,
-                earlyBookingsCount: bookedOnDateCount,
-                newBookingsIds: [],
-              });
-            }
-          }
-        );
-        // Получение id "категорий комнат" на которые забронированы комнаты
-        const bookedOnCategoriesIds = Object.keys(
-          sortedBookingsByRoomCategories
-        );
-        // Добавить "категории комнат" на которые еще нет забронированных комнат
-        roomsCategories.map((roomCategory) =>
-          !bookedOnCategoriesIds.includes(roomCategory._id)
-            ? categoriesAvailableRoomsCount.push({
-                id: roomCategory._id,
-                roomsTotal: roomCategory.room_id.length,
-                price: roomCategory.price_per_night_for_one_quest,
-                earlyBookingsCount: 0,
-                newBookingsIds: [],
-              })
-            : roomCategory
-        );
-        return categoriesAvailableRoomsCount;
-      }
-      return null;
-    },
-    [unavailableBookingDates, roomsCategories, sortedBookingsByRoomCategories]
-  );
-
   useEffect(() => {
-    if (roomsCategories && bookings) {
+    if (roomsCategories && bookings && unavailableBookingDates) {
       const { arrival_datetime, departure_datetime } = filterParams;
       dispatch(
         setCategoriesAvailableRoomsCount(
           getCategoriesAvailableRoomsCount({
+            bookings,
+            roomsCategories,
+            unavailableBookingDates,
             arrival_datetime: arrival_datetime,
             departure_datetime: departure_datetime,
           })
@@ -277,6 +132,7 @@ export const BookingPage = () => {
     filterParams.departure_datetime,
     roomsCategories,
     bookings,
+    unavailableBookingDates,
   ]);
 
   useEffect(() => {
@@ -328,59 +184,6 @@ export const BookingPage = () => {
       }
     }
   }, [newBookings.bookings, categoriesAvailableRoomsCount]);
-
-  const checkDateAvailable = useCallback(
-    ({
-      date,
-      specificRoomCategoryId,
-    }: {
-      date: Moment;
-      specificRoomCategoryId?: string;
-    }): CheckDateAvailableType | null => {
-      if (unavailableBookingDates) {
-        // Определение доступных категорий комнат
-        const categoriesAvailableRoomsCount = getCategoriesAvailableRoomsCount({
-          arrival_datetime: date,
-          departure_datetime: date,
-        });
-
-        if (
-          categoriesAvailableRoomsCount &&
-          categoriesAvailableRoomsCount.length
-        ) {
-          if (specificRoomCategoryId) {
-            const exist = categoriesAvailableRoomsCount.find(
-              (i) => i.id === specificRoomCategoryId
-            );
-
-            return {
-              date,
-              isAvailable: exist ? true : false,
-              roomMinPrice: exist ? exist.price : -1,
-            };
-          }
-          // Определение минимальной стоимости комнаты
-          const prices = Array.from(
-            categoriesAvailableRoomsCount,
-            (i) => i.price
-          );
-          const roomMinPrice = Math.min(...prices);
-
-          return {
-            date,
-            isAvailable:
-              !unavailableBookingDates.find(
-                (i) => i.date === date.format(dateFormat)
-              ) && categoriesAvailableRoomsCount.length > 0,
-            roomMinPrice,
-          };
-        }
-      }
-
-      return null;
-    },
-    [unavailableBookingDates]
-  );
 
   const toSpecificStep = (
     stepName: BookingStepNameType,
@@ -487,7 +290,7 @@ export const BookingPage = () => {
       newRoomCategory?: RoomCategoryType & { additionalPayment: number };
       bedTypeId?: string;
       viewFromWindowId?: string;
-      guestsDetails?: BookingGuestsDetailsPrimitiveType;
+      guestsDetails?: BookingGuestsDetailsType;
       isSetCompleteStep?: boolean;
     }) => {
       // Проверяем правильно ли переданы данные (соответствуют ли id черновика букинга id текущего шага)
@@ -1403,7 +1206,6 @@ export const BookingPage = () => {
     <BasePageLayout isShowPageTitleBanner>
       <BookingContext.Provider
         value={{
-          checkDateAvailable,
           updateBookingDraft,
           bookingProgressCurrentStep: bookingProgress.currentStep,
           toPrevStep,

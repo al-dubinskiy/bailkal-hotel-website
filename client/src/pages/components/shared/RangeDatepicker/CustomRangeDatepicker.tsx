@@ -15,19 +15,32 @@ import moment, { Moment } from "moment";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import { setFilterParams } from "../../../../redux/slices/Bookings/bookingsSlice";
 import { times } from "../../../Booking/components/EnterGuestsDetailsSection/components/constants";
-import {
-  BookingContext,
-  CheckDateAvailableType,
-} from "../../../Booking/BookingPage";
 import { ru } from "date-fns/locale/ru"; // the locale you want
-import { addDays } from "react-datepicker/dist/date_utils";
-import { getDaysInRange } from "../../../Booking/utils";
+import {
+  checkDateAvailable,
+  CheckDateAvailableType,
+  getDaysInRange,
+} from "../../../Booking/utils";
 registerLocale("ru", ru); // register it with the name you want
 
-interface Props {}
+interface Props {
+  startDateDefault?: Date;
+  endDateDefault?: Date;
+  setStartDateDefault?: (val: Date) => void;
+  setEndDateDefault?: (val: Date) => void;
+  withPortal?: boolean;
+  inputWithBorder?: boolean;
+}
 
 export const CustomRangeDatepicker = (props: Props) => {
-  const {} = props;
+  const {
+    startDateDefault,
+    endDateDefault,
+    setStartDateDefault,
+    setEndDateDefault,
+    withPortal = false,
+    inputWithBorder = false,
+  } = props;
   const { unavailableBookingDates } = useAppSelector(
     (state) => state.unavailableBookingDates
   );
@@ -35,14 +48,13 @@ export const CustomRangeDatepicker = (props: Props) => {
   const { bookings } = useAppSelector((state) => state.bookings);
   const minDate = moment();
   const maxDate = moment().add(1, "year");
-  const { checkDateAvailable } = useContext(BookingContext);
   const dispatch = useAppDispatch();
   const { filterParams } = useAppSelector((state) => state.bookings);
   const [startDate, setStartDate] = useState<Date>(
-    filterParams.arrival_datetime.toDate()
+    startDateDefault ? startDateDefault : filterParams.arrival_datetime.toDate()
   );
   const [endDate, setEndDate] = useState<Date>(
-    filterParams.departure_datetime.toDate()
+    endDateDefault ? endDateDefault : filterParams.departure_datetime.toDate()
   );
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -51,17 +63,22 @@ export const CustomRangeDatepicker = (props: Props) => {
     setStartDate(start);
     setEndDate(end);
     if (start && end) {
-      dispatch(
-        setFilterParams({
-          ...filterParams,
-          arrival_datetime: moment(start)
-            .set("hours", Number(times[0].value.split(":")[0])) // 07:00
-            .set("minutes", Number(times[0].value.split(":")[1])),
-          departure_datetime: moment(end)
-            .set("hours", Number(times[8].value.split(":")[0])) // 15:00
-            .set("minutes", Number(times[8].value.split(":")[1])),
-        })
-      );
+      if (setStartDateDefault && setEndDateDefault) {
+        setStartDateDefault(start);
+        setEndDateDefault(end);
+      } else {
+        dispatch(
+          setFilterParams({
+            ...filterParams,
+            arrival_datetime: moment(start)
+              .set("hours", Number(times[0].value.split(":")[0])) // 07:00
+              .set("minutes", Number(times[0].value.split(":")[1])),
+            departure_datetime: moment(end)
+              .set("hours", Number(times[8].value.split(":")[0])) // 15:00
+              .set("minutes", Number(times[8].value.split(":")[1])),
+          })
+        );
+      }
     }
   };
 
@@ -85,7 +102,12 @@ export const CustomRangeDatepicker = (props: Props) => {
     if (unavailableBookingDates && roomsCategories && bookings) {
       const a: CheckDateAvailableType[] = [];
       datesInRange.map((i) => {
-        const b = checkDateAvailable({ date: i });
+        const b = checkDateAvailable({
+          date: i,
+          bookings,
+          roomsCategories,
+          unavailableBookingDates,
+        });
         if (b) {
           a.push(b);
         }
@@ -200,13 +222,16 @@ export const CustomRangeDatepicker = (props: Props) => {
         selectsRange
         monthsShown={2}
         dateFormat={"dd MMMM"}
-        className={`range-date-picker ${isOpen ? "focused" : ""}`}
+        className={`range-date-picker ${isOpen ? "focused" : ""} ${
+          inputWithBorder ? "input-with-border" : ""
+        }`}
         popperPlacement="bottom-end"
         // focusSelectedMonth
         showDisabledMonthNavigation
         disabledKeyboardNavigation
         renderDayContents={(...props) => <CustomDay date={props[1]} />}
         selectsDisabledDaysInRange
+        withPortal={withPortal}
         children={
           <DatePickerFooter
             dateType={

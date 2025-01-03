@@ -9,17 +9,17 @@ import {
 import React, { useContext, useEffect, useMemo, useRef, useState } from "react";
 import { theme } from "../../../../../theme";
 import moment, { Moment } from "moment";
-import { BookingContext } from "../../../BookingPage";
 import {
   CustomSelect,
   SelectItemType,
 } from "../../../../components/shared/FormElements/CustomSelect";
 import { CustomCircleIconButton } from "../../../../components/shared/CustomCircleIconButton";
 import { KeyboardArrowLeft, KeyboardArrowRight } from "@mui/icons-material";
-import { getDaysInRange } from "../../../utils";
+import { checkDateAvailable, getDaysInRange } from "../../../utils";
 import { RoomCategoryType } from "../../../../../redux/slices/RoomsCategories/types";
 import { dateFormat } from "../../../../../constants";
 import { SelectRoomContext } from "../../SelectRoomSection";
+import { useAppSelector } from "../../../../../hooks/redux";
 
 type DateType = {
   date: Moment;
@@ -34,9 +34,13 @@ interface Props {}
 
 export const AvailableDaysList = (props: Props) => {
   const {} = props;
+  const { unavailableBookingDates } = useAppSelector(
+    (state) => state.unavailableBookingDates
+  );
+  const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
+  const { bookings } = useAppSelector((state) => state.bookings);
   const { roomCategory } = useContext(SelectRoomContext);
   const daysListRef = useRef<HTMLInputElement | null>(null);
-  const { checkDateAvailable } = useContext(BookingContext);
 
   const years = useMemo(() => {
     const curYear = moment().get("year");
@@ -54,25 +58,34 @@ export const AvailableDaysList = (props: Props) => {
   const [selectedYear, setSelectedYear] = useState<SelectItemType>(years[0]);
 
   const dates = useMemo((): DateType[] => {
-    if (roomCategory) {
+    if (
+      roomCategory &&
+      bookings &&
+      roomsCategories &&
+      unavailableBookingDates
+    ) {
       const year = selectedYear.value;
 
       const yearDays = getDaysInRange({
         dateStart: {
           year,
-          month: "01",
+          month: "0",
           day: "01",
         },
         dateEnd: {
           year,
-          month: "12",
+          month: "11",
           day: "31",
         },
       });
+
       const a = yearDays.map((i) =>
         checkDateAvailable({
           date: i,
           specificRoomCategoryId: roomCategory._id,
+          bookings,
+          roomsCategories,
+          unavailableBookingDates,
         })
       );
 
@@ -87,6 +100,8 @@ export const AvailableDaysList = (props: Props) => {
     }
     return [];
   }, [selectedYear]);
+
+  console.log(dates);
 
   const setScrollForDaysList = (scrollOffset: number) => {
     if (daysListRef && daysListRef.current) {
@@ -189,8 +204,12 @@ export const AvailableDaysList = (props: Props) => {
 
         <CustomSelect
           data={years}
-          value={selectedYear}
-          setValue={setSelectedYear}
+          value={[selectedYear.value]}
+          setValue={(val) =>
+            typeof val === "string"
+              ? setSelectedYear(years.find((i) => i.value === val) || years[0])
+              : null
+          }
         />
       </Stack>
 

@@ -23,7 +23,7 @@ export const CustomCounterButton = (props: Props) => {
   };
 
   return (
-    <Stack sx={{ flexDirection: "column", gap: "5px" }}>
+    <Stack sx={{ flexDirection: "column", gap: "5px", flex: 1 }}>
       {label ? <Typography variant="someSmall">{label}</Typography> : null}
 
       <Stack
@@ -31,6 +31,7 @@ export const CustomCounterButton = (props: Props) => {
           borderRadius: "10px",
           height: "50px",
           flexDirection: "row",
+          justifyContent: "space-between",
           alignItems: "center",
           overflow: "hidden",
           background: theme.palette.primary.lighter,

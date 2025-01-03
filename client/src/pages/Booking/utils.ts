@@ -1,7 +1,9 @@
 import moment, { Moment } from "moment";
 import {
+  BookingDateTimeType,
   BookingType,
   CreateBookingLocalType,
+  RoomCategoryPriceType,
   RoomGuestsCountType,
 } from "../../redux/slices/Bookings/types";
 import { BookingServiceType } from "../../redux/slices/BookingServices/types";
@@ -12,6 +14,7 @@ import {
   suiteRooms,
 } from "../../assets/images";
 import { dateFormat } from "../../constants";
+import { UnavailableBookingDateType } from "../../redux/slices/UnavailableBookingDates/types";
 
 export const GroupObjectByKey = (key: string, array: Array<any>) => {
   return array.reduce((acc, obj) => {
@@ -100,12 +103,12 @@ export function getDaysInRange({
 }): Moment[] {
   const days = [];
   let date = moment(
-    `${dateStart.year}-${dateStart.month ? dateStart.month : "01"}-${
-      dateStart.day ? dateStart.day : "01"
-    }`
+    `${dateStart.year}-${
+      dateStart.month ? Number(dateStart.month) + 1 : "01"
+    }-${dateStart.day ? dateStart.day : "01"}`
   ); // Первый день года
   const endOfYear = moment(
-    `${dateEnd.year}-${dateEnd.month ? dateEnd.month : "01"}-${
+    `${dateEnd.year}-${dateEnd.month ? Number(dateStart.month) + 1 : "01"}-${
       dateEnd.day ? dateEnd.day : "01"
     }`
   ); // Последний день года
@@ -159,4 +162,194 @@ export const getFreeRoomId = ({
       !prevBookedRoomOnCategory.includes(i)
   );
   return freeRoomId;
+};
+
+// --- For range date picker ---
+export type SortedBookingType = {
+  [key: string]: BookingType[];
+};
+
+const sortBookingsByRoomCategories = ({
+  bookings,
+  roomsCategories,
+}: {
+  bookings: BookingType[];
+  roomsCategories: RoomCategoryType[];
+}): SortedBookingType[] | null => {
+  if (roomsCategories && bookings) {
+    /* Сортировка бронирований по категориям комнат, где
+          "ключ" - id категории комнаты, а
+          "value" - массив дат "заезда" и "выезда" каждого бронирования на эту категорию:
+          {"room_category_id": {
+              arrival_datetime: string;
+              departure_datetime: string;
+            }[]
+          }
+        */
+    const sortedBookings: SortedBookingType[] = GroupObjectByKey(
+      "room_category_id",
+      bookings
+    );
+
+    return sortedBookings;
+  } else {
+    return null;
+  }
+};
+
+export const getCategoriesAvailableRoomsCount = ({
+  unavailableBookingDates,
+  bookings,
+  roomsCategories,
+  arrival_datetime,
+  departure_datetime,
+}: {
+  unavailableBookingDates: UnavailableBookingDateType[];
+  bookings: BookingType[];
+  roomsCategories: RoomCategoryType[];
+} & BookingDateTimeType): RoomCategoryPriceType[] | null => {
+  const sortedBookingsByRoomCategories = sortBookingsByRoomCategories({
+    bookings,
+    roomsCategories,
+  });
+
+  // Если в диапазоне выбранной даты заезда и выезда есть хотя бы одна из "недоступных дат"
+  if (unavailableBookingDates) {
+    if (
+      unavailableBookingDates.find(
+        (i) =>
+          moment(i.date).isBetween(
+            moment(arrival_datetime),
+            moment(departure_datetime)
+          ),
+        "[]"
+      )
+    ) {
+      return [];
+    }
+  }
+
+  if (roomsCategories && sortedBookingsByRoomCategories) {
+    const categoriesAvailableRoomsCount: RoomCategoryPriceType[] = [];
+
+    Object.entries(sortedBookingsByRoomCategories).map((item: any, index) => {
+      const bookingCategoryId: string = item[0];
+      const bookingsOnCategory = item[1];
+
+      // Поиск "категории комнат" по id
+      const categoryRoom = roomsCategories.find(
+        (roomCategory) => roomCategory._id === bookingCategoryId
+      );
+
+      if (categoryRoom) {
+        // Получение общего количество комнат на "категорию комнат"
+        const categoryRoomCount = categoryRoom.room_id.length;
+
+        let bookedOnDateCount = 0;
+
+        bookingsOnCategory.map((i: BookingType) => {
+          // Подсчет ранее забронированных комнат, диапазону ("дата заезда/выезда")
+          // которых принадлежит дата (с фильтра), переданная в ф-цию
+          // (а значит на эту дату можно забронировать меньше комнат или вообще ни одной)
+          if (
+            isDateTimeRangeContained({
+              start1: moment(moment(i.arrival_datetime).format(dateFormat)),
+              end1: moment(moment(i.departure_datetime).format(dateFormat)),
+              start2: moment(arrival_datetime.format(dateFormat)),
+              end2: moment(departure_datetime.format(dateFormat)),
+            })
+          ) {
+            bookedOnDateCount += 1;
+          }
+        });
+
+        // Подсчет новых букингов с "датой заезда/выезда", которая входит в диапазон дат ранее забронированных
+
+        // console.log(categoryRoom.title, bookedOnDateCount, categoryRoomCount);
+        // Записываем количество забронированных комнат в данной "категории комнаты"
+        categoriesAvailableRoomsCount.push({
+          id: categoryRoom._id,
+          roomsTotal: categoryRoomCount,
+          price: categoryRoom.price_per_night_for_one_quest,
+          earlyBookingsCount: bookedOnDateCount,
+          newBookingsIds: [],
+        });
+      }
+    });
+    // Получение id "категорий комнат" на которые забронированы комнаты
+    const bookedOnCategoriesIds = Object.keys(sortedBookingsByRoomCategories);
+    // Добавить "категории комнат" на которые еще нет забронированных комнат
+    roomsCategories.map((roomCategory) =>
+      !bookedOnCategoriesIds.includes(roomCategory._id)
+        ? categoriesAvailableRoomsCount.push({
+            id: roomCategory._id,
+            roomsTotal: roomCategory.room_id.length,
+            price: roomCategory.price_per_night_for_one_quest,
+            earlyBookingsCount: 0,
+            newBookingsIds: [],
+          })
+        : roomCategory
+    );
+    return categoriesAvailableRoomsCount;
+  }
+  return null;
+};
+
+export type CheckDateAvailableType = {
+  date: Moment;
+  isAvailable: boolean;
+  roomMinPrice: number | null;
+};
+
+export const checkDateAvailable = ({
+  date,
+  specificRoomCategoryId,
+  unavailableBookingDates,
+  bookings,
+  roomsCategories,
+}: {
+  date: Moment;
+  specificRoomCategoryId?: string;
+  unavailableBookingDates: UnavailableBookingDateType[];
+  bookings: BookingType[];
+  roomsCategories: RoomCategoryType[];
+}): CheckDateAvailableType | null => {
+  if (unavailableBookingDates) {
+    // Определение доступных категорий комнат
+    const categoriesAvailableRoomsCount = getCategoriesAvailableRoomsCount({
+      unavailableBookingDates,
+      bookings,
+      roomsCategories: roomsCategories,
+      arrival_datetime: date,
+      departure_datetime: date,
+    });
+
+    if (categoriesAvailableRoomsCount && categoriesAvailableRoomsCount.length) {
+      if (specificRoomCategoryId) {
+        const exist = categoriesAvailableRoomsCount.find(
+          (i) => i.id === specificRoomCategoryId
+        );
+
+        return {
+          date,
+          isAvailable: exist ? true : false,
+          roomMinPrice: exist ? exist.price : -1,
+        };
+      }
+      // Определение минимальной стоимости комнаты
+      const prices = Array.from(categoriesAvailableRoomsCount, (i) => i.price);
+      const roomMinPrice = Math.min(...prices);
+
+      return {
+        date,
+        isAvailable:
+          !unavailableBookingDates.find(
+            (i) => i.date === date.format(dateFormat)
+          ) && categoriesAvailableRoomsCount.length > 0,
+        roomMinPrice,
+      };
+    }
+  }
+
+  return null;
 };

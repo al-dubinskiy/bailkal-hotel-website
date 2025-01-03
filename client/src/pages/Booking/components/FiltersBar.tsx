@@ -4,6 +4,7 @@ import { CustomRangeDatepicker } from "../../components/shared/RangeDatepicker/C
 import { SelectGuestsDropdown } from "./FiltersBar/SelectGuestsDropdown";
 import { CustomSelect } from "../../components/shared/FormElements/CustomSelect";
 import { theme } from "../../../theme";
+import { countries } from "./EnterGuestsDetailsSection/components/constants";
 
 type LocaleType = {
   id: string;
@@ -49,22 +50,12 @@ export const FiltersBar = (props: Props) => {
 
       <CustomSelect
         inputLabel="Язык"
-        data={locales.map(({ id, label, value }) => ({
-          id,
-          label,
-          value,
-        }))}
-        value={{
-          id: curLocale.id,
-          label: curLocale.label,
-          value: curLocale.value,
-        }}
-        setValue={({ id, label, value }) =>
-          setCurLocale({
-            id: id.toString(),
-            label,
-            value,
-          })
+        data={locales}
+        value={[curLocale.value]}
+        setValue={(val) =>
+          typeof val === "string"
+            ? setCurLocale(locales.find((i) => i.value === val) || locales[0])
+            : null
         }
       />
     </Stack>

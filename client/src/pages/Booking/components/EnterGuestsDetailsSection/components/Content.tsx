@@ -18,10 +18,7 @@ import { PaymentMethods } from "./PaymentMethods";
 import { useAppSelector } from "../../../../../hooks/redux";
 import { useFormik } from "formik";
 import { countries, times } from "./constants";
-import {
-  BookingGuestsDetailsPrimitiveType,
-  BookingGuestsDetailsType,
-} from "../../../../../redux/slices/Bookings/types";
+import { BookingGuestsDetailsType } from "../../../../../redux/slices/Bookings/types";
 import moment from "moment";
 import * as yup from "yup";
 import { dateTimeFormat } from "../../../../../constants";
@@ -81,7 +78,7 @@ export const Content = (props: Props) => {
     const a = moment(bookingInfo.arrival_datetime, dateTimeFormat).format(
       "HH:mm"
     );
-    return times.find((i) => i.value === a) || times[0];
+    return times.find((i) => i.value === a)?.value || times[0].value;
   };
 
   // Получить ранее установленное "время выезда"
@@ -89,7 +86,7 @@ export const Content = (props: Props) => {
     const a = moment(bookingInfo.departure_datetime, dateTimeFormat).format(
       "HH:mm"
     );
-    return times.find((i) => i.value === a) || times[8];
+    return times.find((i) => i.value === a)?.value || times[8].value;
   };
 
   const formik = useFormik<BookingGuestsDetailsType>({
@@ -99,10 +96,7 @@ export const Content = (props: Props) => {
       surname: bookingUserInfo.surname,
       phone: bookingUserInfo.phone,
       email: bookingUserInfo.email,
-      nationality: bookingUserInfo.nationality
-        ? countries.find((i) => i.value === bookingUserInfo.nationality) ||
-          countries[0]
-        : countries[0],
+      nationality: bookingUserInfo.nationality,
       sendConfirmOnPhone: bookingUserInfo.send_confirm_on_phone,
       wantToKnowAboutSpecialOffersAndNews:
         bookingUserInfo.want_to_know_about_special_offers_and_news,
@@ -118,7 +112,7 @@ export const Content = (props: Props) => {
     },
   });
 
-  const formValues = useMemo((): BookingGuestsDetailsPrimitiveType => {
+  const formValues = useMemo((): BookingGuestsDetailsType => {
     const a = formik.values;
     return {
       name: a.name,
@@ -126,12 +120,12 @@ export const Content = (props: Props) => {
       surname: a.surname,
       phone: a.phone,
       email: a.email,
-      nationality: a.nationality ? a.nationality.value : "",
+      nationality: a.nationality,
       sendConfirmOnPhone: a.sendConfirmOnPhone,
       wantToKnowAboutSpecialOffersAndNews:
         a.wantToKnowAboutSpecialOffersAndNews,
-      arrivalTime: a.arrivalTime.value,
-      departureTime: a.departureTime.value,
+      arrivalTime: a.arrivalTime,
+      departureTime: a.departureTime,
       comment: a.comment,
       bookingForWhom: a.bookingForWhom,
       paymentMethodId: a.paymentMethodId,
@@ -236,8 +230,8 @@ export const Content = (props: Props) => {
       comment: curComment,
     } = formValues;
 
-    const prevArrivalTime = getPrevArrivalTime().value;
-    const prevDepartureTime = getPrevDepartureTime().value;
+    const prevArrivalTime = getPrevArrivalTime();
+    const prevDepartureTime = getPrevDepartureTime();
     const { comment: prevComment } = bookingInfo;
 
     if (
@@ -260,12 +254,12 @@ export const Content = (props: Props) => {
         surname: a.surname,
         phone: a.phone,
         email: a.email,
-        nationality: a.nationality ? a.nationality.value : "",
+        nationality: a.nationality,
         sendConfirmOnPhone: a.sendConfirmOnPhone,
         wantToKnowAboutSpecialOffersAndNews:
           a.wantToKnowAboutSpecialOffersAndNews,
-        arrivalTime: a.arrivalTime.value,
-        departureTime: a.departureTime.value,
+        arrivalTime: a.arrivalTime,
+        departureTime: a.departureTime,
         comment: a.comment,
         bookingForWhom: a.bookingForWhom,
         paymentMethodId: a.paymentMethodId,
