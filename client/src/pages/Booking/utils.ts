@@ -1,6 +1,6 @@
 import moment, { Moment } from "moment";
 import {
-  BookingDateTimeType,
+  BookingDateType,
   BookingType,
   CreateBookingLocalType,
   RoomCategoryPriceType,
@@ -105,12 +105,14 @@ export function getDaysInRange({
   let date = moment(
     `${dateStart.year}-${
       dateStart.month ? Number(dateStart.month) + 1 : "01"
-    }-${dateStart.day ? dateStart.day : "01"}`
+    }-${dateStart.day ? dateStart.day : "01"}`,
+    "YYYY-MM-DD"
   ); // Первый день года
   const endOfYear = moment(
     `${dateEnd.year}-${dateEnd.month ? Number(dateStart.month) + 1 : "01"}-${
       dateEnd.day ? dateEnd.day : "01"
-    }`
+    }`,
+    "YYYY-MM-DD"
   ); // Последний день года
 
   while (date.isSameOrBefore(endOfYear)) {
@@ -181,8 +183,8 @@ const sortBookingsByRoomCategories = ({
           "ключ" - id категории комнаты, а
           "value" - массив дат "заезда" и "выезда" каждого бронирования на эту категорию:
           {"room_category_id": {
-              arrival_datetime: string;
-              departure_datetime: string;
+              arrivalDate: string;
+              departureDate: string;
             }[]
           }
         */
@@ -201,13 +203,13 @@ export const getCategoriesAvailableRoomsCount = ({
   unavailableBookingDates,
   bookings,
   roomsCategories,
-  arrival_datetime,
-  departure_datetime,
+  arrivalDate,
+  departureDate,
 }: {
   unavailableBookingDates: UnavailableBookingDateType[];
   bookings: BookingType[];
   roomsCategories: RoomCategoryType[];
-} & BookingDateTimeType): RoomCategoryPriceType[] | null => {
+} & BookingDateType): RoomCategoryPriceType[] | null => {
   const sortedBookingsByRoomCategories = sortBookingsByRoomCategories({
     bookings,
     roomsCategories,
@@ -217,11 +219,8 @@ export const getCategoriesAvailableRoomsCount = ({
   if (unavailableBookingDates) {
     if (
       unavailableBookingDates.find(
-        (i) =>
-          moment(i.date).isBetween(
-            moment(arrival_datetime),
-            moment(departure_datetime)
-          ),
+        (i: UnavailableBookingDateType) =>
+          moment(i.date).isBetween(moment(arrivalDate), moment(departureDate)),
         "[]"
       )
     ) {
@@ -238,7 +237,8 @@ export const getCategoriesAvailableRoomsCount = ({
 
       // Поиск "категории комнат" по id
       const categoryRoom = roomsCategories.find(
-        (roomCategory) => roomCategory._id === bookingCategoryId
+        (roomCategory: RoomCategoryType) =>
+          roomCategory._id === bookingCategoryId
       );
 
       if (categoryRoom) {
@@ -255,8 +255,8 @@ export const getCategoriesAvailableRoomsCount = ({
             isDateTimeRangeContained({
               start1: moment(moment(i.arrival_datetime).format(dateFormat)),
               end1: moment(moment(i.departure_datetime).format(dateFormat)),
-              start2: moment(arrival_datetime.format(dateFormat)),
-              end2: moment(departure_datetime.format(dateFormat)),
+              start2: moment(arrivalDate.format(dateFormat)),
+              end2: moment(departureDate.format(dateFormat)),
             })
           ) {
             bookedOnDateCount += 1;
@@ -279,7 +279,7 @@ export const getCategoriesAvailableRoomsCount = ({
     // Получение id "категорий комнат" на которые забронированы комнаты
     const bookedOnCategoriesIds = Object.keys(sortedBookingsByRoomCategories);
     // Добавить "категории комнат" на которые еще нет забронированных комнат
-    roomsCategories.map((roomCategory) =>
+    roomsCategories.map((roomCategory: RoomCategoryType) =>
       !bookedOnCategoriesIds.includes(roomCategory._id)
         ? categoriesAvailableRoomsCount.push({
             id: roomCategory._id,
@@ -320,8 +320,8 @@ export const checkDateAvailable = ({
       unavailableBookingDates,
       bookings,
       roomsCategories: roomsCategories,
-      arrival_datetime: date,
-      departure_datetime: date,
+      arrivalDate: date,
+      departureDate: date,
     });
 
     if (categoriesAvailableRoomsCount && categoriesAvailableRoomsCount.length) {

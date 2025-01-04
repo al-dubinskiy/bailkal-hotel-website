@@ -1,4 +1,4 @@
-import { Box, LinearProgress, Stack, Typography } from "@mui/material";
+import { Box, LinearProgress, Stack, SxProps, Typography } from "@mui/material";
 import React, {
   useCallback,
   useContext,
@@ -30,6 +30,7 @@ interface Props {
   setEndDateDefault?: (val: Date) => void;
   withPortal?: boolean;
   inputWithBorder?: boolean;
+  labelStyles?: SxProps;
 }
 
 export const CustomRangeDatepicker = (props: Props) => {
@@ -40,6 +41,7 @@ export const CustomRangeDatepicker = (props: Props) => {
     setEndDateDefault,
     withPortal = false,
     inputWithBorder = false,
+    labelStyles,
   } = props;
   const { unavailableBookingDates } = useAppSelector(
     (state) => state.unavailableBookingDates
@@ -51,10 +53,10 @@ export const CustomRangeDatepicker = (props: Props) => {
   const dispatch = useAppDispatch();
   const { filterParams } = useAppSelector((state) => state.bookings);
   const [startDate, setStartDate] = useState<Date>(
-    startDateDefault ? startDateDefault : filterParams.arrival_datetime.toDate()
+    startDateDefault ? startDateDefault : filterParams.arrivalDate.toDate()
   );
   const [endDate, setEndDate] = useState<Date>(
-    endDateDefault ? endDateDefault : filterParams.departure_datetime.toDate()
+    endDateDefault ? endDateDefault : filterParams.departureDate.toDate()
   );
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -70,12 +72,8 @@ export const CustomRangeDatepicker = (props: Props) => {
         dispatch(
           setFilterParams({
             ...filterParams,
-            arrival_datetime: moment(start)
-              .set("hours", Number(times[0].value.split(":")[0])) // 07:00
-              .set("minutes", Number(times[0].value.split(":")[1])),
-            departure_datetime: moment(end)
-              .set("hours", Number(times[8].value.split(":")[0])) // 15:00
-              .set("minutes", Number(times[8].value.split(":")[1])),
+            arrivalDate: moment(start),
+            departureDate: moment(end),
           })
         );
       }
@@ -142,7 +140,8 @@ export const CustomRangeDatepicker = (props: Props) => {
                 : "x"}
             </span>
           ) : (
-            <LinearProgress />
+            // <LinearProgress />
+            <Box sx={{ height: "12px" }}></Box>
           )}
         </Stack>
       );
@@ -201,7 +200,7 @@ export const CustomRangeDatepicker = (props: Props) => {
     >
       <Typography
         variant="label"
-        sx={{ textTransform: "uppercase", fontWeight: 400 }}
+        sx={{ textTransform: "uppercase", fontWeight: 400, ...labelStyles }}
       >
         Дата заезда и выезда
       </Typography>
@@ -235,9 +234,7 @@ export const CustomRangeDatepicker = (props: Props) => {
         children={
           <DatePickerFooter
             dateType={
-              startDate &&
-              startDate.getTime() ===
-                filterParams.arrival_datetime.toDate().getTime()
+              startDate && moment(startDate).isSame(filterParams.arrivalDate)
                 ? "Выберите дату заезда"
                 : !endDate
                 ? "Выберите дату выезда"

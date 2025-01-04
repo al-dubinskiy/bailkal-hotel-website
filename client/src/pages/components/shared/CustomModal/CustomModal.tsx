@@ -107,6 +107,7 @@ export const CustomModal = (props: Props) => {
             overflowY: "auto",
             scrollbarWidth: "none" /* Firefox */,
             "&::-webkit-scrollbar": { display: "none" },
+            paddingBottom: "24px",
           }}
         >
           {modalContent}

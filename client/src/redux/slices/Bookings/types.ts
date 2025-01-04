@@ -29,9 +29,9 @@ export type BookingUserInfoType = {
   want_to_know_about_special_offers_and_news: boolean;
 };
 
-export type BookingDateTimeType = {
-  arrival_datetime: Moment;
-  departure_datetime: Moment;
+export type BookingDateType = {
+  arrivalDate: Moment;
+  departureDate: Moment;
 };
 
 export type CreateBookingType = {
@@ -94,8 +94,8 @@ export type RoomGuestsCountType = {
 };
 
 export type FiltersParamsType = {
-  arrival_datetime: Moment;
-  departure_datetime: Moment;
+  arrivalDate: Moment;
+  departureDate: Moment;
   rooms: RoomGuestsCountType[];
 };
 

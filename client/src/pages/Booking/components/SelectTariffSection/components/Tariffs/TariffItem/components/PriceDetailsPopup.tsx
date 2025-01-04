@@ -41,11 +41,7 @@ export const PriceDetailsPopup = (props: Props) => {
   };
 
   const nightTotal = useMemo(
-    () =>
-      filterParams.departure_datetime.diff(
-        filterParams.arrival_datetime,
-        "days"
-      ),
+    () => filterParams.departureDate.diff(filterParams.arrivalDate, "days"),
     [filterParams]
   );
 
@@ -106,8 +102,8 @@ export const PriceDetailsPopup = (props: Props) => {
                     </Typography>
 
                     <Typography variant={"label"}>
-                      {filterParams.arrival_datetime.format("DD MMMM")} —
-                      {filterParams.departure_datetime.format("DD MMMM")}
+                      {filterParams.arrivalDate.format("DD MMMM")} —
+                      {filterParams.departureDate.format("DD MMMM")}
                       <span style={{ fontWeight: 600 }}>
                         {`, ${nightTotal} ноч
                         ${

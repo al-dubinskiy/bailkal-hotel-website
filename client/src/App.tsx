@@ -8,21 +8,25 @@ import { ThemeProvider } from "@mui/material/styles";
 import { theme } from "./theme";
 import moment from "moment";
 import "moment/locale/ru";
+import { ToastContainer } from "react-toastify";
 
 moment.locale("ru");
 
 function App() {
   return (
-    <Provider store={store}>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <StyledEngineProvider injectFirst>
-          <Router>
-            <Routes />
-          </Router>
-        </StyledEngineProvider>
-      </ThemeProvider>
-    </Provider>
+    <>
+      <Provider store={store}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <StyledEngineProvider injectFirst>
+            <Router>
+              <Routes />
+            </Router>
+          </StyledEngineProvider>
+        </ThemeProvider>
+      </Provider>
+      <ToastContainer />
+    </>
   );
 }
 

@@ -15,6 +15,7 @@ interface Props {
   multiline?: boolean;
   containerStyles?: SxProps;
   startIcon?: JSX.Element;
+  disabled?: boolean;
 }
 
 export const CustomInput = (props: Props) => {
@@ -31,6 +32,7 @@ export const CustomInput = (props: Props) => {
     multiline = false,
     containerStyles,
     startIcon,
+    disabled = false,
   } = props;
 
   return (
@@ -46,6 +48,7 @@ export const CustomInput = (props: Props) => {
       error={error}
       helperText={helperText}
       multiline={multiline}
+      disabled={disabled}
       slotProps={{
         input: {
           startAdornment: startIcon ? (

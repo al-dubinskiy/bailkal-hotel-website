@@ -56,33 +56,52 @@ export const AdminBookingsStatusesPage = (props: Props) => {
 
   const dataList = useMemo((): DataListType[] => {
     if (sortedBookingsByRoomCategories && roomsCategories && rooms) {
-      const a = Object.entries(sortedBookingsByRoomCategories); // { 0: "a", 1: "b", 2: "c" } => [ ['0', 'a'], ['1', 'b'], ['2', 'c'] ]
+      const bookingsByRoomCategories = Object.entries(
+        sortedBookingsByRoomCategories
+      ); // { 0: "a", 1: "b", 2: "c" } => [ ['0', 'a'], ['1', 'b'], ['2', 'c'] ]
 
-      return roomsCategories.map((i): DataListType => {
-        const b = a.find((j) => j[0] === i._id); // find bookings on room category
+      return roomsCategories.map((roomCategory): DataListType => {
+        const bookings = bookingsByRoomCategories.find(
+          (booking) => booking[0] === roomCategory._id
+        ); // find bookings on room category
 
         return {
-          roomCategory: i,
-          categoryRoomsBookingStatuses: i.room_id.map((k) => {
-            const booking = b && b[1].find((l) => l.room_id === k); // поиск букинга на этот номер
-            return {
-              id: k,
-              isBooked: booking ? true : false, // если есть букинг на эту комнату
-              roomNumber: rooms.find((p) => p._id === k)?.number || -1,
-              booking,
-              bookingDate: booking
-                ? {
+          roomCategory,
+          categoryRoomsBookingStatuses: roomCategory.room_id.map((roomId) => {
+            const bookingsOnRoom = bookings
+              ? bookings[1].filter((booking) => booking.room_id === roomId)
+              : null; // поиск букинга на этот номер
+            console.log("aaa", bookingsOnRoom);
+
+            if (bookingsOnRoom) {
+              bookingsOnRoom.map((booking) => {
+                return {
+                  id: roomId,
+                  isBooked: true,
+                  roomNumber:
+                    rooms.find((room) => room._id === roomId)?.number || -1,
+                  booking,
+                  bookingDate: {
                     arrival_datetime: booking.arrival_datetime,
                     departure_datetime: booking.departure_datetime,
-                  }
-                : undefined,
-              bookingGuests: booking
-                ? {
+                  },
+                  bookingGuests: {
                     adults_count: booking.adults_count,
                     children_count: booking.children_count,
-                  }
-                : undefined,
-              bookingUser: booking ? booking.user : undefined,
+                  },
+                  bookingUser: booking.user,
+                };
+              });
+            }
+            return {
+              id: roomId,
+              isBooked: false, // если есть букинг на эту комнату
+              roomNumber:
+                rooms.find((room) => room._id === roomId)?.number || -1,
+              booking: undefined,
+              bookingDate: undefined,
+              bookingGuests: undefined,
+              bookingUser: undefined,
             };
           }),
         };
@@ -97,7 +116,7 @@ export const AdminBookingsStatusesPage = (props: Props) => {
         return (
           <Accordion
             key={index}
-            defaultExpanded={index === 0}
+            defaultExpanded={true}
             disableGutters={true}
             sx={{
               borderRadius: "16px",

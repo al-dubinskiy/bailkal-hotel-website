@@ -12,7 +12,7 @@ interface Props {}
 export const NotFoundRoomCategoriesBanner = () => {
   const { filterParams } = useAppSelector((state) => state.bookings);
 
-  const { arrival_datetime, departure_datetime } = filterParams;
+  const { arrivalDate, departureDate } = filterParams;
 
   return (
     <Box
@@ -36,9 +36,7 @@ export const NotFoundRoomCategoriesBanner = () => {
           variant="h7"
           sx={{ color: theme.palette.secondary.dark, fontWeight: "600" }}
         >
-          {`На ${arrival_datetime.format(
-            "DD MMMM"
-          )} - ${departure_datetime.format(
+          {`На ${arrivalDate.format("DD MMMM")} - ${departureDate.format(
             "DD MMMM, YYYY"
           )} нет доступных номеров`}
         </Typography>

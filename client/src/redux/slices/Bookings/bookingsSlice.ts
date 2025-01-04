@@ -23,6 +23,7 @@ import { RoomCategoryType } from "../RoomsCategories/types";
 import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 import { times } from "../../../pages/Booking/components/EnterGuestsDetailsSection/components/constants";
+import { Bounce, toast } from "react-toastify";
 
 const DEBUG = true;
 
@@ -106,7 +107,7 @@ export const UpdateBooking = createAsyncThunk(
         body: JSON.stringify(booking),
       });
 
-      if (res.status === 200) {
+      if (res.ok) {
         const json = await res.json();
 
         return json;
@@ -220,13 +221,8 @@ const initialState: IBookingState = {
   currentRoomCategory: null,
   bookingSteps: [],
   filterParams: {
-    arrival_datetime: moment()
-      .set("hours", Number(times[0].value.split(":")[0])) // 07:00
-      .set("minutes", Number(times[0].value.split(":")[1])),
-    departure_datetime: moment()
-      .add(1, "days")
-      .set("hours", Number(times[8].value.split(":")[0])) // 15:00
-      .set("minutes", Number(times[8].value.split(":")[1])),
+    arrivalDate: moment(),
+    departureDate: moment().add(1, "days"),
     rooms: [{ id: uuidv4(), adults: 1, children: 0 }],
   },
   categoriesAvailableRoomsCount: null,
@@ -267,6 +263,10 @@ export const bookingsSlice = createSlice({
     resetCreateBookingState: (state) => {
       state.createBooking.successMessage = null;
       state.createBooking.error = null;
+    },
+    resetUpdateBookingState: (state) => {
+      state.updateBooking.successMessage = null;
+      state.updateBooking.error = null;
     },
   },
   extraReducers: (builder) => {
@@ -324,8 +324,20 @@ export const bookingsSlice = createSlice({
               ? updatedBooking
               : booking;
           });
+        state.updateBooking.successMessage = "Success";
+        toast.success("Данные букинга были успешно обновлены!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
 
-        if (DEBUG) console.log("CreateBooking (API): booking was updated.");
+        if (DEBUG) console.log("UpdateBooking (API): booking was updated.");
       }
     );
     builder.addCase(UpdateBooking.pending, (state, { payload }) => {
@@ -370,4 +382,5 @@ export const {
   setFilterParams,
   setCategoriesAvailableRoomsCount,
   resetCreateBookingState,
+  resetUpdateBookingState,
 } = bookingsSlice.actions;

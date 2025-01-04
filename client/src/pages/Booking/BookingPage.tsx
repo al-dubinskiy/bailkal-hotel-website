@@ -31,6 +31,7 @@ import { BookingServiceType } from "../../redux/slices/BookingServices/types";
 import { useGetApiData } from "../../hooks/getApiData";
 import { StepContent } from "./components/StepContent";
 import { FiltersBar } from "./components/FiltersBar";
+import { times } from "./components/EnterGuestsDetailsSection/components/constants";
 
 // Типы
 export type BookingProgressStepType = {
@@ -114,22 +115,22 @@ export const BookingPage = () => {
 
   useEffect(() => {
     if (roomsCategories && bookings && unavailableBookingDates) {
-      const { arrival_datetime, departure_datetime } = filterParams;
+      const { arrivalDate, departureDate } = filterParams;
       dispatch(
         setCategoriesAvailableRoomsCount(
           getCategoriesAvailableRoomsCount({
             bookings,
             roomsCategories,
             unavailableBookingDates,
-            arrival_datetime: arrival_datetime,
-            departure_datetime: departure_datetime,
+            arrivalDate,
+            departureDate,
           })
         )
       );
     }
   }, [
-    filterParams.arrival_datetime,
-    filterParams.departure_datetime,
+    filterParams.arrivalDate,
+    filterParams.departureDate,
     roomsCategories,
     bookings,
     unavailableBookingDates,
@@ -562,7 +563,6 @@ export const BookingPage = () => {
                 setNewBookings({
                   ...newBookings,
                   bookings: newBookings.bookings.map((i) => {
-                    console.log("dfdf", i.transfer_id);
                     return {
                       ...i,
                       user: {
@@ -648,7 +648,7 @@ export const BookingPage = () => {
     adultsCount: number;
     childrenCount: number;
   }): CreateBookingLocalType => {
-    const { arrival_datetime, departure_datetime } = filterParams;
+    const { arrivalDate, departureDate } = filterParams;
 
     return {
       tempId: tempId,
@@ -666,8 +666,14 @@ export const BookingPage = () => {
       },
       adults_count: adultsCount,
       children_count: childrenCount,
-      arrival_datetime: arrival_datetime.format(dateTimeFormat),
-      departure_datetime: departure_datetime.format(dateTimeFormat),
+      arrival_datetime: arrivalDate
+        .set("hours", Number(times[0].value.split(":")[0])) // 07:00
+        .set("minutes", Number(times[0].value.split(":")[1]))
+        .format(dateTimeFormat),
+      departure_datetime: departureDate
+        .set("hours", Number(times[8].value.split(":")[0])) // 15:00
+        .set("minutes", Number(times[8].value.split(":")[1]))
+        .format(dateTimeFormat),
       tariff_id: "",
       service_id: [],
       bed_type_id: "",
@@ -964,18 +970,24 @@ export const BookingPage = () => {
   // Обновить даты новых букингов если был изменен фильтр "Дата заезда и выезда"
   const updateNewBookingsDates = useCallback(
     (newBookings: NewBookingsType) => {
-      const { arrival_datetime, departure_datetime } = filterParams;
+      const { arrivalDate, departureDate } = filterParams;
       const { bookings } = newBookings;
 
-      if (arrival_datetime && departure_datetime) {
+      if (departureDate && departureDate) {
         if (bookings.length) {
           dispatch(
             setNewBookings({
               bookings: bookings.map((i) => {
                 return {
                   ...i,
-                  arrival_datetime: arrival_datetime.format(dateTimeFormat),
-                  departure_datetime: departure_datetime.format(dateTimeFormat),
+                  arrival_datetime: arrivalDate
+                    .set("hours", Number(times[0].value.split(":")[0])) // 07:00
+                    .set("minutes", Number(times[0].value.split(":")[1]))
+                    .format(dateTimeFormat),
+                  departure_datetime: departureDate
+                    .set("hours", Number(times[8].value.split(":")[0])) // 15:00
+                    .set("minutes", Number(times[8].value.split(":")[1]))
+                    .format(dateTimeFormat),
                 };
               }),
               actionType: "",
@@ -984,7 +996,7 @@ export const BookingPage = () => {
         }
       }
     },
-    [filterParams.arrival_datetime, filterParams.departure_datetime]
+    [filterParams.arrivalDate, filterParams.departureDate]
   );
 
   useEffect(() => {

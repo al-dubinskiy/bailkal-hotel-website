@@ -19,7 +19,7 @@ interface Props {
   name?: string;
   inputLabel?: string;
   value: string[];
-  setValue: (val: string[]) => void;
+  setValue: (val: string[] | string) => void;
   data: SelectItemType[];
   disabledItems?: SelectItemType[];
   onBlur?: (event: React.FocusEvent<HTMLInputElement>) => void;

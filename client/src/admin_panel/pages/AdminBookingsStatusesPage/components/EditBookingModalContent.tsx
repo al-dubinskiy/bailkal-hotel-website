@@ -1,6 +1,6 @@
 import { Stack, Typography } from "@mui/material";
 import { useFormik } from "formik";
-import React, { useMemo } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import * as yup from "yup";
 import { BookingType } from "../../../../redux/slices/Bookings/types";
 import { CustomInput } from "../../../../pages/components/shared/FormElements/CustomInput";
@@ -15,14 +15,25 @@ import {
   countries,
   times,
 } from "../../../../pages/Booking/components/EnterGuestsDetailsSection/components/constants";
-import { useAppSelector } from "../../../../hooks/redux";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import { CustomCounterButton } from "../../../../pages/components/shared/CustomCounterButton";
 import { dateTimeFormat } from "../../../../constants";
 import moment from "moment";
 import { CustomRangeDatepicker } from "../../../../pages/components/shared/RangeDatepicker/CustomRangeDatepicker";
+import {
+  getPrevArrivalTime,
+  getPrevDepartureTime,
+} from "../../../../pages/Booking/components/EnterGuestsDetailsSection/components/utils";
+import { UpdateBooking } from "../../../../redux/slices/Bookings/bookingsSlice";
+import {
+  ToogleButtonModeType,
+  ToogleModeButton,
+} from "../../../../pages/components/shared/ToogleModeButton";
 
 interface Props {
   booking: BookingType;
+  isUpdateBookingInfo: boolean;
+  setIsUpdateBookingInfo: (val: boolean) => void;
 }
 
 const validationSchema = yup.object({
@@ -44,7 +55,8 @@ const validationSchema = yup.object({
 });
 
 export const EditBookingModalContent = (props: Props) => {
-  const { booking } = props;
+  const { booking, isUpdateBookingInfo, setIsUpdateBookingInfo } = props;
+  const dispatch = useAppDispatch();
   const { rooms } = useAppSelector((state) => state.rooms);
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
   const { bookingTariffs } = useAppSelector((state) => state.bookingTariffs);
@@ -59,6 +71,21 @@ export const EditBookingModalContent = (props: Props) => {
   );
   const { transferCars } = useAppSelector((state) => state.transfersCars);
   const { roomGuestsMax } = useAppSelector((state) => state.bookings);
+
+  const [bookingForWhom, setBookingForWhom] = useState<ToogleButtonModeType[]>([
+    {
+      id: "1",
+      label: "Для себя",
+      value: "for_yourself",
+      isSelected: booking.booking_for_whom === "for_yourself" ? true : false,
+    },
+    {
+      id: "2",
+      label: "Для другого",
+      value: "for_another",
+      isSelected: booking.booking_for_whom === "for_another" ? true : false,
+    },
+  ]);
 
   const bookingRoomCategory = useMemo(() => {
     if (roomsCategories) {
@@ -204,12 +231,74 @@ export const EditBookingModalContent = (props: Props) => {
   }, [transferVariants, transferCars]);
 
   const formik = useFormik<BookingType>({
-    initialValues: booking,
+    initialValues: {
+      ...booking,
+    },
     validationSchema: validationSchema,
     onSubmit: (values) => {
       alert(JSON.stringify(values, null, 2));
     },
   });
+
+  const updateBooking = () => {
+    dispatch(
+      UpdateBooking({
+        booking: formik.values,
+      })
+    );
+
+    setIsUpdateBookingInfo(!isUpdateBookingInfo);
+  };
+
+  useEffect(() => {
+    if (isUpdateBookingInfo) {
+      updateBooking();
+    }
+  }, [isUpdateBookingInfo]);
+
+  useEffect(() => {
+    const {
+      room_category_id,
+      tariff_id,
+      service_id,
+      transfer_id,
+      adults_count,
+      children_count,
+    } = formik.values;
+    const guestsCount = adults_count + children_count;
+    if (
+      roomsCategories &&
+      bookingTariffs &&
+      bookingServices &&
+      transferVariants
+    ) {
+      // Стоимость комнаты
+      let a = roomsCategories.find((i) => i._id === room_category_id);
+      const roomPrice = a
+        ? guestsCount > 1
+          ? a.price_per_night_for_two_quest
+          : a.price_per_night_for_one_quest
+        : 0;
+      // Стоимость тарифа
+      const tariffPrice =
+        bookingTariffs.find((i) => i._id === tariff_id)?.cost || 0;
+
+      // Стоимость сервисов
+      const servicesPrice = bookingServices
+        .filter((i) => service_id.includes(i._id))
+        .reduce((acc, cur) => {
+          return (acc += cur.price);
+        }, 0);
+      // Стоимость трансфера
+      const transferPrice =
+        transferVariants.find((i) => i._id === transfer_id)?.price || 0;
+
+      formik.setFieldValue(
+        "price",
+        roomPrice + tariffPrice + servicesPrice + transferPrice
+      );
+    }
+  }, [formik.values]);
 
   console.log(formik.values);
   if (!roomsCategories) return null;
@@ -228,7 +317,6 @@ export const EditBookingModalContent = (props: Props) => {
           >
             Личные данные
           </Typography>
-
           <CustomInput
             id="user.name"
             name="user.name"
@@ -243,7 +331,6 @@ export const EditBookingModalContent = (props: Props) => {
             }
             helperText={formik.touched.user?.name && formik.errors.user?.name}
           />
-
           <CustomInput
             id="user.lastname"
             name="user.lastname"
@@ -261,7 +348,6 @@ export const EditBookingModalContent = (props: Props) => {
               formik.touched.user?.lastname && formik.errors.user?.lastname
             }
           />
-
           <CustomInput
             id="user.surname"
             name="user.surname"
@@ -279,7 +365,6 @@ export const EditBookingModalContent = (props: Props) => {
               formik.touched.user?.surname && formik.errors.user?.surname
             }
           />
-
           <CustomInput
             id="user.phone"
             name="user.phone"
@@ -304,7 +389,6 @@ export const EditBookingModalContent = (props: Props) => {
               />
             }
           />
-
           <CustomInput
             id="user.email"
             name="user.email"
@@ -330,7 +414,6 @@ export const EditBookingModalContent = (props: Props) => {
               />
             }
           />
-
           <CustomSelect
             id="user.nationality"
             name="user.nationality"
@@ -352,7 +435,6 @@ export const EditBookingModalContent = (props: Props) => {
               formik.errors.user?.nationality
             }
           />
-
           <Typography
             variant="label"
             fontWeight={600}
@@ -360,7 +442,6 @@ export const EditBookingModalContent = (props: Props) => {
           >
             Количество гостей
           </Typography>
-
           <Stack
             sx={{
               flexDirection: "row",
@@ -384,7 +465,6 @@ export const EditBookingModalContent = (props: Props) => {
               setValue={(val) => formik.setFieldValue("children_count", val)}
             />
           </Stack>
-
           <Typography
             variant="label"
             fontWeight={600}
@@ -392,7 +472,6 @@ export const EditBookingModalContent = (props: Props) => {
           >
             Данные комнаты
           </Typography>
-
           <CustomSelect
             id="room_category_id"
             name="room_category_id"
@@ -415,7 +494,6 @@ export const EditBookingModalContent = (props: Props) => {
               formik.touched.room_category_id && formik.errors.room_category_id
             }
           />
-
           <CustomSelect
             id="room_id"
             name="room_id"
@@ -431,7 +509,6 @@ export const EditBookingModalContent = (props: Props) => {
             error={formik.touched.room_id && Boolean(formik.errors.room_id)}
             helperText={formik.touched.room_id && formik.errors.room_id}
           />
-
           <CustomSelect
             id="tariff_id"
             name="tariff_id"
@@ -449,7 +526,6 @@ export const EditBookingModalContent = (props: Props) => {
             error={formik.touched.tariff_id && Boolean(formik.errors.tariff_id)}
             helperText={formik.touched.tariff_id && formik.errors.tariff_id}
           />
-
           <CustomSelect
             id="service_id"
             name="service_id"
@@ -476,7 +552,6 @@ export const EditBookingModalContent = (props: Props) => {
             }
             multiple
           />
-
           <Typography
             variant="label"
             fontWeight={600}
@@ -484,7 +559,6 @@ export const EditBookingModalContent = (props: Props) => {
           >
             Специальные предложения
           </Typography>
-
           <CustomSelect
             id="bed_type_id"
             name="bed_type_id"
@@ -507,7 +581,6 @@ export const EditBookingModalContent = (props: Props) => {
               formik.errors.bed_type_id?.toString()
             }
           />
-
           <CustomSelect
             id="view_from_window_id"
             name="view_from_window_id"
@@ -530,7 +603,6 @@ export const EditBookingModalContent = (props: Props) => {
               formik.errors.view_from_window_id?.toString()
             }
           />
-
           <CustomSelect
             id="payment_method_id"
             name="payment_method_id"
@@ -553,7 +625,6 @@ export const EditBookingModalContent = (props: Props) => {
               formik.errors.payment_method_id?.toString()
             }
           />
-
           <Typography
             variant="label"
             fontWeight={600}
@@ -584,7 +655,6 @@ export const EditBookingModalContent = (props: Props) => {
               formik.errors.transfer_id?.toString()
             }
           />
-
           <CustomInput
             id="transfer_comment"
             name="transfer_comment"
@@ -602,7 +672,6 @@ export const EditBookingModalContent = (props: Props) => {
               formik.touched.transfer_comment && formik.errors.transfer_comment
             }
           />
-
           <Typography
             variant="label"
             fontWeight={600}
@@ -614,19 +683,155 @@ export const EditBookingModalContent = (props: Props) => {
           <CustomRangeDatepicker
             startDateDefault={new Date(formik.values.arrival_datetime)}
             endDateDefault={new Date(formik.values.departure_datetime)}
-            setStartDateDefault={(val) =>
+            setStartDateDefault={(val) => {
+              const newDate = moment(val);
+              const year = newDate.get("year");
+              const month = newDate.get("month");
+              const date = newDate.get("date");
+
               formik.setFieldValue(
                 "arrival_datetime",
-                moment(val).format(dateTimeFormat)
-              )
-            }
-            setEndDateDefault={(val) =>
+                moment(formik.values.arrival_datetime, dateTimeFormat)
+                  .set("year", year)
+                  .set("month", month)
+                  .set("date", date)
+                  .format(dateTimeFormat)
+              );
+            }}
+            setEndDateDefault={(val) => {
+              const newDate = moment(val);
+              const year = newDate.get("year");
+              const month = newDate.get("month");
+              const date = newDate.get("date");
+
               formik.setFieldValue(
                 "departure_datetime",
-                moment(val).format(dateTimeFormat)
-              )
-            }
+                moment(formik.values.departure_datetime, dateTimeFormat)
+                  .set("year", year)
+                  .set("month", month)
+                  .set("date", date)
+                  .format(dateTimeFormat)
+              );
+            }}
             inputWithBorder
+            labelStyles={{ textTransform: "normal" }}
+          />
+
+          <Stack
+            sx={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              gap: "24px",
+            }}
+          >
+            <CustomSelect
+              id="arrival_datetime"
+              name="arrival_datetime"
+              inputLabel="Время заезда"
+              data={times}
+              value={[
+                getPrevArrivalTime({
+                  arrival_datetime: formik.values.arrival_datetime,
+                }),
+              ]}
+              setValue={(val) => {
+                if (typeof val === "string") {
+                  const hour = Number(val.split(":")[0]);
+                  const minute = Number(val.split(":")[1]);
+
+                  formik.setFieldValue(
+                    "arrival_datetime",
+                    moment(formik.values.arrival_datetime, dateTimeFormat)
+                      .set("hour", hour)
+                      .set("minute", minute)
+                      .format(dateTimeFormat)
+                  );
+                }
+              }}
+              labelPosition={"left"}
+              containerStyles={{ flex: 0.5 }}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.arrival_datetime &&
+                Boolean(formik.errors.arrival_datetime)
+              }
+            />
+
+            <CustomSelect
+              id="departure_datetime"
+              name="departure_datetime"
+              inputLabel="Время выезда"
+              data={times}
+              value={[
+                getPrevDepartureTime({
+                  departure_datetime: formik.values.departure_datetime,
+                }),
+              ]}
+              setValue={(val) => {
+                if (typeof val === "string") {
+                  const hour = Number(val.split(":")[0]);
+                  const minute = Number(val.split(":")[1]);
+
+                  formik.setFieldValue(
+                    "departure_datetime",
+                    moment(formik.values.departure_datetime, dateTimeFormat)
+                      .set("hour", hour)
+                      .set("minute", minute)
+                      .format(dateTimeFormat)
+                  );
+                }
+              }}
+              labelPosition={"left"}
+              containerStyles={{ flex: 0.5 }}
+              onBlur={formik.handleBlur}
+              error={
+                formik.touched.departure_datetime &&
+                Boolean(formik.errors.departure_datetime)
+              }
+            />
+          </Stack>
+
+          <CustomInput
+            id="comment"
+            name="comment"
+            label="Комментарий к бронированию"
+            value={formik.values.comment || ""}
+            onChange={(val) =>
+              formik.setFieldValue("comment", val.target.value)
+            }
+            multiline
+            onBlur={formik.handleBlur}
+            error={formik.touched.comment && Boolean(formik.errors.comment)}
+            helperText={formik.touched.comment && formik.errors.comment}
+          />
+
+          <ToogleModeButton
+            label="Бронирование для"
+            modes={bookingForWhom}
+            setMode={(val) => {
+              const selected = val.find(
+                (i: ToogleButtonModeType) => i.isSelected
+              );
+              if (selected) {
+                formik.setFieldValue("bookingForWhom", selected.value);
+              }
+              setBookingForWhom(val);
+            }}
+            isCanUnchecked={false}
+          />
+
+          <CustomInput
+            id="price"
+            name="price"
+            label="Общая стоимость"
+            value={formik.values.price.toString() + "₽"}
+            onChange={(val) =>
+              formik.setFieldValue("price", Number(val.target.value))
+            }
+            onBlur={formik.handleBlur}
+            error={formik.touched.price && Boolean(formik.errors.price)}
+            helperText={formik.touched.price && formik.errors.price}
+            disabled
           />
         </Stack>
       </form>

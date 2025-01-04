@@ -24,6 +24,7 @@ import * as yup from "yup";
 import { dateTimeFormat } from "../../../../../constants";
 import { BookingContext } from "../../../BookingPage";
 import { Transfer } from "../../OrderServicesSection/components/Transfer/Transfer";
+import { getPrevArrivalTime, getPrevDepartureTime } from "./utils";
 
 interface Props {
   isUpdateBookingsUserInfo: boolean;
@@ -73,22 +74,6 @@ export const Content = (props: Props) => {
     },
   ]);
 
-  // Получить ранее установленное "время заезда"
-  const getPrevArrivalTime = () => {
-    const a = moment(bookingInfo.arrival_datetime, dateTimeFormat).format(
-      "HH:mm"
-    );
-    return times.find((i) => i.value === a)?.value || times[0].value;
-  };
-
-  // Получить ранее установленное "время выезда"
-  const getPrevDepartureTime = () => {
-    const a = moment(bookingInfo.departure_datetime, dateTimeFormat).format(
-      "HH:mm"
-    );
-    return times.find((i) => i.value === a)?.value || times[8].value;
-  };
-
   const formik = useFormik<BookingGuestsDetailsType>({
     initialValues: {
       name: bookingUserInfo.name,
@@ -100,8 +85,12 @@ export const Content = (props: Props) => {
       sendConfirmOnPhone: bookingUserInfo.send_confirm_on_phone,
       wantToKnowAboutSpecialOffersAndNews:
         bookingUserInfo.want_to_know_about_special_offers_and_news,
-      arrivalTime: getPrevArrivalTime(),
-      departureTime: getPrevDepartureTime(),
+      arrivalTime: getPrevArrivalTime({
+        arrival_datetime: bookingInfo.arrival_datetime,
+      }),
+      departureTime: getPrevDepartureTime({
+        departure_datetime: bookingInfo.departure_datetime,
+      }),
       comment: bookingInfo.comment ? bookingInfo.comment : "",
       bookingForWhom: "for_yourself",
       paymentMethodId: bookingInfo.payment_method_id,
@@ -111,6 +100,21 @@ export const Content = (props: Props) => {
       alert(JSON.stringify(values, null, 2));
     },
   });
+
+  useEffect(() => {
+    formik.setFieldValue(
+      "arrivalTime",
+      getPrevArrivalTime({
+        arrival_datetime: bookingInfo.arrival_datetime,
+      })
+    );
+    formik.setFieldValue(
+      "departureTime",
+      getPrevDepartureTime({
+        departure_datetime: bookingInfo.departure_datetime,
+      })
+    );
+  }, [bookingInfo.arrival_datetime, bookingInfo.departure_datetime]);
 
   const formValues = useMemo((): BookingGuestsDetailsType => {
     const a = formik.values;
@@ -230,8 +234,12 @@ export const Content = (props: Props) => {
       comment: curComment,
     } = formValues;
 
-    const prevArrivalTime = getPrevArrivalTime();
-    const prevDepartureTime = getPrevDepartureTime();
+    const prevArrivalTime = getPrevArrivalTime({
+      arrival_datetime: bookingInfo.arrival_datetime,
+    });
+    const prevDepartureTime = getPrevDepartureTime({
+      departure_datetime: bookingInfo.departure_datetime,
+    });
     const { comment: prevComment } = bookingInfo;
 
     if (

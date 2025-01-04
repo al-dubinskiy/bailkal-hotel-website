@@ -52,7 +52,7 @@ export const CustomButton = (props: Props) => {
         "& .MuiButton-endIcon": {
           marginLeft: "5px",
         },
-        opacity: !disabled ? 1 : 0.7,
+        opacity: !disabled && !loading ? 1 : 0.7,
         "&:hover": {
           opacity: !withoutAnimation ? 1 : 0.7,
         },
@@ -62,7 +62,7 @@ export const CustomButton = (props: Props) => {
         },
         ...containerStyle,
       }}
-      onClick={onClick}
+      onClick={!loading ? onClick : undefined}
       disabled={disabled}
     >
       {loading ? (

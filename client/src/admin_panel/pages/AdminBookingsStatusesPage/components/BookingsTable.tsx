@@ -8,8 +8,7 @@ import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import { Box, Stack, Theme, Typography, useTheme } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
-import Grid from "@mui/material/Grid2";
-import { useTranslation } from "react-i18next";
+import { Bounce, ToastContainer, toast } from "react-toastify";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
@@ -23,7 +22,7 @@ import { CustomModal } from "../../../../pages/components/shared/CustomModal/Cus
 import { RoomCategoryType } from "../../../../redux/slices/RoomsCategories/types";
 import { CustomLabelAndDescription } from "../../../../pages/components/shared/CustomLabelAndDescription";
 import { getBookingServicesInfo } from "../../../../pages/Booking/utils";
-import { useAppSelector } from "../../../../hooks/redux";
+import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import { BookingTariffType } from "../../../../redux/slices/BookingTariffs/types";
 import { BookingServiceType } from "../../../../redux/slices/BookingServices/types";
 import { RoomBedVariantType } from "../../../../redux/slices/RoomBedVariants/types";
@@ -33,6 +32,8 @@ import { TransferCarType } from "../../../../redux/slices/TransferCars/types";
 import { PaymentMethodType } from "../../../../redux/slices/PaymentMethods/types";
 import { EditBookingModalContent } from "./EditBookingModalContent";
 import { BookingDetailsModalContent } from "./BookingDetailsModalContent";
+import { resetUpdateBookingState } from "../../../../redux/slices/Bookings/bookingsSlice";
+import { CheckboxIcon } from "../../../../assets/icons/CheckboxIcon";
 
 type BookingDateType = { arrival_datetime: string; departure_datetime: string };
 type BookingGuestsCountType = { adults_count: number; children_count: number };
@@ -73,6 +74,11 @@ export const getGuestsCount = (guests: BookingGuestsCountType): string => {
 
 export const BookingsTable = (props: Props) => {
   const { data, isLoading } = props;
+  const dispatch = useAppDispatch();
+  const {
+    isLoading: updateBookingIsLoading,
+    successMessage: updateBookingSuccess,
+  } = useAppSelector((state) => state.bookings.updateBooking);
 
   const [openBookingDetailsModal, setOpenBookingDetailsModal] = useState<{
     booking: BookingType | undefined;
@@ -286,6 +292,16 @@ export const BookingsTable = (props: Props) => {
     );
   };
 
+  const [isUpdateBookingInfo, setIsUpdateBookingInfo] =
+    useState<boolean>(false);
+
+  useEffect(() => {
+    if (updateBookingSuccess) {
+      setOpenEditBookingModal({ booking: undefined, status: false });
+      dispatch(resetUpdateBookingState());
+    }
+  }, [updateBookingSuccess]);
+
   return (
     <>
       <div className={classes.root}>
@@ -436,7 +452,6 @@ export const BookingsTable = (props: Props) => {
           setOpenBookingDetailsModal({ booking: undefined, status: false })
         }
         modalStyle={{ width: "500px" }}
-        actionButtonsVariants="save_cancel"
       />
 
       {openEditBookingModal.booking ? (
@@ -444,15 +459,21 @@ export const BookingsTable = (props: Props) => {
           modalTitle="Редактировать бронирование"
           modalContent={
             <Stack sx={{ alignItems: "stretch" }}>
-              <EditBookingModalContent booking={openEditBookingModal.booking} />
+              <EditBookingModalContent
+                booking={openEditBookingModal.booking}
+                isUpdateBookingInfo={isUpdateBookingInfo}
+                setIsUpdateBookingInfo={setIsUpdateBookingInfo}
+              />
             </Stack>
           }
           open={openEditBookingModal.status}
           setOpen={() =>
             setOpenEditBookingModal({ booking: undefined, status: false })
           }
-          modalStyle={{ width: "500px" }}
-          handleConfirm={() => null}
+          modalStyle={{ width: "550px" }}
+          actionButtonsVariants="save_cancel"
+          handleConfirm={() => setIsUpdateBookingInfo(true)}
+          confirmLoading={updateBookingIsLoading}
         />
       ) : null}
     </>
