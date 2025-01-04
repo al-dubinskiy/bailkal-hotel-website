@@ -107,7 +107,6 @@ router.post("/", async (req, res) => {
       });
     }
   } catch (e) {
-    console.log(e);
     res.status(500).json({
       error: "Create booking: статус 500. Ошибка сервера.",
     });
@@ -117,6 +116,25 @@ router.post("/", async (req, res) => {
 // Update booking
 router.put("/:id", async (req, res) => {
   try {
+    const booking = req.body;
+    const updatedBooking = await Booking.findByIdAndUpdate(
+      req.params.id,
+      {
+        ...booking,
+      },
+      { new: true } // Return the updated document
+    );
+
+    if (!updatedBooking) {
+      return res
+        .status(404)
+        .json({ error: "Update booking: статус 404. Бронированиe не найден." });
+    }
+
+    return res.status(200).json({
+      message: `Update booking: статус 201. Бронирование было успешно обновлено.`,
+      data: updatedBooking,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Update booking: статус 500. Ошибка сервера.",

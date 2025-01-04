@@ -1,0 +1,423 @@
+[33mcommit edbe93dabd47d4f19d91ae5b8efcba905d0f7f63[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32madmin_panel_booking_page[m[33m, [m[1;31morigin/admin_panel_booking_page[m[33m)[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Fri Jan 3 18:00:24 2025 +0300
+
+    Начата разработка модалки для редактирования бронирования - 70%
+
+[33mcommit f244e9adbf7561498e2b978f315e9207a08bcec7[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Fri Jan 3 00:24:58 2025 +0300
+
+    Начата разработка модалки для редактирования бронирования - 40%
+
+[33mcommit 46248ba0d78abf78053b3f351697ae3b1f820af3[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Thu Jan 2 23:04:51 2025 +0300
+
+    Начата разработка модалки для редактирования бронирования.
+
+[33mcommit 99c4349e9b6e5a01872e11caa0d0349d1cd33b08[m
+Merge: e144a39 e79bea3
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Thu Jan 2 17:32:02 2025 +0300
+
+    Merge branch 'booking_page_dev' into admin_panel_booking_page
+
+[33mcommit e79bea39a8af73265e44b8ce478abaa5e8b0fd85[m[33m ([m[1;32mbooking_page_dev[m[33m)[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Thu Jan 2 17:31:45 2025 +0300
+
+    Правки.
+
+[33mcommit cd0c947611a73ce10a568756d8f3dbb30f300717[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Thu Jan 2 17:13:36 2025 +0300
+
+    Небольшие правки.
+
+[33mcommit adb9c7bcf90851a1996102d10524d78b83f6cf2c[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Thu Jan 2 17:05:24 2025 +0300
+
+    Реализована проверка на доступной категории комнаты для бронирования, с учетом количества новых букингов на эту категорию.
+
+[33mcommit 0011b659340f2e669e4dd2dc0f0471d27aa766a6[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Tue Dec 31 00:08:17 2024 +0300
+
+    Правки.
+
+[33mcommit 38837331c1d8565689990b41f906e48fc7865eb1[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Mon Dec 30 18:49:26 2024 +0300
+
+    Реализована логика множественного бронирования.
+
+[33mcommit e144a39fef8ddced7bbbc1651d327dcdd2db4b75[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 29 23:23:25 2024 +0300
+
+    Код-рефакторинг.
+
+[33mcommit b61153de0649036a58ace08f02a42d5f6622872b[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 29 22:34:29 2024 +0300
+
+    Код-рефакторинг.
+
+[33mcommit 6bc8219c8fe0286c7829fc3fb2272221a662bb98[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 29 12:45:51 2024 +0300
+
+    Код-рефакторинг.
+
+[33mcommit 99d9ca6699e2c5284241ce77a9f85c4bfc294619[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Dec 28 22:31:18 2024 +0300
+
+    Доработана логика календаря на выбор даты заезда и выезда. Добавлено уведомление о не возможности бронирования на некоторые даты.
+
+[33mcommit f66f1ad975ec4414980e36890220d92b68407400[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Dec 28 14:16:39 2024 +0300
+
+    Доработана верстка календаря.
+
+[33mcommit e4bb200f097c1d7d20968422c544f8d1fbc942a1[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Dec 28 11:58:32 2024 +0300
+
+    Доработано модального окна с информацией о категории номера.
+
+[33mcommit 19e419ac996cefcc391b0205d51c559116335157[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Fri Dec 27 21:45:47 2024 +0300
+
+    Выполнена верстка модального окна с информацией о категории номера.
+
+[33mcommit 6fbc382b46481a94021aa9fca2a76618ba509d2a[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Fri Dec 27 19:24:42 2024 +0300
+
+    Обновлена логика получения и отображения букингов в админ панеле в разделе "Статус бронирования".
+    Обновлена логика уведомления об успешном добавлении букинга.
+
+[33mcommit 18bef3fa31af0e5f8fc014b4f84ccdfe39c0dabd[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Thu Dec 26 23:27:04 2024 +0300
+
+    Начата разработка страницы "Список букингов" - 70%.
+
+[33mcommit bf8a51283cad4a31ca6d496cb4fa9565224b05d9[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Wed Dec 25 22:44:29 2024 +0300
+
+    Разработан каркас верстки и логики Админ-панели. Начата разработка страницы "Список букингов" - 50%.
+
+[33mcommit cdebafccc3c78e079ae2e87154b0d032abede2a4[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 22 20:00:49 2024 +0300
+
+    Добавлена логика создание нового букинга по API. Правки по модалке на "подтверждение букинга" и разработана модалка на "повторно создать букинг"
+
+[33mcommit ddd5a9afc48d8ade2125ecd878da10ea542b60f5[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Dec 21 23:00:26 2024 +0300
+
+    Доработана логика обработки данных на шаге "Введите данные гостей".
+
+[33mcommit 028448d6929599215bb77ecc09715a8b9e794fa8[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Thu Dec 19 10:52:36 2024 +0300
+
+    Добавлены раскрывающая информация о нескольких бронированиях в виджете.
+
+[33mcommit b5e62a76ce6117bcde50668ccaa3af33d26c610c[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Wed Dec 18 23:02:55 2024 +0300
+
+    Правки по логике бронирования.
+
+[33mcommit e0cb2be443432e9e61321fe738848f7d5239b5ce[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Wed Dec 18 16:42:15 2024 +0300
+
+    Доработана логика одиночного бронирования.
+    Начата верстка модального окна для "подтверждения бронирования".
+
+[33mcommit ce5ecc4150ec0f91937d0bf9b4c4fcf6f8303a8f[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Wed Dec 18 13:40:22 2024 +0300
+
+    Доработана логика "одиночного" бронирования.
+
+[33mcommit 1bc67b50cb8ad63b555c21f992e304d57bb64abd[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Mon Dec 16 23:22:18 2024 +0300
+
+    Верстка шага "Введите данные гостей" - 60%
+
+[33mcommit 966457bcce375cfd861ef0f7cf0989844b3fc26a[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Mon Dec 16 22:08:36 2024 +0300
+
+    Верстка шага "Введите данные гостей" - 40%
+
+[33mcommit 58dce4257fd0ae0857aadf055f6601d1bfc889f7[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 15 23:11:58 2024 +0300
+
+    Правки
+
+[33mcommit f09f1dd812a405497e6af81748634b8a1c3ba430[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 15 23:07:07 2024 +0300
+
+    Разработан компонент "Трансфер в отель" - 100%.
+    Доработана логика выбора "сервисов".
+    Начата верстка шага "Введите данные гостей"
+
+[33mcommit 8c0fb595b85bf6d50de51b7c86108cb707f189d0[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Dec 14 23:44:18 2024 +0300
+
+    Разработан компонент "Трансфер в отель" - 80%
+
+[33mcommit c538960dbc1572318bb283da72d416d7e20b1fd7[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Dec 14 22:02:39 2024 +0300
+
+    Правки
+
+[33mcommit 6f3fb8e72027f01e2cb44d1b62a941f527d02e82[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Dec 14 22:02:29 2024 +0300
+
+    Разработан компонент "сервисы" на шаге "Выберите сервисы".
+    Разработан компонент "Трансфер в отель" - 70%
+
+[33mcommit ad00e2f6205b90ceaa4f7c96d737b60b26c8a3df[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Fri Dec 13 00:12:56 2024 +0300
+
+    Разработана логика отображения "особых пожеланий" для соответствующей выбранной категории комнаты.
+
+[33mcommit 640eb80f194fb5a6e7a434e8fd3aa7ae12f665d8[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Mon Dec 9 23:44:30 2024 +0300
+
+    Разработана карточка с предложением смены типа комнаты в секции "Повысить комфорт".
+
+[33mcommit c6b05128f28794fd763ebe2a40406aa0c00b4ad3[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 8 22:09:57 2024 +0300
+
+    Добавлена модель "Категория тарифов" в БД.
+
+[33mcommit c0b28d1fdc430b4787f32abd9df80249b8da36df[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 8 22:09:11 2024 +0300
+
+    Выполнена верстка виджета "текущее состояние бронирования".
+
+[33mcommit e61b8f61c2fb192baff82cfa9538f9791f74a26d[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 8 15:45:03 2024 +0300
+
+    Разработан компонент
+    "подробные особенности и преимущества комнаты", который показывается в компоненте с полной информацией о номере (на шагах бронирования).
+
+[33mcommit 76949805a86e91f3c9df357dbc0d71cd491802c3[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Fri Dec 6 23:20:41 2024 +0300
+
+    Добавлен PopUp с детализацей цены тарифа. Доработана логика отображения скидок на категориях комнат и тарифах.
+
+[33mcommit dc57fe0bb302c5d78bcc91aebe113b443782f0cb[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Thu Dec 5 23:29:05 2024 +0300
+
+    Начата верстка карточки тарифа.
+
+[33mcommit a85e02ff3c348791622b94ee15f3ca1fb8359a6c[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 1 22:19:34 2024 +0300
+
+    Правки.
+
+[33mcommit 33852a671b1b26cf9d534be1b1469eb65eac8c60[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 1 22:14:40 2024 +0300
+
+    Выполнена верстка карточки с информацией о категории комнаты с выбором особых пожеланий на шаге "Выбора тарифа".
+
+[33mcommit 603ab8e1599a0771f4deeac082e9554e31e64355[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 1 12:46:24 2024 +0300
+
+    Выполнена частичная декомпозиция кода Booking Page. Добавлена логика на смену текущего шага в зависимости от текущего состояния бронирования.
+
+[33mcommit a8f62b2214d7f2af1787567cd9ec1bd5afa4598c[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Dec 1 01:07:50 2024 +0300
+
+    Разработана логика банера, для отображение текущего шага и навигации по след./пред. шагам.
+
+[33mcommit 965d5a03ccb278a484b4736e5a60bc88f3d8dbf8[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Nov 30 18:20:16 2024 +0300
+
+    Выполена верстка карточек номеров отеля для режима "одиночного бронирования".
+    Выполнена верстка банера, для отображение текущего шага и навигации по след./пред. шагам.
+
+[33mcommit c676b5e679e79c8d002da133efe8f85e547d25a4[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Mon Nov 25 18:54:14 2024 +0300
+
+    1. Доработана логика контроллера для генерации шаблонов новых букингов в зависимости от выбранных фильтров на экране Бронирования.
+
+[33mcommit 3af482b303dfe83838db495ec77f3aede5c4b05b[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Nov 24 21:59:54 2024 +0300
+
+    Работа на логикой шагов бронирования.
+
+[33mcommit f49499b98c6ef9fd33505898aa5d9241fb5e67e1[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Nov 24 00:17:57 2024 +0300
+
+    Небольшие правки на проверку доступные категорий номеров дял бронирования.
+
+[33mcommit 6969f6ef95544e710e39851ebc338c3ad2300f66[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Nov 23 23:18:48 2024 +0300
+
+    Начата выполнение верстки для компонента "выбор языка" на странице "Бронирования".
+    Исправлена фильтрация на доступные категории номеров.
+
+[33mcommit 7a48f9f60a1a6a1709888a2c7b3b1ba9200e05ab[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Nov 23 15:46:33 2024 +0300
+
+    Some fixes.
+
+[33mcommit f70d9daa4b4abb3920ff24ca0b090a5e6aa49e75[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Nov 23 15:46:09 2024 +0300
+
+    Выполнена верстка Компонента для выбора количества гостей в Фильтр-баре на экране Бронирования.
+
+[33mcommit 04d1fd6df3a13f3f081d5d3fc71f6195b06e7bf1[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Mon Nov 18 19:28:26 2024 +0300
+
+    1. Фикс логики на определение доступных категорий номеров на даты календаря.
+    2. Верстка календаря для выбора даты "заезда/выезда" на странице Бронирования.
+
+[33mcommit 6354e6c76d8800408ad2f29e9529a4a734f31133[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Fri Nov 15 17:09:04 2024 +0300
+
+    Code refactoring.
+
+[33mcommit 904d3a2ed6687c478f10c15a364b7a428d1dc0d1[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Fri Nov 15 16:29:34 2024 +0300
+
+    1. Разработка логики на определение "доступных дат и минимальной цены для бронирования букинга" в календаре - 100%
+
+[33mcommit d5f7c04bd6226539db3fc8dbc4071a78e6a2656f[m[33m ([m[1;31morigin/basic_page_layout_dev[m[33m, [m[1;32mbasic_page_layout_dev[m[33m)[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Fri Nov 15 14:36:45 2024 +0300
+
+    1. Разработка логики на определение "доступных дат для бронирования букинга" в календаре - 50%
+
+[33mcommit b23d8f5070931a311ceebdc7c77effe1af741ba0[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Wed Nov 13 23:46:27 2024 +0300
+
+    1. Правка хедера.
+    2. Верстка футера - 70%
+
+[33mcommit d11aea0c032bb9a76e8154703a526f68048a943a[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Mon Nov 11 21:38:25 2024 +0300
+
+    1. Выполнена верстка хедера.
+    2. Обновлены свойства темы.
+
+[33mcommit db540f17c392a63f024be264bcde8af2892cff01[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sat Nov 9 22:52:53 2024 +0300
+
+    Developed header layout - 70%
+
+[33mcommit 887dc76da35ad2c7c52abcf97aa4a297040bdb8d[m[33m ([m[1;31morigin/setup_express_js_and_mongodb_config[m[33m, [m[1;32msetup_express_js_and_mongodb_config[m[33m)[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Fri Nov 8 15:41:38 2024 +0300
+
+    Некоторые исправления.
+
+[33mcommit 547f0b4936d1d4524d6901705db8120c6c697090[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Fri Nov 8 15:41:07 2024 +0300
+
+    1. Разработана базовая логика бронирования в компоненте "Booking Page": добавление/удаление бронирования, отображение шагов бронирования (в зависимости от количества бронируемых номеров на одного человека).
+    2. Обновлен типы таблицы для логики "бронирования номера".
+
+[33mcommit 420074b9495c66e1d4c0e9b7f16e70bda0cac81c[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Thu Nov 7 22:26:26 2024 +0300
+
+    1. Добавлены таблицы в БД для логики "бронирование номера" - 100%.
+
+[33mcommit a6cbdbcb4c25e373e8e1d490f6b6b08a5d737c93[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Wed Nov 6 22:21:06 2024 +0300
+
+    1. Добавить таблицы в БД для логики "бронирование номера" - 70%.
+    2. Добавлена иконка для вкладки сайта.
+    3. Обновлены типы обьектов данных в Redux.
+
+[33mcommit 697552ad59265761da9aa1e4a914c7831533cda3[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Tue Nov 5 23:02:44 2024 +0300
+
+    1. Подключено и настроено взаимодействие с MongoDB
+    2. Настроена базовая конфигурация роутов, необходимых для логики бронирования
+    3. Добавлены базовые шаблоны страниц сайта
+    4. Настроена базовая конфигурация роутинга по страницам
+
+[33mcommit 3eb01a5e7ec321b01c6c19cb143c3ca15acb7b21[m[33m ([m[1;31morigin/setup_base_config[m[33m, [m[1;32msetup_base_config[m[33m)[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Mon Nov 4 18:32:48 2024 +0300
+
+    1. Подключен и настроен Redux
+    2. Добавленны Redux-slices на "бронирование номера" и настроены роуты на взаимодействие c соответствующие таблицами в БД посредством API.
+
+[33mcommit db26b217147dc5aeb20e451a9b3273d2c0ae508b[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Mon Nov 4 00:25:38 2024 +0300
+
+    1. Настроена базовая конфигурация и структура проекта.
+    2. Установлены необходимые библиотеки, в т.ч. material-ui.
+    3. Настроена конфигурация темы frontend-проекта на material ui - 70%.
+
+[33mcommit ba5a7d7fd46368223f27f2ae65885296e8ca4878[m
+Merge: a39d4d1 3044cdf
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Nov 3 12:30:55 2024 +0300
+
+    Merge branch 'main' of https://github.com/al-dubinskiy/bailkal-hotel-website
+
+[33mcommit 3044cdf60f126e675d33c0c94ab81c3170338619[m
+Author: Alexander Dubinskiy <71846850+al-dubinskiy@users.noreply.github.com>
+Date:   Sun Nov 3 15:17:20 2024 +0300
+
+    Initial commit
+
+[33mcommit a39d4d1514459b0006774e69e0df4ebc4e5c88ff[m
+Author: Alex Dubinskiy <stud.st.2000@gmail.com>
+Date:   Sun Nov 3 12:28:07 2024 +0300
+
+    Added package.json, app.ts files.
