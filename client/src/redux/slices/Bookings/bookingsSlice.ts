@@ -301,6 +301,19 @@ export const bookingsSlice = createSlice({
         } else {
           state.bookings = bookings;
         }
+
+        toast.success("Новый букинг был успешно создан!", {
+          position: "top-right",
+          autoClose: 3000,
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          progress: undefined,
+          theme: "light",
+          transition: Bounce,
+        });
+
         if (DEBUG) console.log("CreateBooking (API): booking was created.");
       }
     );
