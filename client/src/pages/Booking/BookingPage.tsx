@@ -32,6 +32,7 @@ import { useGetApiData } from "../../hooks/getApiData";
 import { StepContent } from "./components/StepContent";
 import { FiltersBar } from "./components/FiltersBar";
 import { times } from "./components/EnterGuestsDetailsSection/components/constants";
+import { bookingTemplate } from "../../admin_panel/pages/AdminBookingsStatusesPage/components/constants";
 
 // Типы
 export type BookingProgressStepType = {
@@ -312,6 +313,8 @@ export const BookingPage = () => {
               roomCategory: newRoomCategory,
               bookings,
               newBookings: newBookings.bookings,
+              arrivalDate: filterParams.arrivalDate,
+              departureDate: filterParams.departureDate,
             });
 
             if (freeRoomId) {
@@ -386,6 +389,8 @@ export const BookingPage = () => {
             roomCategory,
             bookings,
             newBookings: newBookings.bookings,
+            arrivalDate: filterParams.arrivalDate,
+            departureDate: filterParams.departureDate,
           });
 
           if (freeRoomId) {
@@ -651,19 +656,8 @@ export const BookingPage = () => {
     const { arrivalDate, departureDate } = filterParams;
 
     return {
+      ...bookingTemplate,
       tempId: tempId,
-      room_id: "",
-      room_category_id: "",
-      user: {
-        name: "",
-        lastname: "",
-        surname: "",
-        phone: "",
-        email: "",
-        nationality: "",
-        send_confirm_on_phone: false,
-        want_to_know_about_special_offers_and_news: false,
-      },
       adults_count: adultsCount,
       children_count: childrenCount,
       arrival_datetime: arrivalDate
@@ -674,20 +668,10 @@ export const BookingPage = () => {
         .set("hours", Number(times[8].value.split(":")[0])) // 15:00
         .set("minutes", Number(times[8].value.split(":")[1]))
         .format(dateTimeFormat),
-      tariff_id: "",
-      service_id: [],
-      bed_type_id: "",
-      view_from_window_id: "",
-      payment_method_id: "",
-      transfer_id: "",
-      transfer_comment: "",
-      price: 0,
       roomPrice: 0,
       tariffPrice: 0,
       servicePriceTotal: 0,
       transferPrice: 0,
-      comment: "",
-      booking_for_whom: "for_yourself",
       isRoomCategoryWasChanged: false,
     };
   };

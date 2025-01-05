@@ -37,12 +37,10 @@ const schema = new Schema({
     ref: "PaymentMethod",
   },
   bed_type_id: {
-    type: Schema.Types.ObjectId,
-    ref: "RoomBedType",
+    type: String,
   },
   view_from_window_id: {
-    type: Schema.Types.ObjectId,
-    ref: "RoomViewFromWindow",
+    type: String,
   },
   payment_method_id: {
     type: Schema.Types.ObjectId,
@@ -50,8 +48,7 @@ const schema = new Schema({
     ref: "Transfer",
   },
   transfer_id: {
-    type: Schema.Types.ObjectId,
-    ref: "Transfer",
+    type: String,
   },
   transfer_comment: { type: String },
   price: { type: Number, required: true },

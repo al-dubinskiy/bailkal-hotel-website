@@ -10,10 +10,14 @@ interface Props {
   label: string;
   checked: boolean;
   handleChange: (checked: boolean) => void;
+  id: string;
+  name: string;
 }
 
 export const CustomLabelCheckbox = (props: Props) => {
   const {
+    id,
+    name,
     required = false,
     disabled = false,
     defaultChecked = false,
@@ -26,6 +30,8 @@ export const CustomLabelCheckbox = (props: Props) => {
       required={required}
       control={
         <Checkbox
+          id={id}
+          name={name}
           // defaultChecked={defaultChecked}
           sx={{
             color: theme.palette.gray.extraLight,

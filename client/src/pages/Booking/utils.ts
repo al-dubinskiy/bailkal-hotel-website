@@ -58,18 +58,19 @@ export const getBookingServicesInfo = ({
   return services;
 };
 
+// Проверка, полностью ли диапазон 2 находится в диапазоне 1
 export function isDateTimeRangeContained({
   start1,
   end1,
   start2,
   end2,
 }: {
-  start1: Moment;
-  end1: Moment;
-  start2: Moment;
-  end2: Moment;
+  start1: Moment; // ex. 2025-01-01
+  end1: Moment; // ex. 2025-01-10
+  start2: Moment; // ex. 2025-01-03
+  end2: Moment; // ex. 2025-01-08
 }) {
-  return start1.isSameOrBefore(start2) && end1.isSameOrAfter(end2);
+  return start2.isSameOrAfter(start1) && end2.isSameOrBefore(end1);
 }
 
 export const getRoomCategoryPhotos = (roomCategory: RoomCategoryType) => {
@@ -143,27 +144,96 @@ export const getFreeRoomId = ({
   roomCategory,
   bookings,
   newBookings,
+  arrivalDate,
+  departureDate,
 }: {
   roomCategory: RoomCategoryType;
   bookings: BookingType[];
-  newBookings: CreateBookingLocalType[];
+  newBookings?: CreateBookingLocalType[];
+  arrivalDate: Moment;
+  departureDate: Moment;
 }) => {
-  // Получить id всех комнат, которые забронированы на данную категорию
-  const newBookedRoomsOnCategory = Array.from(
-    newBookings.filter((i) => i.room_category_id === roomCategory._id),
-    (i) => i.room_id
+  // Получить все комнат, которые сейчас бронируются на данную категорию
+  const newBookedRoomsOnCategory = newBookings
+    ? newBookings.filter((i) => i.room_category_id === roomCategory._id)
+    : [];
+
+  // Поиск ранее забронированных комнаты на данную категорию
+  const prevBookedRoomOnCategory = bookings.filter(
+    (i) => i.room_category_id === roomCategory._id
   );
-  // Поиск id ранее забронированных на данную категорию
-  const prevBookedRoomOnCategory = bookings
-    .filter((i) => i.room_category_id === roomCategory._id)
-    .map((i) => i.room_id);
+
+  const newAndOldBookings = [
+    ...newBookedRoomsOnCategory,
+    ...prevBookedRoomOnCategory,
+  ];
+
   // Найти id доступной комнаты для бронирования
-  const freeRoomId = roomCategory.room_id.find(
-    (i) =>
-      !newBookedRoomsOnCategory.includes(i) &&
-      !prevBookedRoomOnCategory.includes(i)
-  );
+  const freeRoomId = roomCategory.room_id.find((roomId) => {
+    const bookingsOnRoomId = newAndOldBookings.filter(
+      (booking) => booking.room_id === roomId
+    );
+    // Считаем количество бронирований на данную комнату и на выбранную дату заезда/выезда
+    // если количество != rooms total on category, то вывод, что можно бронировать на эту комнату
+    return (
+      bookingsOnRoomId.filter((booking) =>
+        isDateTimeRangeContained({
+          start1: moment(arrivalDate.format(dateFormat)),
+          end1: moment(departureDate.format(dateFormat)),
+          start2: moment(moment(booking.arrival_datetime).format(dateFormat)),
+          end2: moment(moment(booking.departure_datetime).format(dateFormat)),
+        })
+      ).length !== roomCategory.room_id.length
+    );
+  });
   return freeRoomId;
+};
+
+export const checkIsRoomIdFree = ({
+  roomId,
+  roomCategory,
+  bookings,
+  newBookings,
+  arrivalDate,
+  departureDate,
+}: {
+  roomId: string;
+  roomCategory: RoomCategoryType;
+  bookings: BookingType[];
+  newBookings?: CreateBookingLocalType[];
+  arrivalDate: Moment;
+  departureDate: Moment;
+}): boolean => {
+  // Получить все комнат, которые сейчас бронируются на данную категорию
+  const newBookedRoomsOnCategory = newBookings
+    ? newBookings.filter((i) => i.room_category_id === roomCategory._id)
+    : [];
+
+  // Поиск ранее забронированных комнаты на данную категорию
+  const prevBookedRoomOnCategory = bookings.filter(
+    (i) => i.room_category_id === roomCategory._id
+  );
+
+  const newAndOldBookings = [
+    ...newBookedRoomsOnCategory,
+    ...prevBookedRoomOnCategory,
+  ];
+
+  const bookingsOnRoomId = newAndOldBookings.filter(
+    (booking) => booking.room_id === roomId
+  );
+
+  // Если номер ранее уже был забронирован на выбранную дату
+  return bookingsOnRoomId.find((booking) =>
+    isDateTimeRangeContained({
+      start1: moment(arrivalDate.format(dateFormat)),
+      end1: moment(departureDate.format(dateFormat)),
+      start2: moment(moment(booking.arrival_datetime).format(dateFormat)),
+      end2: moment(moment(booking.departure_datetime).format(dateFormat)),
+    })
+  )
+    ? false
+    : true;
 };
 
 // --- For range date picker ---
@@ -253,10 +323,10 @@ export const getCategoriesAvailableRoomsCount = ({
           // (а значит на эту дату можно забронировать меньше комнат или вообще ни одной)
           if (
             isDateTimeRangeContained({
-              start1: moment(moment(i.arrival_datetime).format(dateFormat)),
-              end1: moment(moment(i.departure_datetime).format(dateFormat)),
-              start2: moment(arrivalDate.format(dateFormat)),
-              end2: moment(departureDate.format(dateFormat)),
+              start1: moment(arrivalDate.format(dateFormat)),
+              end1: moment(departureDate.format(dateFormat)),
+              start2: moment(moment(i.arrival_datetime).format(dateFormat)),
+              end2: moment(moment(i.departure_datetime).format(dateFormat)),
             })
           ) {
             bookedOnDateCount += 1;
@@ -264,8 +334,6 @@ export const getCategoriesAvailableRoomsCount = ({
         });
 
         // Подсчет новых букингов с "датой заезда/выезда", которая входит в диапазон дат ранее забронированных
-
-        // console.log(categoryRoom.title, bookedOnDateCount, categoryRoomCount);
         // Записываем количество забронированных комнат в данной "категории комнаты"
         categoriesAvailableRoomsCount.push({
           id: categoryRoom._id,

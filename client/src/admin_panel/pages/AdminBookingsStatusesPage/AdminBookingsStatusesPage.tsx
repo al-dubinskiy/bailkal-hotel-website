@@ -19,6 +19,7 @@ import {
   CategoryRoomsBookingStatusType,
 } from "./components/BookingsTable";
 import { useGetApiData } from "../../../hooks/getApiData";
+import { CustomButton } from "../../../pages/components/shared/CustomButton";
 
 type DataListType = {
   roomCategory: RoomCategoryType;
@@ -64,37 +65,37 @@ export const AdminBookingsStatusesPage = (props: Props) => {
         const bookings = bookingsByRoomCategories.find(
           (booking) => booking[0] === roomCategory._id
         ); // find bookings on room category
+        const roomsList: CategoryRoomsBookingStatusType[] = [];
 
-        return {
-          roomCategory,
-          categoryRoomsBookingStatuses: roomCategory.room_id.map((roomId) => {
-            const bookingsOnRoom = bookings
-              ? bookings[1].filter((booking) => booking.room_id === roomId)
-              : null; // поиск букинга на этот номер
-            console.log("aaa", bookingsOnRoom);
+        roomCategory.room_id.map((roomId) => {
+          const bookingsOnRoom = bookings
+            ? bookings[1].filter((booking) => booking.room_id === roomId)
+            : null; // поиск букинга на этот номер
 
-            if (bookingsOnRoom) {
-              bookingsOnRoom.map((booking) => {
-                return {
-                  id: roomId,
-                  isBooked: true,
-                  roomNumber:
-                    rooms.find((room) => room._id === roomId)?.number || -1,
-                  booking,
-                  bookingDate: {
-                    arrival_datetime: booking.arrival_datetime,
-                    departure_datetime: booking.departure_datetime,
-                  },
-                  bookingGuests: {
-                    adults_count: booking.adults_count,
-                    children_count: booking.children_count,
-                  },
-                  bookingUser: booking.user,
-                };
+          if (bookingsOnRoom && bookingsOnRoom.length) {
+            bookingsOnRoom.map((booking) => {
+              roomsList.push({
+                id: roomsList.length + 1,
+                roomId,
+                isBooked: true,
+                roomNumber:
+                  rooms.find((room) => room._id === roomId)?.number || -1,
+                booking,
+                bookingDate: {
+                  arrival_datetime: booking.arrival_datetime,
+                  departure_datetime: booking.departure_datetime,
+                },
+                bookingGuests: {
+                  adults_count: booking.adults_count,
+                  children_count: booking.children_count,
+                },
+                bookingUser: booking.user,
               });
-            }
-            return {
-              id: roomId,
+            });
+          } else {
+            roomsList.push({
+              id: roomsList.length + 1,
+              roomId,
               isBooked: false, // если есть букинг на эту комнату
               roomNumber:
                 rooms.find((room) => room._id === roomId)?.number || -1,
@@ -102,8 +103,13 @@ export const AdminBookingsStatusesPage = (props: Props) => {
               bookingDate: undefined,
               bookingGuests: undefined,
               bookingUser: undefined,
-            };
-          }),
+            });
+          }
+        });
+
+        return {
+          roomCategory,
+          categoryRoomsBookingStatuses: roomsList,
         };
       });
     }
@@ -180,15 +186,24 @@ export const AdminBookingsStatusesPage = (props: Props) => {
                     background: theme.palette.primary.extraLight,
                   }}
                 >
-                  <Typography
-                    variant="label"
-                    sx={{ alignSelf: "flex-start" }}
-                  >{`Номера (${
-                    item.categoryRoomsBookingStatuses.filter((i) => i.isBooked)
-                      .length
-                  } из ${item.roomCategory.room_id.length})`}</Typography>
+                  <Stack
+                    sx={{
+                      flexDirection: "row",
+                      alignItems: "center",
+                      gap: "24px",
+                    }}
+                  >
+                    <Typography variant="label">{`Количество номеров: ${item.roomCategory.room_id.length}`}</Typography>
+
+                    <Typography variant="label">{`Количество бронирований: ${
+                      item.categoryRoomsBookingStatuses.filter(
+                        (i) => i.isBooked
+                      ).length
+                    }`}</Typography>
+                  </Stack>
 
                   <BookingsTable
+                    roomCategory={item.roomCategory}
                     data={item.categoryRoomsBookingStatuses}
                     isLoading={false}
                   />

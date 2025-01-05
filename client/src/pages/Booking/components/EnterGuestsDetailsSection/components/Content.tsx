@@ -160,7 +160,6 @@ export const Content = (props: Props) => {
       nationality,
       paymentMethodId,
     } = formValues;
-
     // Если все поля заполнены
     if (
       Object.values({

@@ -130,10 +130,15 @@ export const UserDataForm = (props: Props) => {
               name="nationality"
               inputLabel="Гражданство"
               data={countries}
-              value={[
-                countries.find((i) => i.value === formik.values.nationality)
-                  ?.value || countries[0].value,
-              ]}
+              value={
+                formik.values.nationality
+                  ? [
+                      countries.find(
+                        (i) => i.value === formik.values.nationality
+                      )?.value || countries[0].value,
+                    ]
+                  : []
+              }
               setValue={(val) => formik.setFieldValue("nationality", val)}
               labelPosition={"left"}
               containerStyles={{ flex: 0.5 }}
@@ -149,6 +154,8 @@ export const UserDataForm = (props: Props) => {
 
           <FormGroup sx={{ display: "flex", flexDirection: "column" }}>
             <CustomLabelCheckbox
+              id="sendConfirmOnPhone"
+              name="sendConfirmOnPhone"
               label="Пришлите мне подтверждение на телефон"
               checked={formik.values.sendConfirmOnPhone}
               handleChange={(val) =>
@@ -157,6 +164,8 @@ export const UserDataForm = (props: Props) => {
               defaultChecked
             />
             <CustomLabelCheckbox
+              id="wantToKnowAboutSpecialOffersAndNews"
+              name="wantToKnowAboutSpecialOffersAndNews"
               label="Я хочу узнавать о специальных предложениях и новостях"
               checked={formik.values.wantToKnowAboutSpecialOffersAndNews}
               handleChange={(val) =>

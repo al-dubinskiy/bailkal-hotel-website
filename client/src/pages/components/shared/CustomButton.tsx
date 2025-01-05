@@ -64,6 +64,7 @@ export const CustomButton = (props: Props) => {
       }}
       onClick={!loading ? onClick : undefined}
       disabled={disabled}
+      type={"submit"}
     >
       {loading ? (
         <CircularProgress

@@ -4,7 +4,7 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select, { SelectChangeEvent } from "@mui/material/Select";
-import { Checkbox, SxProps, Typography } from "@mui/material";
+import { Checkbox, Stack, SxProps, Typography } from "@mui/material";
 import { theme } from "../../../../theme";
 
 export type SelectItemType = {
@@ -12,13 +12,20 @@ export type SelectItemType = {
   label: string;
   value: string;
   icon?: React.ReactNode;
+  disabled?: boolean;
+};
+
+export const notSelectedValue: SelectItemType = {
+  id: "",
+  label: "Не выбрано",
+  value: "",
 };
 
 interface Props {
   id?: string;
   name?: string;
   inputLabel?: string;
-  value: string[];
+  value: string[] | any;
   setValue: (val: string[] | string) => void;
   data: SelectItemType[];
   disabledItems?: SelectItemType[];
@@ -97,116 +104,124 @@ export const CustomSelect = (props: Props) => {
           </Typography>
         ) : null}
         {/* <InputLabel id={`${id}-label`}>{inputLabel}</InputLabel> */}
-        <Select
-          // labelId={`${id}-label`}
-          id={id}
-          value={selectedValues}
-          // label={selectLabel}
-          name={name}
-          placeholder="Выберите значение"
-          onChange={handleChange}
-          sx={{
-            "&.MuiOutlinedInput-root": {
-              // height: "57px",
-              flex: 1,
-              borderRadius: "8px",
-              backgroundColor: theme.palette.layoutBackground.light,
+        <Stack sx={{ gap: "5px", flex: 1 }}>
+          <Select
+            // labelId={`${id}-label`}
+            id={id}
+            value={selectedValues}
+            // label={selectLabel}
+            name={name}
+            placeholder="Выберите значение"
+            onChange={handleChange}
+            sx={{
+              "&.MuiOutlinedInput-root": {
+                // height: "57px",
+                flex: 1,
+                borderRadius: "8px",
+                backgroundColor: theme.palette.layoutBackground.light,
 
-              "&.Mui-focused": {
-                "& .MuiOutlinedInput-notchedOutline": {
-                  borderWidth: 1,
-                  borderColor: theme.palette.primary.dark,
-                },
-
-                "&.Mui-error": {
+                "&.Mui-focused": {
                   "& .MuiOutlinedInput-notchedOutline": {
                     borderWidth: 1,
-                    borderColor: theme.palette.error.main,
+                    borderColor: theme.palette.primary.dark,
+                  },
+
+                  "&.Mui-error": {
+                    "& .MuiOutlinedInput-notchedOutline": {
+                      borderWidth: 1,
+                      borderColor: theme.palette.error.main,
+                    },
                   },
                 },
               },
-            },
 
-            "& .MuiFormHelperText-root": {
-              font: theme.typography.small,
-              color: theme.palette.error.main,
-            },
+              "& .MuiFormHelperText-root": {
+                font: theme.typography.small,
+                color: theme.palette.error.main,
+              },
 
-            "& .MuiOutlinedInput-notchedOutline": {
-              borderRadius: "8px",
-              borderWidth: 1,
-              borderColor: theme.palette.gray.extraLight,
-            },
+              "& .MuiOutlinedInput-notchedOutline": {
+                borderRadius: "8px",
+                borderWidth: 1,
+                borderColor: theme.palette.gray.extraLight,
+              },
 
-            "& .MuiTypography-root": {
-              whiteSpace: "normal",
-            },
-            ...customSelectStyle,
-          }}
-          onBlur={onBlur}
-          error={error}
-          multiple={multiple}
-          renderValue={renderValue}
-          displayEmpty
-        >
-          {items.map((item) => {
-            const isCheckedDefault = disabledItems?.find(
-              (i) => i.value === item.value
-            )
-              ? true
-              : false || false;
-            return (
-              <MenuItem
-                key={item.id}
-                value={item.value}
-                sx={{
-                  display: "flex",
-                  flexDirection: "row",
-                  alignItems: "center",
-                  gap: "10px",
-                  "&.Mui-selected": {
-                    backgroundColor: theme.palette.primary.main,
-                    "&:hover": {
+              "& .MuiTypography-root": {
+                whiteSpace: "normal",
+              },
+              ...customSelectStyle,
+            }}
+            onBlur={onBlur}
+            error={error}
+            multiple={multiple}
+            renderValue={renderValue}
+            displayEmpty
+          >
+            {items.map((item) => {
+              const isCheckedDefault = disabledItems?.find(
+                (i) => i.value === item.value
+              )
+                ? true
+                : false || false;
+              return (
+                <MenuItem
+                  key={item.id}
+                  value={item.value}
+                  sx={{
+                    display: "flex",
+                    flexDirection: "row",
+                    alignItems: "center",
+                    gap: "10px",
+                    "&.Mui-selected": {
                       backgroundColor: theme.palette.primary.main,
-                      opacity: !multiple ? 1 : 0.7,
-                    },
-                  },
-
-                  "&.Mui-disabled": {
-                    opacity: 0.6,
-                  },
-                }}
-                disabled={isCheckedDefault}
-              >
-                {multiple ? (
-                  <Checkbox
-                    sx={{
-                      padding: 0,
-                      color: theme.palette.gray.extraLight,
-                      "&.MuiCheckbox-root": {},
-                      "&.Mui-checked": {
-                        color: theme.palette.primary.dark,
+                      "&:hover": {
+                        backgroundColor: theme.palette.primary.main,
+                        opacity: !multiple ? 1 : 0.7,
                       },
-                      "& .MuiSvgIcon-root": { fontSize: "24px" },
-                    }}
-                    inputProps={{ "aria-label": "label-controlled-checkbox" }}
-                    checked={
-                      isCheckedDefault ||
-                      selectedValues.find((i) => i === item.value)
-                        ? true
-                        : false
-                    }
-                  />
-                ) : null}
-                <Typography variant="label">{item.label}</Typography>
-              </MenuItem>
-            );
-          })}
-        </Select>
+                    },
 
-        {helperText ? (
-          <Typography variant="label">{helperText}</Typography>
-        ) : null}
+                    "&.Mui-disabled": {
+                      opacity: 0.6,
+                    },
+                  }}
+                  disabled={isCheckedDefault || item.disabled === true}
+                >
+                  {multiple ? (
+                    <Checkbox
+                      sx={{
+                        padding: 0,
+                        color: theme.palette.gray.extraLight,
+                        "&.MuiCheckbox-root": {},
+                        "&.Mui-checked": {
+                          color: theme.palette.primary.dark,
+                        },
+                        "& .MuiSvgIcon-root": { fontSize: "24px" },
+                      }}
+                      inputProps={{ "aria-label": "label-controlled-checkbox" }}
+                      checked={
+                        isCheckedDefault ||
+                        (Array.isArray(selectedValues) &&
+                          selectedValues.find((i: any) => i === item.value))
+                          ? true
+                          : false
+                      }
+                    />
+                  ) : null}
+                  <Typography variant="label">{item.label}</Typography>
+                </MenuItem>
+              );
+            })}
+          </Select>
+
+          {helperText ? (
+            <Typography
+              variant="small"
+              sx={{ color: theme.palette.error.main }}
+            >
+              {helperText}
+            </Typography>
+          ) : null}
+        </Stack>
       </FormControl>
     </Box>
   );

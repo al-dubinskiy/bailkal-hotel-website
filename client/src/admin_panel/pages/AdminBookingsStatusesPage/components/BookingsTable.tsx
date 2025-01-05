@@ -1,45 +1,34 @@
-import React, {
-  MouseEventHandler,
-  useCallback,
-  useEffect,
-  useState,
-} from "react";
+import React, { useEffect, useState } from "react";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import { Box, Stack, Theme, Typography, useTheme } from "@mui/material";
 import { makeStyles } from "@mui/styles";
 import moment from "moment";
-import { Bounce, ToastContainer, toast } from "react-toastify";
 import ExpandLessIcon from "@mui/icons-material/ExpandLess";
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore";
 import {
   BookingType,
   BookingUserInfoType,
 } from "../../../../redux/slices/Bookings/types";
-import { RoomType } from "../../../../redux/slices/Rooms/types";
-import { Close, Edit, OpenInNew } from "@mui/icons-material";
+import { Add, Close, Edit, OpenInNew } from "@mui/icons-material";
 import { dateTimeFormat } from "../../../../constants";
 import { CustomModal } from "../../../../pages/components/shared/CustomModal/CustomModal";
-import { RoomCategoryType } from "../../../../redux/slices/RoomsCategories/types";
-import { CustomLabelAndDescription } from "../../../../pages/components/shared/CustomLabelAndDescription";
-import { getBookingServicesInfo } from "../../../../pages/Booking/utils";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
-import { BookingTariffType } from "../../../../redux/slices/BookingTariffs/types";
-import { BookingServiceType } from "../../../../redux/slices/BookingServices/types";
-import { RoomBedVariantType } from "../../../../redux/slices/RoomBedVariants/types";
-import { ViewFromRoomWindowType } from "../../../../redux/slices/ViewsFromRoomWindow/types";
-import { TransferVariantType } from "../../../../redux/slices/TransferVariants/types";
-import { TransferCarType } from "../../../../redux/slices/TransferCars/types";
-import { PaymentMethodType } from "../../../../redux/slices/PaymentMethods/types";
-import { EditBookingModalContent } from "./EditBookingModalContent";
+import { CreateOrEditBookingModalContent } from "./CreateOrEditBookingModalContent";
 import { BookingDetailsModalContent } from "./BookingDetailsModalContent";
-import { resetUpdateBookingState } from "../../../../redux/slices/Bookings/bookingsSlice";
-import { CheckboxIcon } from "../../../../assets/icons/CheckboxIcon";
+import {
+  resetCreateBookingState,
+  resetUpdateBookingState,
+} from "../../../../redux/slices/Bookings/bookingsSlice";
+import { bookingTemplate } from "./constants";
+import { CustomButton } from "../../../../pages/components/shared/CustomButton";
+import { RoomCategoryType } from "../../../../redux/slices/RoomsCategories/types";
 
 type BookingDateType = { arrival_datetime: string; departure_datetime: string };
 type BookingGuestsCountType = { adults_count: number; children_count: number };
 
 export type CategoryRoomsBookingStatusType = {
-  id: string;
+  id: number;
+  roomId: string;
   isBooked: boolean;
   roomNumber: number;
   bookingUser: BookingUserInfoType | undefined;
@@ -48,6 +37,7 @@ export type CategoryRoomsBookingStatusType = {
 } & { booking: BookingType | undefined };
 
 interface Props {
+  roomCategory: RoomCategoryType;
   data: CategoryRoomsBookingStatusType[];
   isLoading: boolean;
 }
@@ -73,19 +63,28 @@ export const getGuestsCount = (guests: BookingGuestsCountType): string => {
 };
 
 export const BookingsTable = (props: Props) => {
-  const { data, isLoading } = props;
+  const { roomCategory, data, isLoading } = props;
   const dispatch = useAppDispatch();
   const {
     isLoading: updateBookingIsLoading,
     successMessage: updateBookingSuccess,
   } = useAppSelector((state) => state.bookings.updateBooking);
+  const {
+    isLoading: createBookingIsLoading,
+    successMessage: createBookingSuccess,
+  } = useAppSelector((state) => state.bookings.createBooking);
 
   const [openBookingDetailsModal, setOpenBookingDetailsModal] = useState<{
     booking: BookingType | undefined;
     status: boolean;
   }>({ booking: undefined, status: false });
 
-  const [openEditBookingModal, setOpenEditBookingModal] = useState<{
+  const [openUpdateBookingModal, setOpenUpdateBookingModal] = useState<{
+    booking: BookingType | undefined;
+    status: boolean;
+  }>({ booking: undefined, status: false });
+
+  const [openCreateBookingModal, setOpenCreateBookingModal] = useState<{
     booking: BookingType | undefined;
     status: boolean;
   }>({ booking: undefined, status: false });
@@ -197,52 +196,74 @@ export const BookingsTable = (props: Props) => {
       width: 150,
       cellClassName: "actions",
       getActions: ({ row }: { row: CategoryRoomsBookingStatusType }) => {
-        return [
-          <GridActionsCellItem
-            icon={
-              <Edit
-                htmlColor={theme.palette.text.primary}
-                sx={{ fontSize: "16px" }}
-              />
-            }
-            label=""
-            onClick={() =>
-              setOpenEditBookingModal({
-                booking: row.booking,
-                status: true,
-              })
-            }
-            className={classes.openDetailsActionButton}
-          />,
+        return row.booking
+          ? [
+              <GridActionsCellItem
+                icon={
+                  <Edit
+                    htmlColor={theme.palette.text.primary}
+                    sx={{ fontSize: "16px" }}
+                  />
+                }
+                label=""
+                onClick={() =>
+                  setOpenUpdateBookingModal({
+                    booking: row.booking,
+                    status: true,
+                  })
+                }
+                className={classes.openDetailsActionButton}
+              />,
 
-          <GridActionsCellItem
-            icon={
-              <Close
-                htmlColor={theme.palette.text.primary}
-                sx={{ fontSize: "16px" }}
-              />
-            }
-            label=""
-            onClick={() => null}
-            className={classes.openDetailsActionButton}
-          />,
-          <GridActionsCellItem
-            icon={
-              <OpenInNew
-                htmlColor={theme.palette.text.primary}
-                sx={{ fontSize: "16px" }}
-              />
-            }
-            label=""
-            onClick={() =>
-              setOpenBookingDetailsModal({
-                booking: row.booking,
-                status: true,
-              })
-            }
-            className={classes.openDetailsActionButton}
-          />,
-        ];
+              <GridActionsCellItem
+                icon={
+                  <Close
+                    htmlColor={theme.palette.text.primary}
+                    sx={{ fontSize: "16px" }}
+                  />
+                }
+                label=""
+                onClick={() => null}
+                className={classes.openDetailsActionButton}
+              />,
+              <GridActionsCellItem
+                icon={
+                  <OpenInNew
+                    htmlColor={theme.palette.text.primary}
+                    sx={{ fontSize: "16px" }}
+                  />
+                }
+                label=""
+                onClick={() =>
+                  setOpenCreateBookingModal({
+                    booking: row.booking,
+                    status: true,
+                  })
+                }
+                className={classes.openDetailsActionButton}
+              />,
+            ]
+          : [
+              <GridActionsCellItem
+                icon={
+                  <Add
+                    htmlColor={theme.palette.text.primary}
+                    sx={{ fontSize: "16px" }}
+                  />
+                }
+                label=""
+                onClick={() =>
+                  setOpenCreateBookingModal({
+                    booking: {
+                      ...bookingTemplate,
+                      room_category_id: roomCategory._id,
+                    },
+                    status: true,
+                  })
+                }
+                className={classes.openDetailsActionButton}
+              />,
+            ];
       },
     },
   ];
@@ -292,15 +313,23 @@ export const BookingsTable = (props: Props) => {
     );
   };
 
-  const [isUpdateBookingInfo, setIsUpdateBookingInfo] =
+  const [isUpdateBooking, setIsUpdateBooking] = useState<boolean>(false);
+  const [isCreateBookingInfo, setIsCreateBookingInfo] =
     useState<boolean>(false);
 
   useEffect(() => {
     if (updateBookingSuccess) {
-      setOpenEditBookingModal({ booking: undefined, status: false });
+      setOpenUpdateBookingModal({ booking: undefined, status: false });
       dispatch(resetUpdateBookingState());
     }
   }, [updateBookingSuccess]);
+
+  useEffect(() => {
+    if (createBookingSuccess) {
+      setOpenCreateBookingModal({ booking: undefined, status: false });
+      dispatch(resetCreateBookingState());
+    }
+  }, [createBookingSuccess]);
 
   return (
     <>
@@ -361,12 +390,15 @@ export const BookingsTable = (props: Props) => {
               background: "#fff !important",
               borderRadius: "16px",
               marginBottom: "10px",
+              paddingRight: "10px",
               padding: "10px 0",
               border: "1px solid #E5EEFF",
-              // width: 'calc(100% - 2px)',
 
               "& .MuiDataGrid-actionsCell": {
-                marginRight: "10px",
+                display: "flex",
+                flexDirection: "row",
+                justifyContent: "flex-end",
+                width: "100%",
               },
 
               "&.Mui-hovered, &.Mui-selected, &:hover, &:focus, &.Mui-selected.Mui-hovered":
@@ -438,6 +470,20 @@ export const BookingsTable = (props: Props) => {
         />
       </div>
 
+      <CustomButton
+        label={"Добавить бронирование"}
+        onClick={() =>
+          setOpenCreateBookingModal({
+            booking: { ...bookingTemplate, room_category_id: roomCategory._id },
+            status: true,
+          })
+        }
+        containerVariant={"outlined"}
+        containerBackgroundColor={"buttonDark"}
+        containerStyle={{ alignSelf: "center", padding: "0 40px" }}
+        withoutAnimation
+      />
+
       <CustomModal
         modalTitle="Информация о бронировании"
         modalContent={
@@ -454,26 +500,54 @@ export const BookingsTable = (props: Props) => {
         modalStyle={{ width: "500px" }}
       />
 
-      {openEditBookingModal.booking ? (
+      {openUpdateBookingModal.booking ? (
         <CustomModal
           modalTitle="Редактировать бронирование"
           modalContent={
             <Stack sx={{ alignItems: "stretch" }}>
-              <EditBookingModalContent
-                booking={openEditBookingModal.booking}
-                isUpdateBookingInfo={isUpdateBookingInfo}
-                setIsUpdateBookingInfo={setIsUpdateBookingInfo}
+              <CreateOrEditBookingModalContent
+                booking={openUpdateBookingModal.booking}
+                isUpdateBooking={isUpdateBooking}
+                setIsUpdateBooking={setIsUpdateBooking}
+                mode={"edit"}
               />
             </Stack>
           }
-          open={openEditBookingModal.status}
+          open={openUpdateBookingModal.status}
           setOpen={() =>
-            setOpenEditBookingModal({ booking: undefined, status: false })
+            setOpenUpdateBookingModal({ booking: undefined, status: false })
           }
           modalStyle={{ width: "550px" }}
           actionButtonsVariants="save_cancel"
-          handleConfirm={() => setIsUpdateBookingInfo(true)}
+          handleConfirm={() => setIsUpdateBooking(true)}
           confirmLoading={updateBookingIsLoading}
+        />
+      ) : null}
+
+      {openCreateBookingModal.booking ? (
+        <CustomModal
+          modalTitle="Создать бронирование"
+          modalContent={
+            <Stack sx={{ alignItems: "stretch" }}>
+              <CreateOrEditBookingModalContent
+                booking={openCreateBookingModal.booking}
+                isCreateBooking={isCreateBookingInfo}
+                setIsCreateBooking={setIsCreateBookingInfo}
+                mode={"create"}
+              />
+            </Stack>
+          }
+          open={openCreateBookingModal.status}
+          setOpen={() =>
+            setOpenCreateBookingModal({
+              booking: undefined,
+              status: false,
+            })
+          }
+          modalStyle={{ width: "550px" }}
+          actionButtonsVariants="save_cancel"
+          handleConfirm={() => setIsCreateBookingInfo(true)}
+          confirmLoading={createBookingIsLoading}
         />
       ) : null}
     </>
