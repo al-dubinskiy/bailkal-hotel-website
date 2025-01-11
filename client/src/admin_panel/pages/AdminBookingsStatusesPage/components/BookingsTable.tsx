@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { memo, useContext, useEffect, useState } from "react";
 import { DataGrid, GridActionsCellItem, GridColDef } from "@mui/x-data-grid";
 import { Box, Stack, Theme, Typography, useTheme } from "@mui/material";
 import { makeStyles } from "@mui/styles";
@@ -11,17 +11,11 @@ import {
 } from "../../../../redux/slices/Bookings/types";
 import { Add, Close, Edit, OpenInNew } from "@mui/icons-material";
 import { dateTimeFormat } from "../../../../constants";
-import { CustomModal } from "../../../../pages/components/shared/CustomModal/CustomModal";
-import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
-import { CreateOrEditBookingModalContent } from "./CreateOrEditBookingModalContent";
-import { BookingDetailsModalContent } from "./BookingDetailsModalContent";
-import {
-  resetCreateBookingState,
-  resetUpdateBookingState,
-} from "../../../../redux/slices/Bookings/bookingsSlice";
+import { useAppDispatch } from "../../../../hooks/redux";
 import { bookingTemplate } from "./constants";
 import { CustomButton } from "../../../../pages/components/shared/CustomButton";
 import { RoomCategoryType } from "../../../../redux/slices/RoomsCategories/types";
+import { AdminBookingsStatusesContext } from "../AdminBookingsStatusesPage";
 
 type BookingDateType = { arrival_datetime: string; departure_datetime: string };
 type BookingGuestsCountType = { adults_count: number; children_count: number };
@@ -66,29 +60,11 @@ export const BookingsTable = (props: Props) => {
   const { roomCategory, data, isLoading } = props;
   const dispatch = useAppDispatch();
   const {
-    isLoading: updateBookingIsLoading,
-    successMessage: updateBookingSuccess,
-  } = useAppSelector((state) => state.bookings.updateBooking);
-  const {
-    isLoading: createBookingIsLoading,
-    successMessage: createBookingSuccess,
-  } = useAppSelector((state) => state.bookings.createBooking);
-
-  const [openBookingDetailsModal, setOpenBookingDetailsModal] = useState<{
-    booking: BookingType | undefined;
-    status: boolean;
-  }>({ booking: undefined, status: false });
-
-  const [openUpdateBookingModal, setOpenUpdateBookingModal] = useState<{
-    booking: BookingType | undefined;
-    status: boolean;
-  }>({ booking: undefined, status: false });
-
-  const [openCreateBookingModal, setOpenCreateBookingModal] = useState<{
-    booking: BookingType | undefined;
-    status: boolean;
-  }>({ booking: undefined, status: false });
-
+    setOpenBookingDetailsModal,
+    setOpenCreateBookingModal,
+    setOpenDeleteBookingModal,
+    setOpenUpdateBookingModal,
+  } = useContext(AdminBookingsStatusesContext);
   const classes = useStyles();
   const theme = useTheme();
 
@@ -223,7 +199,12 @@ export const BookingsTable = (props: Props) => {
                   />
                 }
                 label=""
-                onClick={() => null}
+                onClick={() =>
+                  setOpenDeleteBookingModal({
+                    booking: row.booking,
+                    status: true,
+                  })
+                }
                 className={classes.openDetailsActionButton}
               />,
               <GridActionsCellItem
@@ -235,7 +216,7 @@ export const BookingsTable = (props: Props) => {
                 }
                 label=""
                 onClick={() =>
-                  setOpenCreateBookingModal({
+                  setOpenBookingDetailsModal({
                     booking: row.booking,
                     status: true,
                   })
@@ -312,24 +293,6 @@ export const BookingsTable = (props: Props) => {
       </Box>
     );
   };
-
-  const [isUpdateBooking, setIsUpdateBooking] = useState<boolean>(false);
-  const [isCreateBookingInfo, setIsCreateBookingInfo] =
-    useState<boolean>(false);
-
-  useEffect(() => {
-    if (updateBookingSuccess) {
-      setOpenUpdateBookingModal({ booking: undefined, status: false });
-      dispatch(resetUpdateBookingState());
-    }
-  }, [updateBookingSuccess]);
-
-  useEffect(() => {
-    if (createBookingSuccess) {
-      setOpenCreateBookingModal({ booking: undefined, status: false });
-      dispatch(resetCreateBookingState());
-    }
-  }, [createBookingSuccess]);
 
   return (
     <>
@@ -483,73 +446,6 @@ export const BookingsTable = (props: Props) => {
         containerStyle={{ alignSelf: "center", padding: "0 40px" }}
         withoutAnimation
       />
-
-      <CustomModal
-        modalTitle="Информация о бронировании"
-        modalContent={
-          <Stack sx={{ alignItems: "stretch" }}>
-            <BookingDetailsModalContent
-              booking={openBookingDetailsModal.booking}
-            />
-          </Stack>
-        }
-        open={openBookingDetailsModal.status}
-        setOpen={() =>
-          setOpenBookingDetailsModal({ booking: undefined, status: false })
-        }
-        modalStyle={{ width: "500px" }}
-      />
-
-      {openUpdateBookingModal.booking ? (
-        <CustomModal
-          modalTitle="Редактировать бронирование"
-          modalContent={
-            <Stack sx={{ alignItems: "stretch" }}>
-              <CreateOrEditBookingModalContent
-                booking={openUpdateBookingModal.booking}
-                isUpdateBooking={isUpdateBooking}
-                setIsUpdateBooking={setIsUpdateBooking}
-                mode={"edit"}
-              />
-            </Stack>
-          }
-          open={openUpdateBookingModal.status}
-          setOpen={() =>
-            setOpenUpdateBookingModal({ booking: undefined, status: false })
-          }
-          modalStyle={{ width: "550px" }}
-          actionButtonsVariants="save_cancel"
-          handleConfirm={() => setIsUpdateBooking(true)}
-          confirmLoading={updateBookingIsLoading}
-        />
-      ) : null}
-
-      {openCreateBookingModal.booking ? (
-        <CustomModal
-          modalTitle="Создать бронирование"
-          modalContent={
-            <Stack sx={{ alignItems: "stretch" }}>
-              <CreateOrEditBookingModalContent
-                booking={openCreateBookingModal.booking}
-                isCreateBooking={isCreateBookingInfo}
-                setIsCreateBooking={setIsCreateBookingInfo}
-                mode={"create"}
-              />
-            </Stack>
-          }
-          open={openCreateBookingModal.status}
-          setOpen={() =>
-            setOpenCreateBookingModal({
-              booking: undefined,
-              status: false,
-            })
-          }
-          modalStyle={{ width: "550px" }}
-          actionButtonsVariants="save_cancel"
-          handleConfirm={() => setIsCreateBookingInfo(true)}
-          confirmLoading={createBookingIsLoading}
-        />
-      ) : null}
     </>
   );
 };

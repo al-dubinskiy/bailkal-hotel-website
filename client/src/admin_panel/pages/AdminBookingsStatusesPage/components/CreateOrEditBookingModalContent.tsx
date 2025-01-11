@@ -1,6 +1,6 @@
 import { Button, FormGroup, Stack, Typography } from "@mui/material";
 import { useFormik } from "formik";
-import React, { useEffect, useMemo, useState } from "react";
+import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import * as yup from "yup";
 import { BookingType } from "../../../../redux/slices/Bookings/types";
 import { CustomInput } from "../../../../pages/components/shared/FormElements/CustomInput";
@@ -82,6 +82,7 @@ export const CreateOrEditBookingModalContent = (props: Props) => {
     setIsCreateBooking,
     mode,
   } = props;
+
   const dispatch = useAppDispatch();
   const { bookings } = useAppSelector((state) => state.bookings);
   const { rooms } = useAppSelector((state) => state.rooms);
@@ -247,13 +248,9 @@ export const CreateOrEditBookingModalContent = (props: Props) => {
   }, [transferVariants, transferCars]);
 
   const formik = useFormik<BookingType>({
-    initialValues: {
-      ...booking,
-    },
+    initialValues: booking,
     validationSchema: validationSchema,
-    onSubmit: (values) => {
-      alert(JSON.stringify(values, null, 2));
-    },
+    onSubmit: (values) => {},
   });
 
   // На перечень доступных комнат влияет "тип категории" и "дата заезда/выезда"
@@ -409,6 +406,44 @@ export const CreateOrEditBookingModalContent = (props: Props) => {
     formik.setFieldValue("transfer_id", "");
     formik.setFieldValue("transfer_comment", "");
   };
+
+  const setStartDateDefault = useCallback(
+    (val: Date) => {
+      const newDate = moment(val);
+      const year = newDate.get("year");
+      const month = newDate.get("month");
+      const date = newDate.get("date");
+
+      formik.setFieldValue(
+        "arrival_datetime",
+        moment(formik.values.arrival_datetime, dateTimeFormat)
+          .set("year", year)
+          .set("month", month)
+          .set("date", date)
+          .format(dateTimeFormat)
+      );
+    },
+    [formik.values.arrival_datetime]
+  );
+
+  const setEndDateDefault = useCallback(
+    (val: Date) => {
+      const newDate = moment(val);
+      const year = newDate.get("year");
+      const month = newDate.get("month");
+      const date = newDate.get("date");
+
+      formik.setFieldValue(
+        "departure_datetime",
+        moment(formik.values.departure_datetime, dateTimeFormat)
+          .set("year", year)
+          .set("month", month)
+          .set("date", date)
+          .format(dateTimeFormat)
+      );
+    },
+    [formik.values.departure_datetime]
+  );
 
   if (!roomsCategories) return null;
 
@@ -862,36 +897,8 @@ export const CreateOrEditBookingModalContent = (props: Props) => {
           <CustomRangeDatepicker
             startDateDefault={new Date(formik.values.arrival_datetime)}
             endDateDefault={new Date(formik.values.departure_datetime)}
-            setStartDateDefault={(val) => {
-              const newDate = moment(val);
-              const year = newDate.get("year");
-              const month = newDate.get("month");
-              const date = newDate.get("date");
-
-              formik.setFieldValue(
-                "arrival_datetime",
-                moment(formik.values.arrival_datetime, dateTimeFormat)
-                  .set("year", year)
-                  .set("month", month)
-                  .set("date", date)
-                  .format(dateTimeFormat)
-              );
-            }}
-            setEndDateDefault={(val) => {
-              const newDate = moment(val);
-              const year = newDate.get("year");
-              const month = newDate.get("month");
-              const date = newDate.get("date");
-
-              formik.setFieldValue(
-                "departure_datetime",
-                moment(formik.values.departure_datetime, dateTimeFormat)
-                  .set("year", year)
-                  .set("month", month)
-                  .set("date", date)
-                  .format(dateTimeFormat)
-              );
-            }}
+            setStartDateDefault={setStartDateDefault}
+            setEndDateDefault={setEndDateDefault}
             inputWithBorder
             labelStyles={{ textTransform: "normal" }}
           />
@@ -1013,7 +1020,7 @@ export const CreateOrEditBookingModalContent = (props: Props) => {
             disabled
           />
 
-          <FormGroup sx={{ display: "flex", flexDirection: "column" }}>
+          {/* <FormGroup sx={{ display: "flex", flexDirection: "column" }}>
             {mode === "create" ? (
               <CustomLabelCheckbox
                 id="user.send_confirm_on_phone"
@@ -1041,7 +1048,7 @@ export const CreateOrEditBookingModalContent = (props: Props) => {
               }
               defaultChecked
             />
-          </FormGroup>
+          </FormGroup> */}
         </Stack>
       </form>
     </div>

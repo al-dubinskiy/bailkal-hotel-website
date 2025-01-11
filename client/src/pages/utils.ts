@@ -1,3 +1,5 @@
+import { Bounce, toast, ToastOptions, TypeOptions } from "react-toastify";
+
 export function getAllObjectValues(obj: any): any[] {
   let values: any = [];
 
@@ -13,3 +15,24 @@ export function getAllObjectValues(obj: any): any[] {
 
   return values;
 }
+
+export const toastMessage = ({
+  label,
+  type,
+}: {
+  label: string;
+  type: TypeOptions;
+}) => {
+  return toast(label, {
+    position: "top-right",
+    autoClose: 3000,
+    hideProgressBar: false,
+    closeOnClick: true,
+    pauseOnHover: true,
+    draggable: true,
+    progress: undefined,
+    theme: "light",
+    transition: Bounce,
+    type,
+  });
+};

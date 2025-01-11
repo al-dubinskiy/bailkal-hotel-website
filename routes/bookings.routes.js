@@ -94,9 +94,9 @@ router.put("/:id", async (req, res) => {
     );
 
     if (!updatedBooking) {
-      return res
-        .status(404)
-        .json({ error: "Update booking: статус 404. Бронированиe не найден." });
+      return res.status(404).json({
+        error: "Update booking: статус 404. Бронированиe не найдено.",
+      });
     }
 
     return res.status(200).json({
@@ -104,6 +104,7 @@ router.put("/:id", async (req, res) => {
       data: updatedBooking,
     });
   } catch (e) {
+    console.log(e);
     res.status(500).json({
       error: "Update booking: статус 500. Ошибка сервера.",
     });
@@ -113,6 +114,17 @@ router.put("/:id", async (req, res) => {
 // Delete booking
 router.delete("/:id", async (req, res) => {
   try {
+    const deleteBooking = Booking.deleteOne({ id: req.params.id });
+
+    if (!deleteBooking) {
+      return res.status(404).json({
+        error: "Delete booking: статус 404. Бронированиe не найдено.",
+      });
+    }
+
+    return res.status(200).json({
+      message: `Delete booking: статус 201. Бронирование было успешно удалено.`,
+    });
   } catch (e) {
     res.status(500).json({
       error: "Delete booking: статус 500. Ошибка сервера.",

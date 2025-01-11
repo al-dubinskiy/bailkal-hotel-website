@@ -24,6 +24,7 @@ import moment from "moment";
 import { v4 as uuidv4 } from "uuid";
 import { times } from "../../../pages/Booking/components/EnterGuestsDetailsSection/components/constants";
 import { Bounce, toast } from "react-toastify";
+import { toastMessage } from "../../../pages/utils";
 
 const DEBUG = true;
 
@@ -140,15 +141,15 @@ export const DeleteBooking = createAsyncThunk(
         },
       });
 
-      if (res.status === 204) {
+      if (res.ok) {
         return { id };
       } else {
         return thunkAPI.rejectWithValue(
-          "UpdateBooking (API error): " + res.status + " " + res.statusText
+          "DeleteBooking (API error): " + res.status + " " + res.statusText
         );
       }
     } catch (err) {
-      return thunkAPI.rejectWithValue("UpdateBooking (API error): " + err);
+      return thunkAPI.rejectWithValue("DeleteBooking (API error): " + err);
     }
   }
 );
@@ -268,6 +269,10 @@ export const bookingsSlice = createSlice({
       state.updateBooking.successMessage = null;
       state.updateBooking.error = null;
     },
+    resetDeleteBookingState: (state) => {
+      state.deleteBooking.successMessage = null;
+      state.deleteBooking.error = null;
+    },
   },
   extraReducers: (builder) => {
     builder.addCase(
@@ -312,6 +317,7 @@ export const bookingsSlice = createSlice({
           progress: undefined,
           theme: "light",
           transition: Bounce,
+          type: "success",
         });
 
         if (DEBUG) console.log("CreateBooking (API): booking was created.");
@@ -320,10 +326,16 @@ export const bookingsSlice = createSlice({
     builder.addCase(CreateBooking.pending, (state, { payload }) => {
       state.createBooking.error = "";
       state.createBooking.isLoading = true;
+      state.createBooking.successMessage = null;
     });
     builder.addCase(CreateBooking.rejected, (state, { payload }) => {
       state.createBooking.isLoading = false;
       state.createBooking.error = payload;
+      state.createBooking.successMessage = null;
+      toastMessage({
+        label: "Во время создания бронирования произошла ошибка!",
+        type: "error",
+      });
       if (DEBUG) console.log(payload);
     });
     builder.addCase(
@@ -338,49 +350,57 @@ export const bookingsSlice = createSlice({
               : booking;
           });
         state.updateBooking.successMessage = "Success";
-        toast.success("Данные букинга были успешно обновлены!", {
-          position: "top-right",
-          autoClose: 3000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          progress: undefined,
-          theme: "light",
-          transition: Bounce,
+        toastMessage({
+          label: "Данные букинга были успешно обновлены!",
+          type: "success",
         });
-
         if (DEBUG) console.log("UpdateBooking (API): booking was updated.");
       }
     );
     builder.addCase(UpdateBooking.pending, (state, { payload }) => {
       state.updateBooking.error = "";
       state.updateBooking.isLoading = true;
+      state.updateBooking.successMessage = null;
     });
     builder.addCase(UpdateBooking.rejected, (state, { payload }) => {
       state.updateBooking.isLoading = false;
       state.updateBooking.error = payload;
+      state.updateBooking.successMessage = null;
+      toastMessage({
+        label: "Во время обновления данных бронирования произошла ошибка!",
+        type: "error",
+      });
       if (DEBUG) console.log(payload);
     });
     builder.addCase(
       DeleteBooking.fulfilled,
       (state, { payload }: { payload: { id: string } }) => {
-        state.updateBooking.isLoading = false;
+        state.deleteBooking.isLoading = false;
         if (state.bookings)
           state.bookings = state.bookings.filter(
             (booking) => booking._id !== payload.id
           );
-
-        if (DEBUG) console.log("CreateBooking (API): booking was deleted.");
+        state.deleteBooking.successMessage = "Success";
+        toastMessage({
+          label: "Бронирования было успешно удалено!",
+          type: "success",
+        });
+        if (DEBUG) console.log("DeleteBooking (API): booking was deleted.");
       }
     );
     builder.addCase(DeleteBooking.pending, (state, { payload }) => {
-      state.updateBooking.error = "";
-      state.updateBooking.isLoading = true;
+      state.deleteBooking.error = "";
+      state.deleteBooking.isLoading = true;
+      state.deleteBooking.successMessage = null;
     });
     builder.addCase(DeleteBooking.rejected, (state, { payload }) => {
-      state.updateBooking.isLoading = false;
-      state.updateBooking.error = payload;
+      state.deleteBooking.isLoading = false;
+      state.deleteBooking.error = payload;
+      state.deleteBooking.successMessage = null;
+      toastMessage({
+        label: "Во время удаления бронирования произошла ошибка!",
+        type: "error",
+      });
       if (DEBUG) console.log(payload);
     });
   },
@@ -396,4 +416,5 @@ export const {
   setCategoriesAvailableRoomsCount,
   resetCreateBookingState,
   resetUpdateBookingState,
+  resetDeleteBookingState,
 } = bookingsSlice.actions;

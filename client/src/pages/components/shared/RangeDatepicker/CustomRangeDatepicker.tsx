@@ -1,5 +1,6 @@
 import { Box, LinearProgress, Stack, SxProps, Typography } from "@mui/material";
 import React, {
+  memo,
   useCallback,
   useContext,
   useEffect,
@@ -33,7 +34,7 @@ interface Props {
   labelStyles?: SxProps;
 }
 
-export const CustomRangeDatepicker = (props: Props) => {
+export const CustomRangeDatepicker = memo((props: Props) => {
   const {
     startDateDefault,
     endDateDefault,
@@ -245,4 +246,4 @@ export const CustomRangeDatepicker = (props: Props) => {
       />
     </Box>
   );
-};
+});

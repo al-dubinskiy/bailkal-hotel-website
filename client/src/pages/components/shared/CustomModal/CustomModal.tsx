@@ -1,5 +1,5 @@
 import { Box, Modal, Paper, Stack, SxProps, Typography } from "@mui/material";
-import React, { ReactElement } from "react";
+import React, { memo, ReactElement } from "react";
 import { theme } from "../../../../theme";
 import { CustomButton } from "../CustomButton";
 import { CloseOutlined } from "@mui/icons-material";
