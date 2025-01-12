@@ -3,16 +3,19 @@ import {
   createUnavailableBookingDate,
   deleteUnavailableBookingDate,
   getUnavailableBookingDates,
+  rewriteUnavailableBookingDate,
   updateUnavailableBookingDate,
 } from "./httpRequests";
 import {
   CreateUnavailableBookingDateApiResponseType,
   CreateUnavailableBookingDateType,
   GetUnavailableBookingDatesApiResponseType,
+  RewriteUnavailableBookingDateApiResponseType,
   UnavailableBookingDateType,
   UpdateUnavailableBookingDateApiResponseType,
   UpdateUnavailableBookingDateType,
 } from "./types";
+import { toastMessage } from "../../../pages/utils";
 
 const DEBUG = true;
 
@@ -87,26 +90,68 @@ export const CreateUnavailableBookingDate = createAsyncThunk(
   }
 );
 
+export const RewriteUnavailableBookingDate = createAsyncThunk(
+  "unavailableBookingDates/rewrite",
+  async (
+    payload: {
+      unavailableBookingDates: UpdateUnavailableBookingDateType[];
+    },
+    thunkAPI
+  ) => {
+    try {
+      const { unavailableBookingDates } = payload;
+
+      const res = await fetch(`${rewriteUnavailableBookingDate.url}`, {
+        method: rewriteUnavailableBookingDate.method,
+        headers: {
+          ...rewriteUnavailableBookingDate.headers,
+        },
+        body: JSON.stringify(unavailableBookingDates),
+      });
+
+      if (res.ok) {
+        const json = await res.json();
+
+        return json;
+      } else {
+        return thunkAPI.rejectWithValue(
+          "RewriteUnavailableBookingDate (API error): " +
+            res.status +
+            " " +
+            res.statusText
+        );
+      }
+    } catch (err) {
+      return thunkAPI.rejectWithValue(
+        "RewriteUnavailableBookingDate (API error): " + err
+      );
+    }
+  }
+);
+
 export const UpdateUnavailableBookingDate = createAsyncThunk(
   "unavailableBookingDates/update",
   async (
     payload: {
-      unavailableBookingDate: UpdateUnavailableBookingDateType;
+      unavailableBookingDate: UnavailableBookingDateType;
     },
     thunkAPI
   ) => {
     try {
       const { unavailableBookingDate } = payload;
 
-      const res = await fetch(`${updateUnavailableBookingDate.url}`, {
-        method: updateUnavailableBookingDate.method,
-        headers: {
-          ...updateUnavailableBookingDate.headers,
-        },
-        body: JSON.stringify(unavailableBookingDate),
-      });
+      const res = await fetch(
+        `${updateUnavailableBookingDate.url}/${unavailableBookingDate._id}`,
+        {
+          method: updateUnavailableBookingDate.method,
+          headers: {
+            ...updateUnavailableBookingDate.headers,
+          },
+          body: JSON.stringify(unavailableBookingDate),
+        }
+      );
 
-      if (res.status === 200) {
+      if (res.ok) {
         const json = await res.json();
 
         return json;
@@ -174,6 +219,12 @@ interface IRoomTypeState {
     error: any;
     isLoading: boolean;
   };
+  rewriteUnavailableBookingDates: {
+    data: UnavailableBookingDateType[] | null;
+    successMessage: string | null;
+    error: any;
+    isLoading: boolean;
+  };
   updateUnavailableBookingDate: {
     data: UnavailableBookingDateType | null;
     successMessage: string | null;
@@ -195,6 +246,12 @@ const initialState: IRoomTypeState = {
     isLoading: false,
   },
   createUnavailableBookingDate: {
+    successMessage: null,
+    error: null,
+    isLoading: false,
+  },
+  rewriteUnavailableBookingDates: {
+    data: null,
     successMessage: null,
     error: null,
     isLoading: false,
@@ -284,6 +341,49 @@ export const unavailableBookingDatesSlice = createSlice({
       }
     );
     builder.addCase(
+      RewriteUnavailableBookingDate.fulfilled,
+      (
+        state,
+        { payload }: { payload: RewriteUnavailableBookingDateApiResponseType }
+      ) => {
+        state.rewriteUnavailableBookingDates.isLoading = false;
+        const updatedUnavailableBookingDates = payload.data;
+        state.unavailableBookingDates = updatedUnavailableBookingDates;
+
+        toastMessage({
+          label: 'Перечень "недоступных" дат был успешно перезаписан.',
+          type: "success",
+        });
+
+        if (DEBUG)
+          console.log(
+            "UpdateUnavailableBookingDate (API): room type was updated."
+          );
+      }
+    );
+    builder.addCase(
+      RewriteUnavailableBookingDate.pending,
+      (state, { payload }) => {
+        state.rewriteUnavailableBookingDates.error = "";
+        state.rewriteUnavailableBookingDates.isLoading = true;
+      }
+    );
+    builder.addCase(
+      RewriteUnavailableBookingDate.rejected,
+      (state, { payload }) => {
+        state.rewriteUnavailableBookingDates.isLoading = false;
+        state.rewriteUnavailableBookingDates.error = payload;
+
+        toastMessage({
+          label:
+            'Во время перезаписи перечня "недоступных" дат произошла ошибка.',
+          type: "error",
+        });
+
+        if (DEBUG) console.log(payload);
+      }
+    );
+    builder.addCase(
       UpdateUnavailableBookingDate.fulfilled,
       (
         state,
@@ -319,6 +419,13 @@ export const unavailableBookingDatesSlice = createSlice({
       (state, { payload }) => {
         state.updateUnavailableBookingDate.isLoading = false;
         state.updateUnavailableBookingDate.error = payload;
+
+        toastMessage({
+          label:
+            'Во время перезаписи перечня "недоступных" дат произошла ошибка.',
+          type: "error",
+        });
+
         if (DEBUG) console.log(payload);
       }
     );

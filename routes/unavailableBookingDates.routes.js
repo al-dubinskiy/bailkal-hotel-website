@@ -1,6 +1,7 @@
 const { Router } = require("express");
 const UnavailableBookingDate = require("../models/UnavailableBookingDate");
 const moment = require("moment");
+const Booking = require("../models/Booking");
 const router = Router();
 
 // Get unavailable booking dates
@@ -48,10 +49,40 @@ router.post("/", async (req, res) => {
   }
 });
 
+// Rewrite unavailable booking dates
+router.post("/rewrite/", async (req, res) => {
+  try {
+    const date = req.body;
+    const data = [];
+    await UnavailableBookingDate.deleteMany({});
+    await Promise.all(
+      date.map(async (date) => {
+        const newDate = new Booking({
+          ...date,
+          created_at: moment().format("YYYY-MM-DD HH:mm"),
+          updated_at: moment().format("YYYY-MM-DD HH:mm"),
+        });
+        await newDate.save();
+        return data.push(newDate);
+      })
+    );
+
+    return res.status(201).json({
+      message: `Rewrite unavailable booking dates: статус 201. "Недоступные" даты успешно перезаписаны.`,
+      data,
+    });
+  } catch (e) {
+    res.status(500).json({
+      error: "Rewrite unavailable booking dates: статус 500. Ошибка сервера.",
+    });
+  }
+});
+
 // Update unavailable booking date
 router.put("/:id", async (req, res) => {
   try {
   } catch (e) {
+    console.log(e);
     res.status(500).json({
       error: "Update unavailable booking date: статус 500. Ошибка сервера.",
     });

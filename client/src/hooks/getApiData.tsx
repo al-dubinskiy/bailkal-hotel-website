@@ -56,10 +56,10 @@ export const useGetApiData = () => {
   // Get data from API
   // Bookings
   const GetBookingsList = useCallback(() => {
-    if (!bookings) {
+    if (!bookings && !getBookings.isLoading) {
       dispatch(GetBookings());
     }
-  }, [bookings]);
+  }, [bookings, getBookings.isLoading]);
 
   useEffect(() => {
     GetBookingsList();
@@ -67,10 +67,10 @@ export const useGetApiData = () => {
 
   // Unavailable booking dates
   const GetUnavailableBookingDatesList = useCallback(() => {
-    if (!unavailableBookingDates) {
+    if (!unavailableBookingDates && !getUnavailableBookingDates.isLoading) {
       dispatch(GetUnavailableBookingDates());
     }
-  }, [bookings]);
+  }, [bookings, getUnavailableBookingDates.isLoading]);
 
   useEffect(() => {
     GetUnavailableBookingDatesList();
@@ -78,10 +78,10 @@ export const useGetApiData = () => {
 
   // Rooms categories
   const GetRoomsCategoriesList = useCallback(() => {
-    if (!roomsCategories) {
+    if (!roomsCategories && !getRoomsCategories.isLoading) {
       dispatch(GetRoomsCategories());
     }
-  }, [roomsCategories]);
+  }, [roomsCategories, getRoomsCategories.isLoading]);
 
   useEffect(() => {
     GetRoomsCategoriesList();
@@ -89,10 +89,10 @@ export const useGetApiData = () => {
 
   // All rooms list
   const GetRoomsList = useCallback(() => {
-    if (!rooms) {
+    if (!rooms && !getRooms.isLoading) {
       dispatch(GetRooms());
     }
-  }, [rooms]);
+  }, [rooms, getRooms.isLoading]);
 
   useEffect(() => {
     GetRoomsList();
@@ -100,10 +100,10 @@ export const useGetApiData = () => {
 
   // Room bed variants
   const GetRoomBedVariantsList = useCallback(() => {
-    if (!roomBedVariants) {
+    if (!roomBedVariants && !getRoomRoomBedVariants.isLoading) {
       dispatch(GetRoomBedVariants());
     }
-  }, [roomBedVariants]);
+  }, [roomBedVariants, getRoomRoomBedVariants.isLoading]);
 
   useEffect(() => {
     GetRoomBedVariantsList();
@@ -111,10 +111,10 @@ export const useGetApiData = () => {
 
   // Get views from room window
   const GetViewsFromRoomWindowList = useCallback(() => {
-    if (!viewsFromRoomWindow) {
+    if (!viewsFromRoomWindow && !getViewsFromRoomWindow.isLoading) {
       dispatch(GetViewsFromRoomWindow());
     }
-  }, [viewsFromRoomWindow]);
+  }, [viewsFromRoomWindow, getViewsFromRoomWindow.isLoading]);
 
   useEffect(() => {
     GetViewsFromRoomWindowList();
@@ -122,10 +122,10 @@ export const useGetApiData = () => {
 
   // Get payment methods
   const GetPaymentMethodsList = useCallback(() => {
-    if (!paymentMethods) {
+    if (!paymentMethods && !getPaymentMethods.isLoading) {
       dispatch(GetPaymentMethods());
     }
-  }, [paymentMethods]);
+  }, [paymentMethods, getPaymentMethods.isLoading]);
 
   useEffect(() => {
     GetPaymentMethodsList();
@@ -133,10 +133,10 @@ export const useGetApiData = () => {
 
   // Transfer
   const GetTransferVariantsList = useCallback(() => {
-    if (!transferVariants) {
+    if (!transferVariants && !getTransferVariants.isLoading) {
       dispatch(GetTransferVariants());
     }
-  }, [transferVariants]);
+  }, [transferVariants, getTransferVariants.isLoading]);
 
   useEffect(() => {
     GetTransferVariantsList();
@@ -144,10 +144,10 @@ export const useGetApiData = () => {
 
   // Trasfer cars
   const GetTransferCarsList = useCallback(() => {
-    if (!transferCars) {
+    if (!transferCars && !getTransferVariants.isLoading) {
       dispatch(GetTransferCars());
     }
-  }, [transferCars]);
+  }, [transferCars, getTransferCars]);
 
   useEffect(() => {
     GetTransferCarsList();
@@ -155,10 +155,10 @@ export const useGetApiData = () => {
 
   // Bookings tariffs
   const GetBookingsTariffsList = useCallback(() => {
-    if (!bookingTariffs) {
+    if (!bookingTariffs && !getBookingTariffs.isLoading) {
       dispatch(GetBookingTariffs());
     }
-  }, [bookingTariffs]);
+  }, [bookingTariffs, getBookingTariffs.isLoading]);
 
   useEffect(() => {
     GetBookingsTariffsList();
@@ -166,10 +166,10 @@ export const useGetApiData = () => {
 
   // Bookings services
   const GetBookingsServicesList = useCallback(() => {
-    if (!bookingServices) {
+    if (!bookingServices && !getBookingServices.isLoading) {
       dispatch(GetBookingServices());
     }
-  }, [bookingServices]);
+  }, [bookingServices, getBookingServices.isLoading]);
 
   useEffect(() => {
     GetBookingsServicesList();
@@ -177,10 +177,10 @@ export const useGetApiData = () => {
 
   // Rooms features
   const GetRoomsFeaturesList = useCallback(() => {
-    if (!roomFeatures) {
+    if (!roomFeatures && !getRoomFeatures.isLoading) {
       dispatch(GetRoomFeatures());
     }
-  }, [roomFeatures]);
+  }, [roomFeatures, getRoomFeatures.isLoading]);
 
   useEffect(() => {
     GetRoomsFeaturesList();
@@ -188,10 +188,10 @@ export const useGetApiData = () => {
 
   // Rooms features categories
   const GetFeaturesCategoriesList = useCallback(() => {
-    if (!roomFeaturesCategories) {
+    if (!roomFeaturesCategories && !getRoomFeaturesCategories.isLoading) {
       dispatch(GetRoomFeaturesCategories());
     }
-  }, [roomFeaturesCategories]);
+  }, [roomFeaturesCategories, getRoomFeaturesCategories.isLoading]);
 
   useEffect(() => {
     GetFeaturesCategoriesList();

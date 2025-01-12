@@ -15,7 +15,6 @@ import { theme } from "../../../../theme";
 import moment, { Moment } from "moment";
 import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import { setFilterParams } from "../../../../redux/slices/Bookings/bookingsSlice";
-import { times } from "../../../Booking/components/EnterGuestsDetailsSection/components/constants";
 import { ru } from "date-fns/locale/ru"; // the locale you want
 import {
   checkDateAvailable,
@@ -32,6 +31,7 @@ interface Props {
   withPortal?: boolean;
   inputWithBorder?: boolean;
   labelStyles?: SxProps;
+  inputStyles?: SxProps;
 }
 
 export const CustomRangeDatepicker = memo((props: Props) => {
@@ -111,6 +111,7 @@ export const CustomRangeDatepicker = memo((props: Props) => {
           a.push(b);
         }
       });
+      console.log(a);
       return a;
     }
   }, [datesInRange, unavailableBookingDates, roomsCategories, bookings]);

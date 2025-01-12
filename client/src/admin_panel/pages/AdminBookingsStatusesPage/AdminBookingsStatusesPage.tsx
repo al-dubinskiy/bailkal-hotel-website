@@ -35,6 +35,7 @@ import {
   resetDeleteBookingState,
   resetUpdateBookingState,
 } from "../../../redux/slices/Bookings/bookingsSlice";
+import { CustomCircleProgressIndicator } from "../../../pages/components/shared/CustomCircleProgressIndicator";
 
 type DataListType = {
   roomCategory: RoomCategoryType;
@@ -76,12 +77,13 @@ export const AdminBookingsStatusesContext = createContext<{
   setOpenCreateBookingModal: () => null,
   setOpenDeleteBookingModal: () => null,
 });
+
 interface Props {}
 
 export const AdminBookingsStatusesPage = (props: Props) => {
   const {} = props;
 
-  const { isLoading } = useGetApiData();
+  const { isLoading: dataIsLoading } = useGetApiData();
   const dispatch = useAppDispatch();
   const { bookings } = useAppSelector((state) => state.bookings);
   const { roomsCategories } = useAppSelector((state) => state.roomsCategories);
@@ -229,9 +231,6 @@ export const AdminBookingsStatusesPage = (props: Props) => {
     return [];
   }, [sortedBookingsByRoomCategories, rooms]);
 
-  useEffect(() => {
-    console.log(123);
-  }, []);
   return (
     <AdminBookingsStatusesContext.Provider
       value={{
@@ -241,194 +240,205 @@ export const AdminBookingsStatusesPage = (props: Props) => {
         setOpenDeleteBookingModal,
       }}
     >
-      <>
-        <AdminBasePageLayout
-          children={dataList.map((item, index) => {
-            return (
-              <Accordion
-                key={index}
-                defaultExpanded={true}
-                disableGutters={true}
-                sx={{
-                  borderRadius: "16px",
-                  background: theme.palette.primary.lighter,
-                }}
-              >
-                <AccordionSummary
-                  expandIcon={
-                    <CustomCircleIconButton
-                      icon={<KeyboardArrowDown />}
-                      sx={
-                        {
-                          // position: "absolute",
-                          // top: "24px",
-                          // right: "24px",
-                          // transform: `rotate(${roomDetailsOpen ? 180 : 0}deg)`,
-                          // zIndex: 1,
-                        }
-                      }
-                    />
-                  }
-                  aria-controls={`panel-${index + 1}-content`}
-                  id={`panel-${index + 1}-header`}
-                  sx={{
-                    "&.MuiAccordionSummary-root": {
-                      margin: "24px 0",
-                      "& .MuiAccordionSummary-content": {
-                        margin: 0,
-
-                        "& .MuiTypography-root": {
-                          margin: 0,
-                        },
-                      },
-                    },
-                  }}
-                >
-                  <Typography variant="body" sx={{ margin: "10px auto" }}>
-                    {item.roomCategory.title}
-                  </Typography>
-                </AccordionSummary>
-                <AccordionDetails
-                  sx={{
-                    padding: 0,
-                    display: "flex",
-                    flexDirection: "column",
-                    alignItems: "stretch",
-                  }}
-                >
-                  <Stack
+      <AdminBasePageLayout
+        children={
+          dataIsLoading ? (
+            <CustomCircleProgressIndicator />
+          ) : (
+            <Stack sx={{ alignItems: "stretch", gap: "24px" }}>
+              {dataList.map((item, index) => {
+                return (
+                  <Accordion
+                    key={index}
+                    defaultExpanded={true}
+                    disableGutters={true}
                     sx={{
-                      alignItems: "stretch",
-                      padding: "24px",
-                      paddingTop: 0,
+                      borderRadius: "16px",
+                      background: theme.palette.primary.lighter,
                     }}
                   >
-                    <Stack
+                    <AccordionSummary
+                      expandIcon={
+                        <CustomCircleIconButton
+                          icon={<KeyboardArrowDown />}
+                          sx={
+                            {
+                              // position: "absolute",
+                              // top: "24px",
+                              // right: "24px",
+                              // transform: `rotate(${roomDetailsOpen ? 180 : 0}deg)`,
+                              // zIndex: 1,
+                            }
+                          }
+                        />
+                      }
+                      aria-controls={`panel-${index + 1}-content`}
+                      id={`panel-${index + 1}-header`}
                       sx={{
+                        "&.MuiAccordionSummary-root": {
+                          margin: "24px 0",
+                          "& .MuiAccordionSummary-content": {
+                            margin: 0,
+
+                            "& .MuiTypography-root": {
+                              margin: 0,
+                            },
+                          },
+                        },
+                      }}
+                    >
+                      <Typography variant="body" sx={{ margin: "10px auto" }}>
+                        {item.roomCategory.title}
+                      </Typography>
+                    </AccordionSummary>
+                    <AccordionDetails
+                      sx={{
+                        padding: 0,
+                        display: "flex",
+                        flexDirection: "column",
                         alignItems: "stretch",
-                        padding: "24px",
-                        borderRadius: "16px",
-                        background: theme.palette.primary.extraLight,
                       }}
                     >
                       <Stack
                         sx={{
-                          flexDirection: "row",
-                          alignItems: "center",
-                          gap: "24px",
+                          alignItems: "stretch",
+                          padding: "24px",
+                          paddingTop: 0,
                         }}
                       >
-                        <Typography variant="label">{`Количество номеров: ${item.roomCategory.room_id.length}`}</Typography>
+                        <Stack
+                          sx={{
+                            alignItems: "stretch",
+                            padding: "24px",
+                            borderRadius: "16px",
+                            background: theme.palette.primary.extraLight,
+                          }}
+                        >
+                          <Stack
+                            sx={{
+                              flexDirection: "row",
+                              alignItems: "center",
+                              gap: "24px",
+                            }}
+                          >
+                            <Typography variant="label">{`Количество номеров: ${item.roomCategory.room_id.length}`}</Typography>
 
-                        <Typography variant="label">{`Количество бронирований: ${
-                          item.categoryRoomsBookingStatuses.filter(
-                            (i) => i.isBooked
-                          ).length
-                        }`}</Typography>
+                            <Typography variant="label">{`Количество бронирований: ${
+                              item.categoryRoomsBookingStatuses.filter(
+                                (i) => i.isBooked
+                              ).length
+                            }`}</Typography>
+                          </Stack>
+
+                          <BookingsTable
+                            roomCategory={item.roomCategory}
+                            data={item.categoryRoomsBookingStatuses}
+                            isLoading={false}
+                          />
+                        </Stack>
                       </Stack>
-
-                      <BookingsTable
-                        roomCategory={item.roomCategory}
-                        data={item.categoryRoomsBookingStatuses}
-                        isLoading={false}
+                    </AccordionDetails>
+                  </Accordion>
+                );
+              })}
+              <CustomModal
+                modalTitle="Информация о бронировании"
+                modalContent={
+                  <Stack sx={{ alignItems: "stretch" }}>
+                    <BookingDetailsModalContent
+                      booking={openBookingDetailsModal.booking}
+                    />
+                  </Stack>
+                }
+                open={openBookingDetailsModal.status}
+                setOpen={() =>
+                  setOpenBookingDetailsModal({
+                    booking: undefined,
+                    status: false,
+                  })
+                }
+                modalStyle={{ width: "500px" }}
+              />
+              {openUpdateBookingModal.booking ? (
+                <CustomModal
+                  modalTitle="Редактировать бронирование"
+                  modalContent={
+                    <Stack sx={{ alignItems: "stretch" }}>
+                      <CreateOrEditBookingModalContent
+                        booking={openUpdateBookingModal.booking}
+                        isUpdateBooking={isUpdateBooking}
+                        setIsUpdateBooking={setIsUpdateBooking}
+                        mode={"edit"}
                       />
                     </Stack>
-                  </Stack>
-                </AccordionDetails>
-              </Accordion>
-            );
-          })}
-          pageTitle="Выберите тип номера"
-        />
-
-        <CustomModal
-          modalTitle="Информация о бронировании"
-          modalContent={
-            <Stack sx={{ alignItems: "stretch" }}>
-              <BookingDetailsModalContent
-                booking={openBookingDetailsModal.booking}
-              />
+                  }
+                  open={openUpdateBookingModal.status}
+                  setOpen={() =>
+                    setOpenUpdateBookingModal({
+                      booking: undefined,
+                      status: false,
+                    })
+                  }
+                  modalStyle={{ width: "550px" }}
+                  actionButtonsVariants="save_cancel"
+                  handleConfirm={() => setIsUpdateBooking(true)}
+                  confirmLoading={updateBookingIsLoading}
+                />
+              ) : null}
+              {openCreateBookingModal.booking ? (
+                <CustomModal
+                  modalTitle="Создать бронирование"
+                  modalContent={
+                    <Stack sx={{ alignItems: "stretch" }}>
+                      <CreateOrEditBookingModalContent
+                        booking={openCreateBookingModal.booking}
+                        isCreateBooking={isCreateBookingInfo}
+                        setIsCreateBooking={setIsCreateBookingInfo}
+                        mode={"create"}
+                      />
+                    </Stack>
+                  }
+                  open={openCreateBookingModal.status}
+                  setOpen={() =>
+                    setOpenCreateBookingModal({
+                      booking: undefined,
+                      status: false,
+                    })
+                  }
+                  modalStyle={{ width: "550px" }}
+                  actionButtonsVariants="save_cancel"
+                  handleConfirm={() => setIsCreateBookingInfo(true)}
+                  confirmLoading={createBookingIsLoading}
+                />
+              ) : null}
+              {openDeleteBookingModal.booking ? (
+                <CustomModal
+                  modalTitle="Удалить бронирование"
+                  modalContent={
+                    <Stack sx={{ alignItems: "center", marginTop: "20px" }}>
+                      <Typography variant="label">
+                        Вы подтверждаете удаление этого бронирования?
+                      </Typography>
+                    </Stack>
+                  }
+                  open={openDeleteBookingModal.status}
+                  setOpen={() =>
+                    setOpenDeleteBookingModal({
+                      booking: undefined,
+                      status: false,
+                    })
+                  }
+                  modalStyle={{ width: "400px" }}
+                  actionButtonsVariants="yes_no"
+                  handleConfirm={deleteBooking}
+                  confirmLoading={deleteBookingIsLoading}
+                />
+              ) : null}
             </Stack>
-          }
-          open={openBookingDetailsModal.status}
-          setOpen={() =>
-            setOpenBookingDetailsModal({ booking: undefined, status: false })
-          }
-          modalStyle={{ width: "500px" }}
-        />
-
-        {openUpdateBookingModal.booking ? (
-          <CustomModal
-            modalTitle="Редактировать бронирование"
-            modalContent={
-              <Stack sx={{ alignItems: "stretch" }}>
-                <CreateOrEditBookingModalContent
-                  booking={openUpdateBookingModal.booking}
-                  isUpdateBooking={isUpdateBooking}
-                  setIsUpdateBooking={setIsUpdateBooking}
-                  mode={"edit"}
-                />
-              </Stack>
-            }
-            open={openUpdateBookingModal.status}
-            setOpen={() =>
-              setOpenUpdateBookingModal({ booking: undefined, status: false })
-            }
-            modalStyle={{ width: "550px" }}
-            actionButtonsVariants="save_cancel"
-            handleConfirm={() => setIsUpdateBooking(true)}
-            confirmLoading={updateBookingIsLoading}
-          />
-        ) : null}
-
-        {openCreateBookingModal.booking ? (
-          <CustomModal
-            modalTitle="Создать бронирование"
-            modalContent={
-              <Stack sx={{ alignItems: "stretch" }}>
-                <CreateOrEditBookingModalContent
-                  booking={openCreateBookingModal.booking}
-                  isCreateBooking={isCreateBookingInfo}
-                  setIsCreateBooking={setIsCreateBookingInfo}
-                  mode={"create"}
-                />
-              </Stack>
-            }
-            open={openCreateBookingModal.status}
-            setOpen={() =>
-              setOpenCreateBookingModal({
-                booking: undefined,
-                status: false,
-              })
-            }
-            modalStyle={{ width: "550px" }}
-            actionButtonsVariants="save_cancel"
-            handleConfirm={() => setIsCreateBookingInfo(true)}
-            confirmLoading={createBookingIsLoading}
-          />
-        ) : null}
-
-        {openDeleteBookingModal.booking ? (
-          <CustomModal
-            modalTitle="Удалить бронирование"
-            modalContent={
-              <Stack sx={{ alignItems: "center", marginTop: "20px" }}>
-                <Typography variant="label">
-                  Вы подтверждаете удаление этого бронирования?
-                </Typography>
-              </Stack>
-            }
-            open={openDeleteBookingModal.status}
-            setOpen={() =>
-              setOpenDeleteBookingModal({ booking: undefined, status: false })
-            }
-            modalStyle={{ width: "400px" }}
-            actionButtonsVariants="yes_no"
-            handleConfirm={deleteBooking}
-            confirmLoading={deleteBookingIsLoading}
-          />
-        ) : null}
-      </>
+          )
+        }
+        pageTitle="Выберите тип номера"
+      />
     </AdminBookingsStatusesContext.Provider>
   );
 };

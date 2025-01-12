@@ -104,7 +104,7 @@ export const CustomSelect = (props: Props) => {
           </Typography>
         ) : null}
         {/* <InputLabel id={`${id}-label`}>{inputLabel}</InputLabel> */}
-        <Stack sx={{ gap: "5px", flex: 1 }}>
+        <Stack sx={{ gap: "5px", flex: 1, ...contentStyles }}>
           <Select
             // labelId={`${id}-label`}
             id={id}

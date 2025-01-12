@@ -175,15 +175,13 @@ export const getFreeRoomId = ({
     );
     // Считаем количество бронирований на данную комнату и на выбранную дату заезда/выезда
     // если количество != rooms total on category, то вывод, что можно бронировать на эту комнату
-    return (
-      bookingsOnRoomId.filter((booking) =>
-        isDateTimeRangeContained({
-          start1: moment(arrivalDate.format(dateFormat)),
-          end1: moment(departureDate.format(dateFormat)),
-          start2: moment(moment(booking.arrival_datetime).format(dateFormat)),
-          end2: moment(moment(booking.departure_datetime).format(dateFormat)),
-        })
-      ).length !== roomCategory.room_id.length
+    return !bookingsOnRoomId.find((booking) =>
+      isDateTimeRangeContained({
+        start1: moment(arrivalDate.format(dateFormat)),
+        end1: moment(departureDate.format(dateFormat)),
+        start2: moment(moment(booking.arrival_datetime).format(dateFormat)),
+        end2: moment(moment(booking.departure_datetime).format(dateFormat)),
+      })
     );
   });
   return freeRoomId;
@@ -358,6 +356,7 @@ export const getCategoriesAvailableRoomsCount = ({
           })
         : roomCategory
     );
+
     return categoriesAvailableRoomsCount;
   }
   return null;
@@ -389,7 +388,7 @@ export const checkDateAvailable = ({
       bookings,
       roomsCategories: roomsCategories,
       arrivalDate: date,
-      departureDate: date,
+      departureDate: date.add(1, "days"),
     });
 
     if (categoriesAvailableRoomsCount && categoriesAvailableRoomsCount.length) {

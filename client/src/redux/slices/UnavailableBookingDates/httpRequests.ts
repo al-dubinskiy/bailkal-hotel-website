@@ -18,6 +18,15 @@ export const createUnavailableBookingDate: RequestTypeHTTP = {
   },
 };
 
+export const rewriteUnavailableBookingDate: RequestTypeHTTP = {
+  url: baseUrl + "/api/unavailableBookingDates/rewrite/",
+  method: "POST",
+  headers: {
+    "Content-Type": "application/json",
+    Accept: "application/json",
+  },
+};
+
 export const updateUnavailableBookingDate: RequestTypeHTTP = {
   url: baseUrl + "/api/unavailableBookingDates",
   method: "PUT" /* .../{id} */,

@@ -1,6 +1,6 @@
 import { Stack } from "@mui/material";
 import React, { useState } from "react";
-import { CustomRangeDatepicker } from "../../components/shared/RangeDatepicker/CustomRangeDatepicker";
+import { CustomRangeDatepicker } from "../../components/shared/CustomDatepickers/CustomRangeDatepicker";
 import { SelectGuestsDropdown } from "./FiltersBar/SelectGuestsDropdown";
 import { CustomSelect } from "../../components/shared/FormElements/CustomSelect";
 import { theme } from "../../../theme";

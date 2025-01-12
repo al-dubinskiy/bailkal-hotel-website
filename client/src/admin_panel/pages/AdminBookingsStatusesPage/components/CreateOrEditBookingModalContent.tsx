@@ -20,7 +20,7 @@ import { useAppDispatch, useAppSelector } from "../../../../hooks/redux";
 import { CustomCounterButton } from "../../../../pages/components/shared/CustomCounterButton";
 import { dateTimeFormat } from "../../../../constants";
 import moment from "moment";
-import { CustomRangeDatepicker } from "../../../../pages/components/shared/RangeDatepicker/CustomRangeDatepicker";
+import { CustomRangeDatepicker } from "../../../../pages/components/shared/CustomDatepickers/CustomRangeDatepicker";
 import {
   getPrevArrivalTime,
   getPrevDepartureTime,

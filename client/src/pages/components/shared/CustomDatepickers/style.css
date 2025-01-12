@@ -197,6 +197,10 @@ input.range-date-picker.focused {
     background-color: #B1CFFF !important;
 }
 
+.react-datepicker__day--today.react-datepicker__day--selected {
+    color: #1a1a1a;
+}
+
 .react-datepicker__day--in-selecting-range {
     background-color: #B1CFFF !important;
 }

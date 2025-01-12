@@ -114,14 +114,13 @@ router.put("/:id", async (req, res) => {
 // Delete booking
 router.delete("/:id", async (req, res) => {
   try {
-    const deleteBooking = Booking.deleteOne({ id: req.params.id });
+    const deleteBooking = await Booking.findByIdAndDelete(req.params.id);
 
     if (!deleteBooking) {
       return res.status(404).json({
         error: "Delete booking: статус 404. Бронированиe не найдено.",
       });
     }
-
     return res.status(200).json({
       message: `Delete booking: статус 201. Бронирование было успешно удалено.`,
     });

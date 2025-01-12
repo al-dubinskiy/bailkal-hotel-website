@@ -16,10 +16,10 @@ interface Props {
   label?: string;
   modes: ToogleButtonModeType[] | any;
   setMode: (val: ToogleButtonModeType[] | any) => void;
-  contentStyle?: SxProps;
   buttonsDirection?: "row" | "column";
   isCanUnchecked?: boolean;
   helperText?: string;
+  contentStyles?: SxProps;
 }
 
 export const ToogleModeButton = (props: Props) => {
@@ -27,10 +27,10 @@ export const ToogleModeButton = (props: Props) => {
     label,
     modes,
     setMode,
-    contentStyle,
     buttonsDirection = "row",
     isCanUnchecked = true,
     helperText,
+    contentStyles,
   } = props;
 
   const changeModeHandler = (val: ToogleButtonModeType) => {
@@ -63,6 +63,7 @@ export const ToogleModeButton = (props: Props) => {
           columnGap: "24px",
           rowGap: "10px",
           width: { xs: "100%", md: "max-content" },
+          ...contentStyles,
         }}
       >
         {label ? <Typography variant="label">{label}</Typography> : null}

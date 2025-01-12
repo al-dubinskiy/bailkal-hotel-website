@@ -22,6 +22,11 @@ export type CreateUnavailableBookingDateApiResponseType = {
   data: UnavailableBookingDateType;
 };
 
+export type RewriteUnavailableBookingDateApiResponseType = {
+  success: boolean;
+  data: UnavailableBookingDateType[];
+};
+
 export type UpdateUnavailableBookingDateApiResponseType = {
   success: boolean;
   data: UnavailableBookingDateType;
