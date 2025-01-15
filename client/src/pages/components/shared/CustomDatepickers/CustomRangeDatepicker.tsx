@@ -106,12 +106,12 @@ export const CustomRangeDatepicker = memo((props: Props) => {
           bookings,
           roomsCategories,
           unavailableBookingDates,
+          isForCalendar: true,
         });
         if (b) {
           a.push(b);
         }
       });
-      console.log(a);
       return a;
     }
   }, [datesInRange, unavailableBookingDates, roomsCategories, bookings]);

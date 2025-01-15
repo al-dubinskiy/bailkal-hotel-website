@@ -5,11 +5,13 @@ import { v4 as uuidv4 } from "uuid";
 import {
   resetCreateBookingState,
   setBookingSteps,
+  setCategoriesAvailableRoomsCount,
   setFilterParams,
   setNewBookings,
 } from "../../../redux/slices/Bookings/bookingsSlice";
 import { useAppDispatch, useAppSelector } from "../../../hooks/redux";
 import { useHistory } from "react-router-dom";
+import { getCategoriesAvailableRoomsCount } from "../utils";
 
 interface Props {
   open: boolean;
@@ -21,9 +23,12 @@ export const WishCreateNewBooking = (props: Props) => {
   const history = useHistory();
 
   const dispatch = useAppDispatch();
-  const { filterParams, createBooking } = useAppSelector(
-    (state) => state.bookings
-  );
+  const {
+    filterParams,
+    createBooking,
+    bookings,
+    categoriesAvailableRoomsCount,
+  } = useAppSelector((state) => state.bookings);
 
   const createNewBooking = () => {
     dispatch(setBookingSteps([]));
@@ -40,6 +45,16 @@ export const WishCreateNewBooking = (props: Props) => {
       })
     );
     dispatch(resetCreateBookingState());
+    if (categoriesAvailableRoomsCount) {
+      dispatch(
+        setCategoriesAvailableRoomsCount(
+          categoriesAvailableRoomsCount?.map((i) => ({
+            ...i,
+            newBookingsIds: [],
+          }))
+        )
+      );
+    }
   };
 
   return (

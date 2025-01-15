@@ -273,10 +273,12 @@ export const getCategoriesAvailableRoomsCount = ({
   roomsCategories,
   arrivalDate,
   departureDate,
+  isForCalendar = false,
 }: {
   unavailableBookingDates: UnavailableBookingDateType[];
   bookings: BookingType[];
   roomsCategories: RoomCategoryType[];
+  isForCalendar?: boolean;
 } & BookingDateType): RoomCategoryPriceType[] | null => {
   const sortedBookingsByRoomCategories = sortBookingsByRoomCategories({
     bookings,
@@ -319,13 +321,38 @@ export const getCategoriesAvailableRoomsCount = ({
           // Подсчет ранее забронированных комнат, диапазону ("дата заезда/выезда")
           // которых принадлежит дата (с фильтра), переданная в ф-цию
           // (а значит на эту дату можно забронировать меньше комнат или вообще ни одной)
+
+          if (arrivalDate.format(dateFormat) === "2025-01-15") {
+            // console.log({
+            //   start1: moment(moment(i.arrival_datetime).format(dateFormat)),
+            //   end1: moment(moment(i.departure_datetime).format(dateFormat)),
+            //   start2: arrivalDate,
+            //   end2: departureDate,
+            // });
+            // console.log(
+            //   isDateTimeRangeContained({
+            //     start1: moment(moment(i.arrival_datetime).format(dateFormat)),
+            //     end1: moment(moment(i.departure_datetime).format(dateFormat)),
+            //     start2: arrivalDate,
+            //     end2: departureDate,
+            //   })
+            // );
+          }
           if (
-            isDateTimeRangeContained({
-              start1: moment(arrivalDate.format(dateFormat)),
-              end1: moment(departureDate.format(dateFormat)),
-              start2: moment(moment(i.arrival_datetime).format(dateFormat)),
-              end2: moment(moment(i.departure_datetime).format(dateFormat)),
-            })
+            (!isForCalendar &&
+              isDateTimeRangeContained({
+                start1: moment(arrivalDate.format(dateFormat)),
+                end1: moment(departureDate.format(dateFormat)),
+                start2: moment(moment(i.arrival_datetime).format(dateFormat)),
+                end2: moment(moment(i.departure_datetime).format(dateFormat)),
+              })) ||
+            (isForCalendar &&
+              isDateTimeRangeContained({
+                start1: moment(moment(i.arrival_datetime).format(dateFormat)),
+                end1: moment(moment(i.departure_datetime).format(dateFormat)),
+                start2: arrivalDate,
+                end2: departureDate,
+              }))
           ) {
             bookedOnDateCount += 1;
           }
@@ -342,9 +369,10 @@ export const getCategoriesAvailableRoomsCount = ({
         });
       }
     });
-    // Получение id "категорий комнат" на которые забронированы комнаты
+
+    // // Получение id "категорий комнат" на которые забронированы комнаты
     const bookedOnCategoriesIds = Object.keys(sortedBookingsByRoomCategories);
-    // Добавить "категории комнат" на которые еще нет забронированных комнат
+    // // Добавить "категории комнат" на которые еще нет забронированных комнат
     roomsCategories.map((roomCategory: RoomCategoryType) =>
       !bookedOnCategoriesIds.includes(roomCategory._id)
         ? categoriesAvailableRoomsCount.push({
@@ -374,12 +402,15 @@ export const checkDateAvailable = ({
   unavailableBookingDates,
   bookings,
   roomsCategories,
+  isForCalendar = false,
 }: {
   date: Moment;
   specificRoomCategoryId?: string;
   unavailableBookingDates: UnavailableBookingDateType[];
   bookings: BookingType[];
   roomsCategories: RoomCategoryType[];
+
+  isForCalendar?: boolean;
 }): CheckDateAvailableType | null => {
   if (unavailableBookingDates) {
     // Определение доступных категорий комнат
@@ -388,7 +419,8 @@ export const checkDateAvailable = ({
       bookings,
       roomsCategories: roomsCategories,
       arrivalDate: date,
-      departureDate: date.add(1, "days"),
+      departureDate: date,
+      isForCalendar,
     });
 
     if (categoriesAvailableRoomsCount && categoriesAvailableRoomsCount.length) {
@@ -404,7 +436,18 @@ export const checkDateAvailable = ({
         };
       }
       // Определение минимальной стоимости комнаты
-      const prices = Array.from(categoriesAvailableRoomsCount, (i) => i.price);
+      let prices = [];
+
+      if (isForCalendar) {
+        prices = Array.from(
+          categoriesAvailableRoomsCount.filter(
+            (i) => i.earlyBookingsCount < i.roomsTotal
+          ),
+          (i) => i.price
+        );
+      } else {
+        prices = Array.from(categoriesAvailableRoomsCount, (i) => i.price);
+      }
       const roomMinPrice = Math.min(...prices);
 
       return {
